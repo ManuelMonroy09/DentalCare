@@ -66,7 +66,7 @@ public class MainController {
 
     @FXML
     private void mostrarHistorial() {
-        mostrarMensaje("Historial", "Módulo de historial próximamente.");
+        cargarVista("/ui/fxml/HistorialView.fxml");
     }
 
     @FXML
@@ -75,20 +75,17 @@ public class MainController {
     }
 
     private void cargarVista(String ruta) {
-
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(ruta));
             loader.setControllerFactory(context::getBean);
             Parent view = loader.load();
             contentArea.getChildren().setAll(view);
-
         } catch (Exception e) {
             throw new RuntimeException("No fue posible cargar la vista: " + ruta, e);
         }
     }
 
     private void mostrarMensaje(String titulo, String mensaje) {
-
         Label title = new Label(titulo);
         title.getStyleClass().add("page-title");
         Label description = new Label(mensaje);

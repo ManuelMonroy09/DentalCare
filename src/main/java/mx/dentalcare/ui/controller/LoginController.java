@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -20,8 +21,12 @@ import org.springframework.stereotype.Component;
 public class LoginController {
 
     @FXML private StackPane authRoot;
+    @FXML private HBox authShell;
     @FXML private PasswordField txtPassword;
     @FXML private Label lblError;
+
+    private double mouseOffsetX;
+    private double mouseOffsetY;
 
     private final AuthenticationService authenticationService;
     private final ApplicationContext context;
@@ -37,6 +42,20 @@ public class LoginController {
         if (!authRoot.getStylesheets().contains(overrides)) {
             authRoot.getStylesheets().add(overrides);
         }
+    }
+
+    @FXML
+    private void iniciarMovimientoVentana(javafx.scene.input.MouseEvent event) {
+        Stage stage = (Stage) authRoot.getScene().getWindow();
+        mouseOffsetX = event.getScreenX() - stage.getX();
+        mouseOffsetY = event.getScreenY() - stage.getY();
+    }
+
+    @FXML
+    private void moverVentana(javafx.scene.input.MouseEvent event) {
+        Stage stage = (Stage) authRoot.getScene().getWindow();
+        stage.setX(event.getScreenX() - mouseOffsetX);
+        stage.setY(event.getScreenY() - mouseOffsetY);
     }
 
     @FXML

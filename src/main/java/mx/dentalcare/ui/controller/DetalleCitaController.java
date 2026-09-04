@@ -5,16 +5,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ButtonType;
+import javafx.scene.control.Button;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import mx.dentalcare.domain.cita.Cita;
-import mx.dentalcare.domain.cita.EstadoCita;
 import mx.dentalcare.domain.tratamiento.TratamientoAplicado;
-import mx.dentalcare.service.CitaService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +23,7 @@ import java.util.stream.Collectors;
 public class DetalleCitaController {
 
     private static final double ANCHO_VENTANA = 620;
-    private static final double ALTO_VENTANA = 720;
+    private static final double ALTO_VENTANA = 620;
 
     @FXML private Label lblPaciente;
     @FXML private Label lblFecha;
@@ -38,15 +34,10 @@ public class DetalleCitaController {
     @FXML private Label lblTotalTratamientos;
     @FXML private Label lblNotas;
     @FXML private Label lblEstado;
-    @FXML private Button btnConfirmar;
-    @FXML private Button btnAtendida;
-    @FXML private Button btnNoAsistio;
-    @FXML private Button btnCancelarCita;
     @FXML private Button btnEditar;
     @FXML private Button btnCerrar;
 
     private final ApplicationContext applicationContext;
-    private final CitaService citaService;
     private Cita cita;
 
     private static final DateTimeFormatter FORMATO_FECHA =
@@ -54,21 +45,14 @@ public class DetalleCitaController {
     private static final DateTimeFormatter FORMATO_HORA =
             DateTimeFormatter.ofPattern("HH:mm");
 
-    public DetalleCitaController(
-            ApplicationContext applicationContext,
-            CitaService citaService) {
+    public DetalleCitaController(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
-        this.citaService = citaService;
     }
 
     @FXML
     public void initialize() {
         btnCerrar.setOnAction(event -> cerrarVentana());
         btnEditar.setOnAction(event -> editarCita());
-        btnConfirmar.setOnAction(event -> confirmarCita());
-        btnAtendida.setOnAction(event -> marcarAtendida());
-        btnNoAsistio.setOnAction(event -> marcarNoAsistio());
-        btnCancelarCita.setOnAction(event -> cancelarCita());
     }
 
     public void setCita(Cita cita) {
@@ -138,93 +122,6 @@ public class DetalleCitaController {
                 ? cita.getNotas()
                 : "Sin notas");
         lblEstado.setText(formatearEstado(cita));
-        actualizarAccionesEstado();
-    }
-
-    private void actualizarAccionesEstado() {
-        EstadoCita estado = cita != null ? cita.getEstado() : null;
-        boolean terminal = estado == EstadoCita.ATENDIDA
-                || estado == EstadoCita.CANCELADA
-                || estado == EstadoCita.NO_ASISTIO;
-
-        btnConfirmar.setDisable(terminal || estado == EstadoCita.CONFIRMADA);
-        btnAtendida.setDisable(terminal);
-        btnNoAsistio.setDisable(terminal);
-        btnCancelarCita.setDisable(terminal);
-    }
-
-    private void confirmarCita() {
-        if (cita == null || cita.getId() == null) {
-            return;
-        }
-
-        try {
-            cita = citaService.confirmar(cita.getId());
-            mostrarCita();
-        } catch (Exception e) {
-            mostrarError("No fue posible confirmar la cita.", e.getMessage());
-        }
-    }
-
-    private void marcarAtendida() {
-        if (cita == null || cita.getId() == null) {
-            return;
-        }
-
-        try {
-            cita = citaService.marcarAtendida(cita.getId());
-            mostrarCita();
-        } catch (Exception e) {
-            mostrarError("No fue posible marcar la cita como atendida.", e.getMessage());
-        }
-    }
-
-    private void marcarNoAsistio() {
-        if (!confirmarAccion(
-                "Registrar inasistencia",
-                "¿Deseas registrar que el paciente no asistió a esta cita?")) {
-            return;
-        }
-
-        try {
-            cita = citaService.marcarNoAsistio(cita.getId());
-            mostrarCita();
-        } catch (Exception e) {
-            mostrarError("No fue posible registrar la inasistencia.", e.getMessage());
-        }
-    }
-
-    private void cancelarCita() {
-        if (!confirmarAccion(
-                "Cancelar cita",
-                "¿Deseas cancelar esta cita?")) {
-            return;
-        }
-
-        try {
-            cita = citaService.cancelar(cita.getId());
-            mostrarCita();
-        } catch (Exception e) {
-            mostrarError("No fue posible cancelar la cita.", e.getMessage());
-        }
-    }
-
-    private boolean confirmarAccion(String titulo, String mensaje) {
-        Alert alerta = new Alert(Alert.AlertType.CONFIRMATION);
-        alerta.setTitle(titulo);
-        alerta.setHeaderText(null);
-        alerta.setContentText(mensaje);
-        return alerta.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK;
-    }
-
-    private void mostrarError(String encabezado, String detalle) {
-        Alert alerta = new Alert(Alert.AlertType.ERROR);
-        alerta.setTitle("DentalCare");
-        alerta.setHeaderText(encabezado);
-        alerta.setContentText(detalle != null && !detalle.isBlank()
-                ? detalle
-                : "Ocurrió un error inesperado.");
-        alerta.showAndWait();
     }
 
     private void editarCita() {

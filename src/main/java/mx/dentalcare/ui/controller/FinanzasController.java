@@ -240,7 +240,7 @@ public class FinanzasController {
     }
 
     private String moneda(BigDecimal valor) { return "$" + (valor == null ? "0.00" : valor.setScale(2, RoundingMode.HALF_UP).toPlainString()); }
-    private String valor(String valor) { return valor == null ? "" : valor; }
+    private String valor(Object valor) { return valor == null ? "" : String.valueOf(valor); }
     private boolean vacio(String valor) { return valor == null || valor.isBlank(); }
 
     private void mostrarError(String titulo, String mensaje) {

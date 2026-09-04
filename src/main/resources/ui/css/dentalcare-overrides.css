@@ -200,35 +200,42 @@
    LOGIN - BOTÓN PRINCIPAL
    ========================================================= */
 
-.auth-login-button {
+.button.auth-login-button {
     -fx-background-color: #2563eb;
+    -fx-background-insets: 0;
+    -fx-background-radius: 9px;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-border-radius: 9px;
     -fx-text-fill: white;
-    -fx-pref-height: 46px;
-    -fx-min-height: 46px;
-    -fx-max-height: 46px;
     -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-padding: 0 24px;
-    -fx-background-radius: 9px;
-    -fx-border-radius: 9px;
-    -fx-border-color: transparent;
+    -fx-pref-width: 300px;
+    -fx-min-width: 300px;
+    -fx-max-width: 300px;
+    -fx-pref-height: 46px;
+    -fx-min-height: 46px;
+    -fx-max-height: 46px;
     -fx-cursor: hand;
 }
 
-.auth-login-button:hover {
+.button.auth-login-button:hover {
     -fx-background-color: #1d4ed8;
 }
 
-.auth-login-button:pressed {
+.button.auth-login-button:pressed {
     -fx-background-color: #1e40af;
 }
 
-.auth-login-button:focused {
+.button.auth-login-button:focused {
+    -fx-background-color: #2563eb;
     -fx-border-color: #93c5fd;
     -fx-border-width: 2px;
 }
 
-.auth-login-button:disabled {
+.button.auth-login-button:disabled {
+    -fx-background-color: #2563eb;
     -fx-opacity: 0.65;
 }
 

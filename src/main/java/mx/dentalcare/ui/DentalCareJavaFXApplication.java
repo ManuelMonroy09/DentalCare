@@ -26,23 +26,31 @@ public class DentalCareJavaFXApplication extends Application {
         AuthenticationService authenticationService = context.getBean(AuthenticationService.class);
 
         if (authenticationService.isConfigured()) {
-            mostrarVista(stage, "/ui/fxml/LoginView.fxml", "DentalCare | Iniciar sesión");
+            mostrarVista(stage, "/ui/fxml/LoginView.fxml", "DentalCare | Iniciar sesión", 960, 620);
         } else {
-            mostrarVista(stage, "/ui/fxml/SetupView.fxml", "DentalCare | Configuración inicial");
+            mostrarVista(stage, "/ui/fxml/SetupView.fxml", "DentalCare | Configuración inicial", 1200, 750);
         }
     }
 
-    private void mostrarVista(Stage stage, String ruta, String titulo) throws Exception {
+    private void mostrarVista(Stage stage, String ruta, String titulo, double ancho, double alto) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource(ruta));
         loader.setControllerFactory(context::getBean);
 
         Parent root = loader.load();
-        Scene scene = new Scene(root, 1200, 750);
+        Scene scene = new Scene(root, ancho, alto);
 
         stage.setTitle(titulo);
         stage.setScene(scene);
-        stage.setMinWidth(1000);
-        stage.setMinHeight(650);
+
+        if (ruta.endsWith("LoginView.fxml")) {
+            stage.setMinWidth(960);
+            stage.setMinHeight(620);
+            stage.setResizable(false);
+        } else {
+            stage.setMinWidth(1000);
+            stage.setMinHeight(650);
+        }
+
         stage.show();
     }
 

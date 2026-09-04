@@ -12,100 +12,42 @@
         xmlns="http://javafx.com/javafx/21"
         xmlns:fx="http://javafx.com/fxml/1"
         fx:controller="mx.dentalcare.ui.controller.MainController"
-        stylesheets="@../css/dentalcare.css"
         styleClass="root">
 
-    <top>
+    <stylesheets>
+        <String fx:value="@../css/dentalcare.css"/>
+        <String fx:value="@../css/dentalcare-overrides.css"/>
+    </stylesheets>
 
+    <top>
         <HBox
                 alignment="CENTER_LEFT"
                 spacing="15"
                 styleClass="header">
-
-            <Label
-                    text="DentalCare"
-                    styleClass="logo"/>
-
-            <HBox
-                    HBox.hgrow="ALWAYS"/>
-
-            <Label
-                    text="Administrador"
-                    styleClass="user-name"/>
-
-            <Button
-                    text="⚙"
-                    styleClass="icon-button"/>
-
+            <Label text="DentalCare" styleClass="logo"/>
+            <HBox HBox.hgrow="ALWAYS"/>
+            <Label text="Administrador" styleClass="user-name"/>
+            <Button text="⚙" styleClass="icon-button"/>
         </HBox>
-
     </top>
 
     <left>
-
-        <VBox
-                spacing="8"
-                styleClass="sidebar">
-
+        <VBox spacing="8" styleClass="sidebar">
             <padding>
-
-                <Insets
-                        top="20"
-                        right="15"
-                        bottom="20"
-                        left="15"/>
-
+                <Insets top="20" right="15" bottom="20" left="15"/>
             </padding>
-
-            <Button
-                    fx:id="inicioButton"
-                    text="⌂   Inicio"
-                    onAction="#mostrarInicio"
-                    styleClass="menu-button"/>
-
-            <Button
-                    fx:id="pacientesButton"
-                    text="♟   Pacientes"
-                    onAction="#mostrarPacientes"
-                    styleClass="menu-button"/>
-
-            <Button
-                    fx:id="citasButton"
-                    text="▣   Citas"
-                    onAction="#mostrarCitas"
-                    styleClass="menu-button"/>
-
-            <Button
-                    fx:id="tratamientosButton"
-                    text="✚   Tratamientos"
-                    onAction="#mostrarTratamientos"
-                    styleClass="menu-button"/>
-
-            <Button
-                    fx:id="historialButton"
-                    text="☷   Historial"
-                    onAction="#mostrarHistorial"
-                    styleClass="menu-button"/>
-
-            <VBox
-                    VBox.vgrow="ALWAYS"/>
-
-            <Button
-                    fx:id="configuracionButton"
-                    text="⚙   Configuración"
-                    onAction="#mostrarConfiguracion"
-                    styleClass="menu-button"/>
-
+            <Button fx:id="inicioButton" text="⌂   Inicio" onAction="#mostrarInicio" styleClass="menu-button"/>
+            <Button fx:id="pacientesButton" text="♟   Pacientes" onAction="#mostrarPacientes" styleClass="menu-button"/>
+            <Button fx:id="citasButton" text="▣   Citas" onAction="#mostrarCitas" styleClass="menu-button"/>
+            <Button fx:id="tratamientosButton" text="✚   Tratamientos" onAction="#mostrarTratamientos" styleClass="menu-button"/>
+            <Button fx:id="historialButton" text="☷   Historial" onAction="#mostrarHistorial" styleClass="menu-button"/>
+            <VBox VBox.vgrow="ALWAYS"/>
+            <Button fx:id="configuracionButton" text="⚙   Configuración" onAction="#mostrarConfiguracion" styleClass="menu-button"/>
         </VBox>
-
     </left>
 
     <center>
-
-        <StackPane
-                fx:id="contentArea"
-                styleClass="content-area"/>
-
+        <StackPane fx:id="contentArea" styleClass="content-area"/>
     </center>
 
 </BorderPane>

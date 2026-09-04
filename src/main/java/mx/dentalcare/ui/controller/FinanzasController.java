@@ -3,12 +3,17 @@ package mx.dentalcare.ui.controller;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.print.PrinterJob;
+import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
+import mx.dentalcare.domain.configuracion.ConfiguracionConsultorio;
 import mx.dentalcare.domain.financiero.Cargo;
 import mx.dentalcare.domain.financiero.EstadoCargo;
 import mx.dentalcare.domain.financiero.MetodoPago;
 import mx.dentalcare.domain.financiero.Pago;
 import mx.dentalcare.domain.paciente.Paciente;
+import mx.dentalcare.service.ConfiguracionService;
 import mx.dentalcare.service.FinanzasService;
 import mx.dentalcare.service.PacientesService;
 import org.springframework.stereotype.Component;
@@ -37,13 +42,15 @@ public class FinanzasController {
 
     private final FinanzasService finanzasService;
     private final PacientesService pacientesService;
+    private final ConfiguracionService configuracionService;
     private final Map<Long, Paciente> pacientes = new HashMap<>();
     private static final DateTimeFormatter FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter FECHA_HORA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-    public FinanzasController(FinanzasService finanzasService, PacientesService pacientesService) {
+    public FinanzasController(FinanzasService finanzasService, PacientesService pacientesService, ConfiguracionService configuracionService) {
         this.finanzasService = finanzasService;
         this.pacientesService = pacientesService;
+        this.configuracionService = configuracionService;
     }
 
     @FXML
@@ -54,18 +61,14 @@ public class FinanzasController {
     }
 
     private void configurarTabla() {
-        // Hace que las columnas ocupen todo el ancho disponible sin dejar una franja vacía.
         cargosTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
-
-        fechaColumn.setCellValueFactory(data -> new SimpleStringProperty(
-                data.getValue().getFecha() == null ? "" : data.getValue().getFecha().format(FECHA)));
+        fechaColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getFecha() == null ? "" : data.getValue().getFecha().format(FECHA)));
         pacienteColumn.setCellValueFactory(data -> new SimpleStringProperty(nombrePaciente(data.getValue().getPacienteId())));
         conceptoColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getConcepto()));
         importeColumn.setCellValueFactory(data -> new SimpleStringProperty(moneda(data.getValue().getImporte())));
         pagadoColumn.setCellValueFactory(data -> new SimpleStringProperty(moneda(finanzasService.obtenerTotalPagado(data.getValue().getId()))));
         pendienteColumn.setCellValueFactory(data -> new SimpleStringProperty(moneda(finanzasService.obtenerSaldoPendiente(data.getValue().getId()))));
-        estadoColumn.setCellValueFactory(data -> new SimpleStringProperty(
-                finanzasService.obtenerEstadoCargo(data.getValue().getId()).getDescripcion()));
+        estadoColumn.setCellValueFactory(data -> new SimpleStringProperty(finanzasService.obtenerEstadoCargo(data.getValue().getId()).getDescripcion()));
     }
 
     @FXML
@@ -73,9 +76,7 @@ public class FinanzasController {
         try {
             int creados = finanzasService.generarCargosPendientes();
             cargarDatos();
-            mensajeLabel.setText(creados == 0
-                    ? "No hay nuevos cargos por generar."
-                    : creados + " cargo(s) sincronizado(s).");
+            mensajeLabel.setText(creados == 0 ? "No hay nuevos cargos por generar." : creados + " cargo(s) sincronizado(s).");
         } catch (IllegalStateException | IllegalArgumentException ex) {
             mensajeLabel.setText(ex.getMessage());
         }
@@ -84,16 +85,9 @@ public class FinanzasController {
     @FXML
     private void registrarPago() {
         Cargo cargo = cargosTable.getSelectionModel().getSelectedItem();
-        if (cargo == null) {
-            mensajeLabel.setText("Selecciona un cargo para registrar un pago.");
-            return;
-        }
-
+        if (cargo == null) { mensajeLabel.setText("Selecciona un cargo para registrar un pago."); return; }
         BigDecimal pendiente = finanzasService.obtenerSaldoPendiente(cargo.getId());
-        if (pendiente.compareTo(BigDecimal.ZERO) <= 0) {
-            mensajeLabel.setText("El cargo seleccionado ya está pagado.");
-            return;
-        }
+        if (pendiente.compareTo(BigDecimal.ZERO) <= 0) { mensajeLabel.setText("El cargo seleccionado ya está pagado."); return; }
 
         TextInputDialog montoDialog = new TextInputDialog(pendiente.toPlainString());
         montoDialog.setTitle("Registrar pago");
@@ -103,12 +97,8 @@ public class FinanzasController {
         if (montoResultado.isEmpty()) return;
 
         BigDecimal monto;
-        try {
-            monto = new BigDecimal(montoResultado.get().trim().replace(",", "."));
-        } catch (NumberFormatException ex) {
-            mensajeLabel.setText("El monto no tiene un formato válido.");
-            return;
-        }
+        try { monto = new BigDecimal(montoResultado.get().trim().replace(",", ".")); }
+        catch (NumberFormatException ex) { mensajeLabel.setText("El monto no tiene un formato válido."); return; }
 
         ChoiceDialog<MetodoPago> metodoDialog = new ChoiceDialog<>(MetodoPago.EFECTIVO, MetodoPago.values());
         metodoDialog.setTitle("Método de pago");
@@ -118,27 +108,84 @@ public class FinanzasController {
         if (metodoResultado.isEmpty()) return;
 
         try {
-            finanzasService.registrarPago(cargo.getId(), monto, metodoResultado.get(), null);
+            Pago pago = finanzasService.registrarPago(cargo.getId(), monto, metodoResultado.get(), null);
             cargarDatos();
             mensajeLabel.setText("Pago registrado correctamente.");
+            ofrecerImpresion(pago, cargo);
         } catch (IllegalArgumentException | IllegalStateException ex) {
             mensajeLabel.setText(ex.getMessage());
         }
     }
 
+    private void ofrecerImpresion(Pago pago, Cargo cargo) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Pago registrado");
+        alert.setHeaderText("Pago registrado correctamente");
+        alert.setContentText("¿Deseas imprimir el recibo para el paciente?");
+        ButtonType imprimir = new ButtonType("Imprimir");
+        ButtonType despues = new ButtonType("Ahora no", ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().setAll(imprimir, despues);
+        if (alert.showAndWait().orElse(despues) == imprimir) imprimirRecibo(pago, cargo);
+    }
+
+    @FXML
+    private void imprimirRecibo() {
+        Cargo cargo = cargosTable.getSelectionModel().getSelectedItem();
+        if (cargo == null) { mensajeLabel.setText("Selecciona un cargo para imprimir su recibo."); return; }
+        List<Pago> pagos = finanzasService.obtenerPagosPorCargo(cargo.getId());
+        if (pagos.isEmpty()) { mensajeLabel.setText("El cargo seleccionado no tiene pagos registrados."); return; }
+        imprimirRecibo(pagos.get(0), cargo);
+    }
+
+    private void imprimirRecibo(Pago pago, Cargo cargo) {
+        ConfiguracionConsultorio configuracion = configuracionService.obtener();
+        Paciente paciente = pacientes.get(cargo.getPacienteId());
+        String nombre = paciente == null ? "Paciente #" + cargo.getPacienteId() : nombrePaciente(cargo.getPacienteId());
+        BigDecimal pendiente = finanzasService.obtenerSaldoPendiente(cargo.getId());
+
+        VBox ticket = new VBox(6);
+        ticket.setPrefWidth(280);
+        ticket.setStyle("-fx-background-color: white; -fx-padding: 16px; -fx-font-family: 'Segoe UI';");
+        agregarTexto(ticket, valor(configuracion.getNombreConsultorio()), "-fx-font-size: 18px; -fx-font-weight: bold; -fx-alignment: center;");
+        if (!vacio(configuracion.getNombreOdontologo())) agregarTexto(ticket, configuracion.getNombreOdontologo(), "-fx-font-size: 12px; -fx-alignment: center;");
+        if (!vacio(configuracion.getDireccion())) agregarTexto(ticket, configuracion.getDireccion(), "-fx-font-size: 11px; -fx-alignment: center;");
+        if (!vacio(configuracion.getTelefono())) agregarTexto(ticket, "Tel. " + configuracion.getTelefono(), "-fx-font-size: 11px; -fx-alignment: center;");
+        if (!vacio(configuracion.getEmail())) agregarTexto(ticket, configuracion.getEmail(), "-fx-font-size: 11px; -fx-alignment: center;");
+        agregarTexto(ticket, "RECIBO DE PAGO", "-fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 8px 0 4px 0;");
+        agregarTexto(ticket, "Folio de pago: #" + valor(pago.getId()), "-fx-font-size: 11px;");
+        agregarTexto(ticket, "Fecha: " + (pago.getFecha() == null ? "" : pago.getFecha().format(FECHA_HORA)), "-fx-font-size: 11px;");
+        agregarTexto(ticket, "Paciente: " + nombre, "-fx-font-size: 11px;");
+        agregarTexto(ticket, "Concepto: " + valor(cargo.getConcepto()), "-fx-font-size: 11px; -fx-wrap-text: true;");
+        agregarTexto(ticket, "Método: " + (pago.getMetodoPago() == null ? "" : pago.getMetodoPago().getDescripcion()), "-fx-font-size: 11px;");
+        agregarTexto(ticket, "--------------------------------", "-fx-font-size: 10px;");
+        agregarTexto(ticket, "Cargo total:  " + moneda(cargo.getImporte()), "-fx-font-size: 11px;");
+        agregarTexto(ticket, "Pago recibido: " + moneda(pago.getMonto()), "-fx-font-size: 13px; -fx-font-weight: bold;");
+        agregarTexto(ticket, "Saldo pendiente: " + moneda(pendiente), "-fx-font-size: 11px;");
+        if (!vacio(configuracion.getPieRecibo())) agregarTexto(ticket, configuracion.getPieRecibo(), "-fx-font-size: 11px; -fx-padding: 10px 0 0 0; -fx-wrap-text: true;");
+
+        PrinterJob job = PrinterJob.createPrinterJob();
+        if (job == null) { mostrarError("Impresión", "No hay una impresora disponible en el sistema."); return; }
+        if (!job.showPrintDialog(cargosTable.getScene().getWindow())) return;
+        boolean impreso = job.printPage(ticket);
+        if (impreso) job.endJob(); else mostrarError("Impresión", "No fue posible enviar el recibo a la impresora.");
+    }
+
+    private void agregarTexto(VBox contenedor, String texto, String estilo) {
+        Label label = new Label(texto);
+        label.setWrapText(true);
+        label.setMaxWidth(Double.MAX_VALUE);
+        label.setStyle(estilo);
+        contenedor.getChildren().add(label);
+    }
+
     @FXML
     private void verDetalle() {
         Cargo cargo = cargosTable.getSelectionModel().getSelectedItem();
-        if (cargo == null) {
-            mensajeLabel.setText("Selecciona un cargo para ver su detalle.");
-            return;
-        }
-
+        if (cargo == null) { mensajeLabel.setText("Selecciona un cargo para ver su detalle."); return; }
         BigDecimal pagado = finanzasService.obtenerTotalPagado(cargo.getId());
         BigDecimal pendiente = finanzasService.obtenerSaldoPendiente(cargo.getId());
         EstadoCargo estado = finanzasService.obtenerEstadoCargo(cargo.getId());
         List<Pago> pagos = finanzasService.obtenerPagosPorCargo(cargo.getId());
-
         StringBuilder detalle = new StringBuilder();
         detalle.append("Paciente: ").append(nombrePaciente(cargo.getPacienteId())).append("\n")
                 .append("Fecha: ").append(cargo.getFecha() == null ? "" : cargo.getFecha().format(FECHA_HORA)).append("\n")
@@ -147,33 +194,20 @@ public class FinanzasController {
                 .append("Total pagado: ").append(moneda(pagado)).append("\n")
                 .append("Saldo pendiente: ").append(moneda(pendiente)).append("\n")
                 .append("Estado: ").append(estado.getDescripcion()).append("\n\n")
-                .append("Historial de pagos").append("\n");
-
-        if (pagos.isEmpty()) {
-            detalle.append("Sin pagos registrados.");
-        } else {
-            for (Pago pago : pagos) {
-                detalle.append("• ")
-                        .append(pago.getFecha() == null ? "" : pago.getFecha().format(FECHA_HORA))
-                        .append(" | ").append(moneda(pago.getMonto()))
-                        .append(" | ").append(pago.getMetodoPago() == null ? "Sin método" : pago.getMetodoPago().getDescripcion())
-                        .append("\n");
-                if (pago.getNotas() != null && !pago.getNotas().isBlank()) {
-                    detalle.append("  Nota: ").append(pago.getNotas()).append("\n");
-                }
-            }
+                .append("Historial de pagos\n");
+        if (pagos.isEmpty()) detalle.append("Sin pagos registrados.");
+        else for (Pago pago : pagos) {
+            detalle.append("• ").append(pago.getFecha() == null ? "" : pago.getFecha().format(FECHA_HORA)).append(" | ")
+                    .append(moneda(pago.getMonto())).append(" | ")
+                    .append(pago.getMetodoPago() == null ? "Sin método" : pago.getMetodoPago().getDescripcion()).append("\n");
+            if (pago.getNotas() != null && !pago.getNotas().isBlank()) detalle.append("  Nota: ").append(pago.getNotas()).append("\n");
         }
-
         Alert dialogo = new Alert(Alert.AlertType.INFORMATION);
-        dialogo.setTitle("Detalle del cargo");
-        dialogo.setHeaderText("Cargo #" + cargo.getId());
-        dialogo.setContentText(detalle.toString());
-        dialogo.getDialogPane().setMinWidth(520);
-        dialogo.showAndWait();
+        dialogo.setTitle("Detalle del cargo"); dialogo.setHeaderText("Cargo #" + cargo.getId()); dialogo.setContentText(detalle.toString());
+        dialogo.getDialogPane().setMinWidth(520); dialogo.showAndWait();
     }
 
     private void cargarDatos() {
-        // La sincronización automática conserva la reconciliación de cargos antiguos o faltantes.
         finanzasService.generarCargosPendientes();
         List<Cargo> cargos = finanzasService.obtenerCargos();
         cargosTable.setItems(FXCollections.observableArrayList(cargos));
@@ -185,19 +219,21 @@ public class FinanzasController {
 
     private void cargarPacientes() {
         pacientes.clear();
-        pacientesService.obtenerTodos().forEach(p -> {
-            if (p.getId() != null) pacientes.put(p.getId(), p);
-        });
+        pacientesService.obtenerTodos().forEach(p -> { if (p.getId() != null) pacientes.put(p.getId(), p); });
     }
 
     private String nombrePaciente(Long id) {
         Paciente p = pacientes.get(id);
         if (p == null) return "Paciente #" + (id == null ? "?" : id);
-        return (p.getNombre() + " " + p.getApellidoPaterno() + " " + p.getApellidoMaterno())
-                .trim().replaceAll("\\s+", " ");
+        return (p.getNombre() + " " + p.getApellidoPaterno() + " " + p.getApellidoMaterno()).trim().replaceAll("\\s+", " ");
     }
 
-    private String moneda(BigDecimal valor) {
-        return "$" + (valor == null ? "0.00" : valor.setScale(2).toPlainString());
+    private String moneda(BigDecimal valor) { return "$" + (valor == null ? "0.00" : valor.setScale(2).toPlainString()); }
+    private String valor(String valor) { return valor == null ? "" : valor; }
+    private boolean vacio(String valor) { return valor == null || valor.isBlank(); }
+
+    private void mostrarError(String titulo, String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(titulo); alert.setHeaderText(null); alert.setContentText(mensaje); alert.showAndWait();
     }
 }

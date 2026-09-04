@@ -46,8 +46,9 @@ public class EncryptedFilePacienteRepository implements PacienteRepository {
             boolean idExiste;
 
             do {
+                final Long idBuscado = nuevoId;
                 idExiste = data.getPacientes().stream()
-                        .anyMatch(p -> p.getId() != null && p.getId().equals(nuevoId));
+                        .anyMatch(p -> p.getId() != null && p.getId().equals(idBuscado));
 
                 if (idExiste) {
                     nuevoId++;

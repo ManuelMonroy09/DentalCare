@@ -26,17 +26,22 @@
     <HBox spacing="15">
         <VBox spacing="4" styleClass="stat-card" HBox.hgrow="ALWAYS">
             <Label text="Ingresos de hoy" styleClass="page-subtitle"/>
-            <Label fx:id="ingresosLabel" text="MXN 0.00" styleClass="stat-value"/>
+            <Label fx:id="ingresosLabel" text="$0.00" styleClass="stat-value"/>
         </VBox>
         <VBox spacing="4" styleClass="stat-card" HBox.hgrow="ALWAYS">
             <Label text="Por cobrar" styleClass="page-subtitle"/>
-            <Label fx:id="pendienteLabel" text="MXN 0.00" styleClass="stat-value"/>
+            <Label fx:id="pendienteLabel" text="$0.00" styleClass="stat-value"/>
+        </VBox>
+        <VBox spacing="4" styleClass="stat-card" HBox.hgrow="ALWAYS">
+            <Label text="Cobros de hoy" styleClass="page-subtitle"/>
+            <Label fx:id="cobrosHoyLabel" text="0" styleClass="stat-value"/>
         </VBox>
     </HBox>
 
     <HBox alignment="CENTER_LEFT" spacing="10">
-        <Button text="Generar cargos" onAction="#sincronizarCargos" styleClass="primary-button"/>
-        <Button text="Registrar pago" onAction="#registrarPago" styleClass="secondary-button"/>
+        <Button text="Registrar pago" onAction="#registrarPago" styleClass="primary-button"/>
+        <Button text="Ver detalle" onAction="#verDetalle" styleClass="secondary-button"/>
+        <Button text="Sincronizar cargos" onAction="#sincronizarCargos" styleClass="secondary-button"/>
         <Label fx:id="mensajeLabel" text="" styleClass="page-subtitle" HBox.hgrow="ALWAYS"/>
     </HBox>
 

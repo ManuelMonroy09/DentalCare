@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import mx.dentalcare.DentalCareApplication;
@@ -28,7 +29,7 @@ public class DentalCareJavaFXApplication extends Application {
 
         if (authenticationService.isConfigured()) {
             stage.initStyle(StageStyle.UNDECORATED);
-            mostrarVista(stage, "/ui/fxml/LoginView.fxml", "DentalCare | Iniciar sesión", 960, 620);
+            mostrarVista(stage, "/ui/fxml/LoginView.fxml", "DentalCare | Iniciar sesión", 900, 540);
         } else {
             mostrarVista(stage, "/ui/fxml/SetupView.fxml", "DentalCare | Configuración inicial", 1200, 750);
         }
@@ -41,12 +42,16 @@ public class DentalCareJavaFXApplication extends Application {
         Parent root = loader.load();
         Scene scene = new Scene(root, ancho, alto);
 
+        if (ruta.endsWith("LoginView.fxml")) {
+            scene.setFill(Color.TRANSPARENT);
+        }
+
         stage.setTitle(titulo);
         stage.setScene(scene);
 
         if (ruta.endsWith("LoginView.fxml")) {
-            stage.setMinWidth(960);
-            stage.setMinHeight(620);
+            stage.setMinWidth(900);
+            stage.setMinHeight(540);
             stage.setResizable(false);
         } else {
             stage.setMinWidth(1000);

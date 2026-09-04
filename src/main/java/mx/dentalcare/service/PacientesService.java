@@ -2,6 +2,7 @@ package mx.dentalcare.service;
 
 import mx.dentalcare.domain.paciente.Paciente;
 import mx.dentalcare.domain.paciente.exception.PacienteValidationException;
+import mx.dentalcare.repository.CitaRepository;
 import mx.dentalcare.repository.PacienteRepository;
 import org.springframework.stereotype.Service;
 
@@ -20,9 +21,11 @@ public class PacientesService {
     private static final String PATRON_EMAIL = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
 
     private final PacienteRepository pacienteRepository;
+    private final CitaRepository citaRepository;
 
-    public PacientesService(PacienteRepository pacienteRepository){
+    public PacientesService(PacienteRepository pacienteRepository, CitaRepository citaRepository){
         this.pacienteRepository = pacienteRepository;
+        this.citaRepository = citaRepository;
     }
 
     public List<Paciente> obtenerTodos(){
@@ -40,6 +43,20 @@ public class PacientesService {
     }
 
     public void eliminar(Long id){
+        if (id == null) {
+            throw new IllegalArgumentException("El identificador del paciente es obligatorio.");
+        }
+        pacienteRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("No existe el paciente seleccionado."));
+
+        boolean tieneCitas = citaRepository.findAll().stream()
+                .anyMatch(cita -> cita.getPaciente() != null
+                        && id.equals(cita.getPaciente().getId()));
+
+        if (tieneCitas) {
+            throw new IllegalStateException("No se puede eliminar un paciente que tiene citas registradas. Elimina las citas sin cargos o conserva al paciente para mantener su historial.");
+        }
+
         pacienteRepository.deleteById(id);
     }
 
@@ -56,20 +73,16 @@ public class PacientesService {
     }
 
     private void validarNombre(String nombre){
-
         if(nombre == null || nombre.isBlank()){
             throw new PacienteValidationException("El nombre del paciente es obligatorio.");
         }
         String valor = nombre.trim();
-
         if(valor.length() < 2){
             throw new PacienteValidationException("El nombre debe contener al menos 2 caracteres.");
         }
-
         if(valor.length() > MAX_NOMBRE){
             throw new PacienteValidationException("El nombre no puede superar los 50 caracteres.");
         }
-
         if(!valor.matches(PATRON_NOMBRE)){
             throw new PacienteValidationException("El nombre solo puede contener letras, espacios, apóstrofes y guiones.");
         }
@@ -80,51 +93,41 @@ public class PacientesService {
             throw new PacienteValidationException("El apellido paterno es obligatorio.");
         }
         String valor = apellidoPaterno.trim();
-
         if(valor.length() < 2){
             throw new PacienteValidationException("El apellido paterno debe contener al menos 2 caracteres.");
         }
-
         if(valor.length() > MAX_APELLIDO){
             throw new PacienteValidationException("El apellido paterno no puede superar los 50 caracteres.");
         }
-
         if(!valor.matches(PATRON_NOMBRE)){
             throw new PacienteValidationException("El apellido paterno solo puede contener letras, espacios, apóstrofes y guiones.");
         }
     }
 
     private void validarApellidoMaterno(String apellidoMaterno){
-
         if(apellidoMaterno == null || apellidoMaterno.isBlank()){
             throw new PacienteValidationException("El apellido materno es obligatorio.");
         }
         String valor = apellidoMaterno.trim();
-
         if(valor.length() < 2){
             throw new PacienteValidationException("El apellido materno debe contener al menos 2 caracteres.");
         }
-
         if(valor.length() > MAX_APELLIDO){
             throw new PacienteValidationException("El apellido materno no puede superar los 50 caracteres.");
         }
-
         if(!valor.matches(PATRON_NOMBRE)){
             throw new PacienteValidationException("El apellido materno solo puede contener letras, espacios, apóstrofes y guiones.");
         }
     }
 
     private void validarTelefono(String telefono){
-
         if(telefono == null || telefono.isBlank()){
             throw new PacienteValidationException("El teléfono es obligatorio.");
         }
         String valor = telefono.trim();
-
         if(valor.length() > MAX_TELEFONO){
             throw new PacienteValidationException("El teléfono debe contener exactamente 10 dígitos.");
         }
-
         if(!valor.matches(PATRON_TELEFONO)){
             throw new PacienteValidationException("El teléfono debe contener exactamente 10 dígitos.");
         }
@@ -135,11 +138,9 @@ public class PacientesService {
             return;
         }
         String valor = email.trim();
-
         if(valor.length() > MAX_EMAIL){
             throw new PacienteValidationException("El correo electrónico no puede superar los 100 caracteres.");
         }
-
         if(!valor.matches(PATRON_EMAIL)){
             throw new PacienteValidationException("El correo electrónico no tiene un formato válido.");
         }
@@ -163,7 +164,6 @@ public class PacientesService {
         if(existente.getId() == null || paciente.getId() == null){
             return false;
         }
-
         return existente.getId().equals(paciente.getId());
     }
 

@@ -16,7 +16,8 @@
         xmlns:fx="http://javafx.com/fxml/1"
         fx:controller="mx.dentalcare.ui.controller.HistorialController"
         spacing="20"
-        styleClass="content">
+        styleClass="content"
+        stylesheets="@../css/dentalcare.css,@../css/dentalcare-overrides.css">
 
     <padding>
         <Insets top="5" right="0" bottom="5" left="0"/>

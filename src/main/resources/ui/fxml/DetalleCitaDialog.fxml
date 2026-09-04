@@ -15,17 +15,10 @@
         spacing="18">
 
     <padding>
-        <Insets
-                top="25"
-                right="30"
-                bottom="25"
-                left="30"/>
+        <Insets top="25" right="30" bottom="25" left="30"/>
     </padding>
 
-    <!-- TÍTULO -->
-
     <VBox spacing="4">
-
         <Label
                 text="Detalle de cita"
                 styleClass="dialog-title"/>
@@ -33,14 +26,9 @@
         <Label
                 text="Información de la cita seleccionada."
                 styleClass="page-subtitle"/>
-
     </VBox>
 
-
-    <!-- PACIENTE -->
-
     <VBox spacing="5">
-
         <Label
                 text="Paciente"
                 styleClass="form-label"/>
@@ -49,92 +37,35 @@
                 fx:id="lblPaciente"
                 text="-"
                 styleClass="detail-value"/>
-
     </VBox>
 
-
-    <!-- FECHA + HORARIO -->
-
     <HBox spacing="35">
-
-        <VBox
-                spacing="5"
-                HBox.hgrow="ALWAYS">
-
-            <Label
-                    text="Fecha"
-                    styleClass="form-label"/>
-
-            <Label
-                    fx:id="lblFecha"
-                    text="-"
-                    styleClass="detail-value"/>
-
+        <VBox spacing="5" HBox.hgrow="ALWAYS">
+            <Label text="Fecha" styleClass="form-label"/>
+            <Label fx:id="lblFecha" text="-" styleClass="detail-value"/>
         </VBox>
 
-
-        <VBox
-                spacing="5"
-                HBox.hgrow="ALWAYS">
-
-            <Label
-                    text="Horario"
-                    styleClass="form-label"/>
-
-            <Label
-                    fx:id="lblHorario"
-                    text="-"
-                    styleClass="detail-value"/>
-
+        <VBox spacing="5" HBox.hgrow="ALWAYS">
+            <Label text="Horario" styleClass="form-label"/>
+            <Label fx:id="lblHorario" text="-" styleClass="detail-value"/>
         </VBox>
-
     </HBox>
 
-
-    <!-- DURACIÓN + ESTADO -->
-
     <HBox spacing="35">
-
-        <VBox
-                spacing="5"
-                HBox.hgrow="ALWAYS">
-
-            <Label
-                    text="Duración"
-                    styleClass="form-label"/>
-
-            <Label
-                    fx:id="lblDuracion"
-                    text="-"
-                    styleClass="detail-value"/>
-
+        <VBox spacing="5" HBox.hgrow="ALWAYS">
+            <Label text="Duración" styleClass="form-label"/>
+            <Label fx:id="lblDuracion" text="-" styleClass="detail-value"/>
         </VBox>
 
-
-        <VBox
-                spacing="5"
-                HBox.hgrow="ALWAYS">
-
-            <Label
-                    text="Estado"
-                    styleClass="form-label"/>
-
-            <Label
-                    fx:id="lblEstado"
-                    text="-"
-                    styleClass="detail-status"/>
-
+        <VBox spacing="5" HBox.hgrow="ALWAYS">
+            <Label text="Estado" styleClass="form-label"/>
+            <Label fx:id="lblEstado" text="-" styleClass="detail-status"/>
         </VBox>
-
     </HBox>
-
-
-    <!-- MOTIVO -->
 
     <VBox spacing="5">
-
         <Label
-                text="Motivo"
+                text="Motivo de consulta"
                 styleClass="form-label"/>
 
         <Label
@@ -143,16 +74,30 @@
                 wrapText="true"
                 maxWidth="Infinity"
                 styleClass="detail-value"/>
-
     </VBox>
 
+    <VBox spacing="5">
+        <Label
+                text="Tratamientos"
+                styleClass="form-label"/>
 
-    <!-- NOTAS -->
+        <Label
+                fx:id="lblTratamientos"
+                text="-"
+                wrapText="true"
+                maxWidth="Infinity"
+                styleClass="detail-value"/>
 
-    <VBox
-            spacing="5"
-            VBox.vgrow="ALWAYS">
+        <HBox alignment="CENTER_RIGHT" spacing="8">
+            <Label text="Total:" styleClass="form-label"/>
+            <Label
+                    fx:id="lblTotalTratamientos"
+                    text="$0.00"
+                    styleClass="detail-value"/>
+        </HBox>
+    </VBox>
 
+    <VBox spacing="5" VBox.vgrow="ALWAYS">
         <Label
                 text="Notas"
                 styleClass="form-label"/>
@@ -164,16 +109,9 @@
                 maxWidth="Infinity"
                 VBox.vgrow="ALWAYS"
                 styleClass="detail-notes"/>
-
     </VBox>
 
-
-    <!-- BOTONES -->
-
-    <HBox
-            spacing="10"
-            alignment="CENTER_RIGHT">
-
+    <HBox spacing="10" alignment="CENTER_RIGHT">
         <Button
                 fx:id="btnEditar"
                 text="Editar cita"
@@ -185,7 +123,6 @@
                 text="Cerrar"
                 mnemonicParsing="false"
                 styleClass="secondary-button"/>
-
     </HBox>
 
 </VBox>

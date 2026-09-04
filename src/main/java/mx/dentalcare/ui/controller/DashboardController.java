@@ -6,6 +6,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import mx.dentalcare.domain.cita.Cita;
+import mx.dentalcare.domain.cita.TratamientoAplicado;
 import mx.dentalcare.service.CitaService;
 import mx.dentalcare.service.PacientesService;
 import org.springframework.stereotype.Component;
@@ -32,7 +33,7 @@ public class DashboardController {
     private Label lblProximoPaciente;
 
     @FXML
-    private Label lblProximoMotivo;
+    private Label lblProximoTratamiento;
 
     @FXML
     private Label lblProximoEstado;
@@ -60,7 +61,10 @@ public class DashboardController {
 
     private void cargarResumen() {
         int totalPacientes = pacienteService.obtenerTodos().size();
-        long citasHoy = citaService.obtenerTodas().stream().filter(cita -> cita.getInicio() != null).filter(cita -> cita.getInicio().toLocalDate().equals(LocalDate.now())).count();
+        long citasHoy = citaService.obtenerTodas().stream()
+                .filter(cita -> cita.getInicio() != null)
+                .filter(cita -> cita.getInicio().toLocalDate().equals(LocalDate.now()))
+                .count();
         lblTotalPacientes.setText(String.valueOf(totalPacientes));
         lblCitasHoy.setText(String.valueOf(citasHoy));
     }
@@ -68,39 +72,59 @@ public class DashboardController {
     private void cargarProximaCita() {
         LocalDateTime ahora = LocalDateTime.now();
         LocalDate hoy = LocalDate.now();
-        Cita proximaCita = citaService.obtenerTodas().stream().filter(cita -> cita.getInicio() != null).filter(cita -> cita.getInicio().toLocalDate().equals(hoy)).filter(cita -> cita.getInicio().isAfter(ahora)).min(Comparator.comparing(Cita::getInicio)).orElse(null);
+
+        Cita proximaCita = citaService.obtenerTodas().stream()
+                .filter(cita -> cita.getInicio() != null)
+                .filter(cita -> cita.getInicio().toLocalDate().equals(hoy))
+                .filter(cita -> cita.getInicio().isAfter(ahora))
+                .min(Comparator.comparing(Cita::getInicio))
+                .orElse(null);
+
         if (proximaCita == null) {
             mostrarSinProximaCita();
             return;
         }
+
         lblProximaHora.setText(proximaCita.getInicio().format(FORMATO_HORA));
+
         if (proximaCita.getPaciente() != null) {
-            String nombre = proximaCita.getPaciente().getNombre() + " " + proximaCita.getPaciente().getApellidoPaterno();
+            String nombre = proximaCita.getPaciente().getNombre() + " "
+                    + proximaCita.getPaciente().getApellidoPaterno();
             lblProximoPaciente.setText(nombre);
         } else {
             lblProximoPaciente.setText("Paciente no disponible");
         }
-        lblProximoMotivo.setText(proximaCita.getMotivo() != null ? proximaCita.getMotivo() : "Sin motivo");
-        lblProximoEstado.setText(proximaCita.getEstado() != null ? proximaCita.getEstado().name() : "SIN ESTADO");
+
+        lblProximoTratamiento.setText(obtenerResumenTratamientos(proximaCita));
+        lblProximoEstado.setText(proximaCita.getEstado() != null
+                ? proximaCita.getEstado().name()
+                : "SIN ESTADO");
     }
 
     private void mostrarSinProximaCita() {
         lblProximaHora.setText("--:--");
         lblProximoPaciente.setText("No hay próximas citas");
-        lblProximoMotivo.setText("Agenda libre");
+        lblProximoTratamiento.setText("Agenda libre");
         lblProximoEstado.setText("");
     }
 
     private void cargarCitasHoy() {
         contenedorCitasHoy.getChildren().clear();
         LocalDate hoy = LocalDate.now();
-        List<Cita> citasHoy = citaService.obtenerTodas().stream().filter(cita -> cita.getInicio() != null).filter(cita -> cita.getInicio().toLocalDate().equals(hoy)).sorted(Comparator.comparing(Cita::getInicio)).toList();
+
+        List<Cita> citasHoy = citaService.obtenerTodas().stream()
+                .filter(cita -> cita.getInicio() != null)
+                .filter(cita -> cita.getInicio().toLocalDate().equals(hoy))
+                .sorted(Comparator.comparing(Cita::getInicio))
+                .toList();
+
         if (citasHoy.isEmpty()) {
             Label mensaje = new Label("No hay citas programadas para hoy.");
             mensaje.getStyleClass().add("page-subtitle");
             contenedorCitasHoy.getChildren().add(mensaje);
             return;
         }
+
         for (Cita cita : citasHoy) {
             contenedorCitasHoy.getChildren().add(crearFilaCita(cita));
         }
@@ -110,26 +134,59 @@ public class DashboardController {
         HBox fila = new HBox(15);
         fila.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
         fila.getStyleClass().add("dashboard-appointment");
+
         Label hora = new Label(cita.getInicio().format(FORMATO_HORA));
         hora.getStyleClass().add("dashboard-appointment-time");
+
         VBox informacion = new VBox(3);
         String nombrePaciente;
         if (cita.getPaciente() != null) {
-            nombrePaciente = cita.getPaciente().getNombre() + " " + cita.getPaciente().getApellidoPaterno();
+            nombrePaciente = cita.getPaciente().getNombre() + " "
+                    + cita.getPaciente().getApellidoPaterno();
         } else {
             nombrePaciente = "Paciente no disponible";
         }
+
         Label paciente = new Label(nombrePaciente);
         paciente.getStyleClass().add("dashboard-appointment-patient");
-        Label motivo = new Label(cita.getMotivo() != null ? cita.getMotivo() : "Sin motivo");
-        motivo.getStyleClass().add("dashboard-appointment-reason");
-        informacion.getChildren().addAll(paciente, motivo);
+
+        Label tratamiento = new Label(obtenerResumenTratamientos(cita));
+        tratamiento.getStyleClass().add("dashboard-appointment-treatment");
+        tratamiento.setWrapText(true);
+
+        informacion.getChildren().addAll(paciente, tratamiento);
         HBox.setHgrow(informacion, Priority.ALWAYS);
-        Label estado = new Label(cita.getEstado() != null ? cita.getEstado().name() : "SIN ESTADO");
+
+        Label estado = new Label(cita.getEstado() != null
+                ? cita.getEstado().name()
+                : "SIN ESTADO");
         estado.getStyleClass().add("dashboard-appointment-status");
         aplicarEstiloEstado(estado, cita);
+
         fila.getChildren().addAll(hora, informacion, estado);
         return fila;
+    }
+
+    private String obtenerResumenTratamientos(Cita cita) {
+        if (cita.getTratamientos() == null || cita.getTratamientos().isEmpty()) {
+            return "Sin tratamiento registrado";
+        }
+
+        List<String> nombres = cita.getTratamientos().stream()
+                .filter(tratamiento -> tratamiento != null)
+                .map(TratamientoAplicado::getNombreTratamiento)
+                .filter(nombre -> nombre != null && !nombre.isBlank())
+                .toList();
+
+        if (nombres.isEmpty()) {
+            return "Sin tratamiento registrado";
+        }
+
+        if (nombres.size() == 1) {
+            return nombres.get(0);
+        }
+
+        return nombres.get(0) + " +" + (nombres.size() - 1);
     }
 
     private void aplicarEstiloEstado(Label estado, Cita cita) {

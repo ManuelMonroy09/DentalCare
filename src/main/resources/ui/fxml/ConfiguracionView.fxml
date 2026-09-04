@@ -3,6 +3,8 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
@@ -15,7 +17,29 @@
     <padding><Insets top="30" right="35" bottom="30" left="35"/></padding>
 
     <Label text="Configuración" styleClass="page-title"/>
-    <Label text="Administración local de DentalCare" styleClass="page-subtitle"/>
+    <Label text="Personaliza los datos del consultorio y la operación local de DentalCare." styleClass="page-subtitle"/>
+
+    <VBox spacing="12" styleClass="stat-card">
+        <Label text="Datos del consultorio" styleClass="section-title"/>
+        <Label text="Estos datos aparecerán en los recibos impresos para el paciente." styleClass="page-subtitle" wrapText="true"/>
+        <GridPane hgap="12" vgap="10">
+            <Label text="Nombre del consultorio" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtNombreConsultorio" promptText="Ej. Clínica Dental Sonrisa" GridPane.rowIndex="0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS"/>
+            <Label text="Odontólogo" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtOdontologo" promptText="Nombre del odontólogo" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS"/>
+            <Label text="Teléfono" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtTelefono" promptText="Teléfono del consultorio" GridPane.rowIndex="2" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS"/>
+            <Label text="Correo" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtEmail" promptText="correo@ejemplo.com" GridPane.rowIndex="3" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS"/>
+            <Label text="Dirección" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtDireccion" promptText="Dirección del consultorio" GridPane.rowIndex="4" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS"/>
+            <Label text="Pie del recibo" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+            <TextField fx:id="txtPieRecibo" promptText="Mensaje que aparecerá al final del recibo" GridPane.rowIndex="5" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS"/>
+        </GridPane>
+        <HBox spacing="10">
+            <Button text="Guardar configuración" onAction="#guardarConfiguracion" styleClass="primary-button"/>
+        </HBox>
+    </VBox>
 
     <VBox spacing="12" styleClass="stat-card">
         <Label text="Respaldo y restauración" styleClass="section-title"/>

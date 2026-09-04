@@ -13,7 +13,7 @@
       fx:controller="mx.dentalcare.ui.controller.FinanzasController"
       spacing="20"
       styleClass="content"
-      stylesheets="@../css/dentalcare.css,@../css/dentalcare-overrides.css">
+      stylesheets="@../css/dentalcare.css">
     <padding>
         <Insets top="5" right="0" bottom="5" left="0"/>
     </padding>

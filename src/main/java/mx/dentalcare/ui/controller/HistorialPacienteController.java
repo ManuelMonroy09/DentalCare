@@ -44,9 +44,7 @@ public class HistorialPacienteController {
     private final ApplicationContext applicationContext;
     private Paciente paciente;
 
-    public HistorialPacienteController(
-            CitaService citaService,
-            ApplicationContext applicationContext) {
+    public HistorialPacienteController(CitaService citaService, ApplicationContext applicationContext) {
         this.citaService = citaService;
         this.applicationContext = applicationContext;
     }
@@ -54,7 +52,6 @@ public class HistorialPacienteController {
     @FXML
     public void initialize() {
         configurarColumnas();
-
         historialTable.getSelectionModel().selectedItemProperty().addListener(
                 (obs, anterior, actual) -> btnDetalle.setDisable(actual == null)
         );
@@ -73,7 +70,7 @@ public class HistorialPacienteController {
 
     public void setPaciente(Paciente paciente) {
         this.paciente = paciente;
-        lblPaciente.setText(paciente != null ? paciente.getNombreCompleto() : "Paciente");
+        lblPaciente.setText(obtenerNombrePaciente(paciente));
         cargarHistorial();
         ajustarTamanoVentana();
     }
@@ -81,38 +78,27 @@ public class HistorialPacienteController {
     private void configurarColumnas() {
         fechaColumn.setCellValueFactory(data -> {
             Cita cita = data.getValue();
-            return new SimpleStringProperty(
-                    cita != null && cita.getInicio() != null
-                            ? cita.getInicio().format(FORMATO_FECHA)
-                            : "-"
-            );
+            return new SimpleStringProperty(cita != null && cita.getInicio() != null
+                    ? cita.getInicio().format(FORMATO_FECHA) : "-");
         });
 
         horarioColumn.setCellValueFactory(data -> {
             Cita cita = data.getValue();
-            return new SimpleStringProperty(
-                    cita != null && cita.getInicio() != null && cita.getFin() != null
-                            ? cita.getInicio().format(FORMATO_HORA) + " - " + cita.getFin().format(FORMATO_HORA)
-                            : "-"
-            );
+            return new SimpleStringProperty(cita != null && cita.getInicio() != null && cita.getFin() != null
+                    ? cita.getInicio().format(FORMATO_HORA) + " - " + cita.getFin().format(FORMATO_HORA) : "-");
         });
 
         motivoColumn.setCellValueFactory(data -> {
             Cita cita = data.getValue();
-            return new SimpleStringProperty(
-                    cita != null && cita.getMotivo() != null && !cita.getMotivo().isBlank()
-                            ? cita.getMotivo().trim()
-                            : "Sin motivo registrado"
-            );
+            return new SimpleStringProperty(cita != null && cita.getMotivo() != null && !cita.getMotivo().isBlank()
+                    ? cita.getMotivo().trim() : "Sin motivo registrado");
         });
 
         tratamientosColumn.setCellValueFactory(data ->
-                new SimpleStringProperty(obtenerResumenTratamientos(data.getValue()))
-        );
+                new SimpleStringProperty(obtenerResumenTratamientos(data.getValue())));
 
         totalColumn.setCellValueFactory(data ->
-                new SimpleStringProperty(formatearTotal(data.getValue()))
-        );
+                new SimpleStringProperty(formatearTotal(data.getValue())));
 
         centrarColumna(fechaColumn);
         centrarColumna(horarioColumn);
@@ -148,9 +134,19 @@ public class HistorialPacienteController {
 
         lblResumen.setText(
                 consultas + (consultas == 1 ? " consulta atendida" : " consultas atendidas")
-                        + "  ·  Total de tratamientos: $"
-                        + total.setScale(2).toPlainString()
+                        + "  ·  Total de tratamientos: $" + total.setScale(2).toPlainString()
         );
+    }
+
+    private String obtenerNombrePaciente(Paciente paciente) {
+        if (paciente == null) {
+            return "Paciente";
+        }
+
+        String nombre = paciente.getNombre() != null ? paciente.getNombre().trim() : "";
+        String paterno = paciente.getApellidoPaterno() != null ? paciente.getApellidoPaterno().trim() : "";
+        String materno = paciente.getApellidoMaterno() != null ? paciente.getApellidoMaterno().trim() : "";
+        return (nombre + " " + paterno + " " + materno).trim();
     }
 
     private String obtenerResumenTratamientos(Cita cita) {
@@ -172,9 +168,7 @@ public class HistorialPacienteController {
         if (cita == null) {
             return "$0.00";
         }
-
-        BigDecimal total = cita.obtenerTotalTratamientos();
-        return "$" + total.setScale(2).toPlainString();
+        return "$" + cita.obtenerTotalTratamientos().setScale(2).toPlainString();
     }
 
     private void abrirDetalle() {
@@ -185,8 +179,7 @@ public class HistorialPacienteController {
 
         try {
             FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/ui/fxml/DetalleCitaDialog.fxml")
-            );
+                    getClass().getResource("/ui/fxml/DetalleCitaDialog.fxml"));
             loader.setControllerFactory(applicationContext::getBean);
 
             Parent root = loader.load();

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="mx.dentalcare.ui.controller.FinanzasController"
+      spacing="20"
+      styleClass="content"
+      stylesheets="@../css/dentalcare.css,@../css/dentalcare-overrides.css">
+    <padding>
+        <Insets top="5" right="0" bottom="5" left="0"/>
+    </padding>
+
+    <VBox spacing="5">
+        <Label text="Finanzas" styleClass="page-title"/>
+        <Label text="Control de cargos, pagos y saldos pendientes del consultorio." styleClass="page-subtitle"/>
+    </VBox>
+
+    <HBox spacing="15">
+        <VBox spacing="4" styleClass="stat-card" HBox.hgrow="ALWAYS">
+            <Label text="Ingresos de hoy" styleClass="page-subtitle"/>
+            <Label fx:id="ingresosLabel" text="$0.00" styleClass="stat-value"/>
+        </VBox>
+        <VBox spacing="4" styleClass="stat-card" HBox.hgrow="ALWAYS">
+            <Label text="Por cobrar" styleClass="page-subtitle"/>
+            <Label fx:id="pendienteLabel" text="$0.00" styleClass="stat-value"/>
+        </VBox>
+    </HBox>
+
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <Button text="Generar cargos" onAction="#sincronizarCargos" styleClass="primary-button"/>
+        <Button text="Registrar pago" onAction="#registrarPago" styleClass="secondary-button"/>
+        <Label fx:id="mensajeLabel" text="" styleClass="page-subtitle" HBox.hgrow="ALWAYS"/>
+    </HBox>
+
+    <TableView fx:id="cargosTable" VBox.vgrow="ALWAYS" styleClass="patients-table">
+        <columns>
+            <TableColumn fx:id="fechaColumn" text="Fecha" prefWidth="105"/>
+            <TableColumn fx:id="pacienteColumn" text="Paciente" prefWidth="190"/>
+            <TableColumn fx:id="conceptoColumn" text="Concepto" prefWidth="200"/>
+            <TableColumn fx:id="importeColumn" text="Cargo" prefWidth="110"/>
+            <TableColumn fx:id="pagadoColumn" text="Pagado" prefWidth="110"/>
+            <TableColumn fx:id="pendienteColumn" text="Pendiente" prefWidth="120"/>
+            <TableColumn fx:id="estadoColumn" text="Estado" prefWidth="110"/>
+        </columns>
+    </TableView>
+</VBox>

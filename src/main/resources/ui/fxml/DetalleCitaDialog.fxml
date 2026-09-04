@@ -92,7 +92,7 @@
             <Label text="Total:" styleClass="form-label"/>
             <Label
                     fx:id="lblTotalTratamientos"
-                    text="$0.00"
+                    text="0.00"
                     styleClass="detail-value"/>
         </HBox>
     </VBox>

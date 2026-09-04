@@ -17,7 +17,7 @@
     <padding><Insets top="30" right="35" bottom="30" left="35"/></padding>
 
     <Label text="Configuración" styleClass="page-title"/>
-    <Label text="Personaliza los datos del consultorio y la operación local de DentalCare." styleClass="page-subtitle"/>
+    <Label text="Personaliza los datos del consultorio y las herramientas de mantenimiento de DentalCare." styleClass="page-subtitle"/>
 
     <VBox spacing="12" styleClass="stat-card">
         <Label text="Datos del consultorio" styleClass="section-title"/>
@@ -44,9 +44,22 @@
     <VBox spacing="12" styleClass="stat-card">
         <Label text="Respaldo y restauración" styleClass="section-title"/>
         <Label text="Los respaldos conservan los archivos de datos cifrados de DentalCare. Guarda una copia fuera de la carpeta de instalación." styleClass="page-subtitle" wrapText="true"/>
-        <HBox spacing="10">
+        <HBox spacing="10" wrapText="true">
             <Button text="Crear respaldo" onAction="#crearRespaldo" styleClass="primary-button"/>
+            <Button text="Respaldo automático" onAction="#crearRespaldoAutomatico" styleClass="primary-button"/>
             <Button text="Restaurar respaldo" onAction="#restaurarRespaldo" styleClass="secondary-button"/>
+        </HBox>
+        <HBox spacing="10">
+            <Button text="Abrir carpeta de datos" onAction="#abrirCarpetaDatos" styleClass="secondary-button"/>
+            <Button text="Abrir carpeta de respaldo" onAction="#abrirCarpetaRespaldo" styleClass="secondary-button"/>
+        </HBox>
+    </VBox>
+
+    <VBox spacing="12" styleClass="stat-card">
+        <Label text="Información del sistema" styleClass="section-title"/>
+        <Label text="Consulta la versión de DentalCare, la versión de Java y la ubicación de los datos locales." styleClass="page-subtitle" wrapText="true"/>
+        <HBox spacing="10">
+            <Button text="Ver información" onAction="#mostrarInformacionSistema" styleClass="secondary-button"/>
         </HBox>
     </VBox>
 

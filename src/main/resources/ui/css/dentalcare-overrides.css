@@ -1,0 +1,72 @@
+/* =========================================================
+   DENTALCARE - AJUSTES VISUALES
+   ========================================================= */
+
+/* =========================================================
+   AGENDA - TARJETAS DE CITAS
+   ========================================================= */
+
+.agenda-event {
+    -fx-padding: 5px 7px;
+    -fx-background-radius: 7px;
+    -fx-border-radius: 7px;
+    -fx-border-width: 0 0 0 4px;
+}
+
+.agenda-event:hover {
+    -fx-opacity: 0.92;
+}
+
+.agenda-event-patient {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.agenda-event-time,
+.agenda-event-treatment {
+    -fx-font-size: 10px;
+}
+
+.agenda-event-treatment {
+    -fx-font-weight: bold;
+}
+
+.agenda-event-notes {
+    -fx-font-size: 9px;
+    -fx-text-fill: #6b7280;
+    -fx-padding: 1px 0 0 0;
+}
+
+/* Mantiene la información secundaria visualmente discreta. */
+.agenda-event-reason {
+    -fx-font-size: 9px;
+    -fx-text-fill: #6b7280;
+}
+
+/* =========================================================
+   DASHBOARD - TRATAMIENTO
+   ========================================================= */
+
+.dashboard-next-treatment {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #374151;
+}
+
+.dashboard-appointment-treatment {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #374151;
+}
+
+.dashboard-appointment {
+    -fx-padding: 10px 12px;
+    -fx-background-color: #f8f9fa;
+    -fx-background-radius: 8px;
+    -fx-border-color: transparent;
+    -fx-border-radius: 8px;
+}
+
+.dashboard-appointment:hover {
+    -fx-background-color: #f3f4f6;
+}

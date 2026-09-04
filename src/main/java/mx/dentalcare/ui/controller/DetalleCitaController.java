@@ -9,40 +9,29 @@ import javafx.scene.control.Label;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import mx.dentalcare.domain.cita.Cita;
+import mx.dentalcare.domain.tratamiento.TratamientoAplicado;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class DetalleCitaController {
 
-    @FXML
-    private Label lblPaciente;
-
-    @FXML
-    private Label lblFecha;
-
-    @FXML
-    private Label lblHorario;
-
-    @FXML
-    private Label lblDuracion;
-
-    @FXML
-    private Label lblMotivo;
-
-    @FXML
-    private Label lblNotas;
-
-    @FXML
-    private Label lblEstado;
-
-    @FXML
-    private Button btnEditar;
-
-    @FXML
-    private Button btnCerrar;
+    @FXML private Label lblPaciente;
+    @FXML private Label lblFecha;
+    @FXML private Label lblHorario;
+    @FXML private Label lblDuracion;
+    @FXML private Label lblMotivo;
+    @FXML private Label lblTratamientos;
+    @FXML private Label lblTotalTratamientos;
+    @FXML private Label lblNotas;
+    @FXML private Label lblEstado;
+    @FXML private Button btnEditar;
+    @FXML private Button btnCerrar;
 
     private final ApplicationContext applicationContext;
     private Cita cita;
@@ -68,20 +57,43 @@ public class DetalleCitaController {
         if (cita == null) {
             return;
         }
+
         lblPaciente.setText(cita.getNombrePaciente());
 
         if (cita.getInicio() != null && cita.getFin() != null) {
             lblFecha.setText(capitalizar(cita.getInicio().format(FORMATO_FECHA)));
             lblHorario.setText(cita.getInicio().format(FORMATO_HORA) + " - " + cita.getFin().format(FORMATO_HORA));
         }
+
         lblDuracion.setText(cita.getDuracionMinutos() + " minutos");
-        lblMotivo.setText(cita.getMotivo() != null && !cita.getMotivo().isBlank() ? cita.getMotivo() : "Sin motivo especificado");
-        lblNotas.setText(cita.getNotas() != null && !cita.getNotas().isBlank() ? cita.getNotas() : "Sin notas");
+        lblMotivo.setText(cita.getMotivo() != null && !cita.getMotivo().isBlank()
+                ? cita.getMotivo()
+                : "Sin motivo de consulta especificado");
+
+        List<TratamientoAplicado> tratamientos = cita.getTratamientos();
+        if (tratamientos == null || tratamientos.isEmpty()) {
+            lblTratamientos.setText("Sin tratamientos registrados");
+            lblTotalTratamientos.setText("$0.00");
+        } else {
+            String resumen = tratamientos.stream()
+                    .filter(t -> t != null)
+                    .map(TratamientoAplicado::getNombre)
+                    .filter(nombre -> nombre != null && !nombre.isBlank())
+                    .collect(Collectors.joining(", "));
+
+            lblTratamientos.setText(resumen.isBlank() ? "Sin tratamientos registrados" : resumen);
+
+            BigDecimal total = cita.obtenerTotalTratamientos();
+            lblTotalTratamientos.setText("$" + total.setScale(2).toPlainString());
+        }
+
+        lblNotas.setText(cita.getNotas() != null && !cita.getNotas().isBlank()
+                ? cita.getNotas()
+                : "Sin notas");
         lblEstado.setText(formatearEstado(cita));
     }
 
     private void editarCita() {
-
         if (cita == null) {
             return;
         }
@@ -92,19 +104,15 @@ public class DetalleCitaController {
             Parent root = loader.load();
             NuevaCitaController controller = loader.getController();
             controller.prepararParaEdicion(cita);
+
             Stage stage = new Stage();
             stage.setTitle("Editar cita");
             stage.initModality(Modality.APPLICATION_MODAL);
-
-            Scene scene = new Scene(root, 720, 820);
-            stage.setScene(scene);
-
+            stage.setScene(new Scene(root, 720, 820));
             stage.setMinWidth(720);
             stage.setMinHeight(820);
-
             stage.setMaxWidth(720);
             stage.setMaxHeight(820);
-
             stage.setResizable(false);
             stage.showAndWait();
             mostrarCita();
@@ -115,27 +123,21 @@ public class DetalleCitaController {
     }
 
     private String formatearEstado(Cita cita) {
-
         if (cita.getEstado() == null) {
             return "Sin estado";
         }
-        switch (cita.getEstado()) {
 
+        switch (cita.getEstado()) {
             case PROGRAMADA:
                 return "Programada";
-
             case CONFIRMADA:
                 return "Confirmada";
-
             case ATENDIDA:
                 return "Atendida";
-
             case CANCELADA:
                 return "Cancelada";
-
             case NO_ASISTIO:
                 return "No asistió";
-
             default:
                 return cita.getEstado().toString();
         }

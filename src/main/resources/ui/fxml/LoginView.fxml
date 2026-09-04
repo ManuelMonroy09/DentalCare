@@ -46,7 +46,7 @@
             <Label fx:id="lblError" styleClass="auth-error" wrapText="true" managed="false" visible="false"/>
 
             <HBox alignment="CENTER">
-                <Button text="Iniciar sesión" prefWidth="300" maxWidth="300" styleClass="primary-button auth-login-button" onAction="#iniciarSesion"/>
+                <Button text="Iniciar sesión" styleClass="auth-login-button" onAction="#iniciarSesion"/>
             </HBox>
 
             <Label text="DentalCare • Acceso seguro" styleClass="auth-footer"/>

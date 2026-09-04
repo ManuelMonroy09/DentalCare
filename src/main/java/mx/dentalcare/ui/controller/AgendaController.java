@@ -22,6 +22,8 @@ import mx.dentalcare.domain.cita.EstadoCita;
 import mx.dentalcare.service.CitaService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+
+import java.net.URL;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -1060,6 +1062,10 @@ public class AgendaController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/ui/fxml/NuevaCitaDialog.fxml"));
             loader.setControllerFactory(applicationContext::getBean);
             Parent root = loader.load();
+            URL css = getClass().getResource("/ui/css/dentalcare.css");
+            if (css != null) {
+                root.getStylesheets().add(css.toExternalForm());
+            }
             NuevaCitaController controller = loader.getController();
             controller.prepararNuevaCita(fecha, hora);
             Stage stage = new Stage();

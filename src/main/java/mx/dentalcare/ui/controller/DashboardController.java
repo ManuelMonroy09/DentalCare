@@ -6,7 +6,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import mx.dentalcare.domain.cita.Cita;
-import mx.dentalcare.domain.cita.TratamientoAplicado;
+import mx.dentalcare.domain.tratamiento.TratamientoAplicado;
 import mx.dentalcare.service.CitaService;
 import mx.dentalcare.service.PacientesService;
 import org.springframework.stereotype.Component;
@@ -174,7 +174,7 @@ public class DashboardController {
 
         List<String> nombres = cita.getTratamientos().stream()
                 .filter(tratamiento -> tratamiento != null)
-                .map(TratamientoAplicado::getNombreTratamiento)
+                .map(TratamientoAplicado::getNombre)
                 .filter(nombre -> nombre != null && !nombre.isBlank())
                 .toList();
 

@@ -12,12 +12,8 @@
         xmlns="http://javafx.com/javafx/21"
         xmlns:fx="http://javafx.com/fxml/1"
         fx:controller="mx.dentalcare.ui.controller.MainController"
-        styleClass="root">
-
-    <stylesheets>
-        <String fx:value="@../css/dentalcare.css"/>
-        <String fx:value="@../css/dentalcare-overrides.css"/>
-    </stylesheets>
+        styleClass="root"
+        stylesheets="@../css/dentalcare.css,@../css/dentalcare-overrides.css">
 
     <top>
         <HBox

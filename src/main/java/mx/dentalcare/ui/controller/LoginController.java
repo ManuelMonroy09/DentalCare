@@ -122,6 +122,7 @@ public class LoginController {
         stage.setScene(scene);
         stage.setMinWidth(1000);
         stage.setMinHeight(650);
+        stage.setResizable(true);
         stage.show();
 
         root.setOpacity(0);

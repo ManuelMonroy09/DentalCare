@@ -1,5 +1,6 @@
 package mx.dentalcare.ui.controller;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -20,6 +21,9 @@ import java.util.stream.Collectors;
 
 @Component
 public class DetalleCitaController {
+
+    private static final double ANCHO_VENTANA = 620;
+    private static final double ALTO_VENTANA = 720;
 
     @FXML private Label lblPaciente;
     @FXML private Label lblFecha;
@@ -51,6 +55,24 @@ public class DetalleCitaController {
     public void setCita(Cita cita) {
         this.cita = cita;
         mostrarCita();
+        ajustarTamanoVentana();
+    }
+
+    private void ajustarTamanoVentana() {
+        Platform.runLater(() -> {
+            if (btnCerrar.getScene() == null || btnCerrar.getScene().getWindow() == null) {
+                return;
+            }
+
+            Stage stage = (Stage) btnCerrar.getScene().getWindow();
+            stage.setMinWidth(ANCHO_VENTANA);
+            stage.setMinHeight(ALTO_VENTANA);
+            stage.setMaxWidth(ANCHO_VENTANA);
+            stage.setMaxHeight(ALTO_VENTANA);
+            stage.setWidth(ANCHO_VENTANA);
+            stage.setHeight(ALTO_VENTANA);
+            stage.setResizable(false);
+        });
     }
 
     private void mostrarCita() {

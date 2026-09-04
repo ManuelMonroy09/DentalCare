@@ -16,6 +16,7 @@
         stylesheets="@../css/dentalcare.css">
 
     <HBox maxWidth="900" maxHeight="540" styleClass="auth-shell">
+
         <VBox prefWidth="430" spacing="18" styleClass="auth-brand-panel">
             <VBox spacing="10">
                 <StackPane styleClass="auth-logo-mark">
@@ -50,7 +51,9 @@
 
             <Label text="DentalCare • Acceso seguro" styleClass="auth-footer"/>
         </VBox>
+
     </HBox>
 
-    <Button text="×" styleClass="auth-close-button" onAction="#cerrarVentana" StackPane.alignment="TOP_RIGHT" translateX="-12" translateY="12"/>
+    <Button text="×" styleClass="auth-close-button" onAction="#cerrarVentana" StackPane.alignment="TOP_RIGHT"/>
+
 </StackPane>

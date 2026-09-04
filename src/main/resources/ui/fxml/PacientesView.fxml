@@ -36,7 +36,7 @@
 
             <Button
                     fx:id="historialButton"
-                    text="Historial"
+                    text="Ver historial"
                     styleClass="secondary-button"/>
 
             <Button

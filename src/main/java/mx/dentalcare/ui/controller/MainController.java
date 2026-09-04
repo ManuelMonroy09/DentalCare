@@ -33,7 +33,7 @@ public class MainController {
     @FXML private void mostrarTratamientos() { cargarVista("/ui/fxml/TratamientosView.fxml"); }
     @FXML private void mostrarHistorial() { cargarVista("/ui/fxml/HistorialView.fxml"); }
     @FXML private void mostrarFinanzas() { cargarVista("/ui/fxml/FinanzasView.fxml"); }
-    @FXML private void mostrarConfiguracion() { mostrarMensaje("Configuración", "Módulo de configuración próximamente."); }
+    @FXML private void mostrarConfiguracion() { cargarVista("/ui/fxml/ConfiguracionView.fxml"); }
 
     private void cargarVista(String ruta) {
         try {

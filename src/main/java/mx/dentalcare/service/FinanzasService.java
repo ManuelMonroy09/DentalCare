@@ -54,10 +54,18 @@ public class FinanzasService {
                 .orElseThrow(() -> new IllegalArgumentException("No existe el pago seleccionado."));
     }
 
-    /** Genera los cargos faltantes de citas atendidas con tratamientos cobrables. Es idempotente. */
+    /**
+     * Genera los cargos faltantes de citas confirmadas o atendidas con tratamientos cobrables.
+     * Es idempotente y permite registrar anticipos antes de la atención.
+     */
     public int generarCargosPendientes() {
         int creados = 0;
-        for (Cita cita : citaService.obtenerHistorial()) {
+        for (Cita cita : citaService.obtenerTodas()) {
+            if (cita.getEstado() != EstadoCita.CONFIRMADA
+                    && cita.getEstado() != EstadoCita.ATENDIDA) {
+                continue;
+            }
+
             BigDecimal total = cita.obtenerTotalTratamientos();
             if (cita.getId() == null || total == null || total.compareTo(BigDecimal.ZERO) <= 0) {
                 continue;
@@ -77,8 +85,9 @@ public class FinanzasService {
         if (cita.getPaciente() == null || cita.getPaciente().getId() == null) {
             throw new IllegalArgumentException("La cita debe tener un paciente válido.");
         }
-        if (cita.getEstado() != EstadoCita.ATENDIDA) {
-            throw new IllegalStateException("Solo una cita atendida puede generar un cargo.");
+        if (cita.getEstado() != EstadoCita.CONFIRMADA
+                && cita.getEstado() != EstadoCita.ATENDIDA) {
+            throw new IllegalStateException("Solo una cita confirmada o atendida puede generar un cargo.");
         }
 
         return cargoRepository.findByCitaId(cita.getId()).orElseGet(() -> {

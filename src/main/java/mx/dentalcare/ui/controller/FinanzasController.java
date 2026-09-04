@@ -123,10 +123,10 @@ public class FinanzasController {
         alert.setTitle("Pago registrado");
         alert.setHeaderText("Pago registrado correctamente");
         alert.setContentText("¿Deseas imprimir el recibo para el paciente?");
-        ButtonType imprimir = new ButtonType("Imprimir");
+        ButtonType imprimir = new ButtonType("Ver recibo");
         ButtonType despues = new ButtonType("Ahora no", ButtonBar.ButtonData.CANCEL_CLOSE);
         alert.getButtonTypes().setAll(imprimir, despues);
-        if (alert.showAndWait().orElse(despues) == imprimir) imprimirRecibo(pago, cargo);
+        if (alert.showAndWait().orElse(despues) == imprimir) mostrarVistaPrevia(pago, cargo);
     }
 
     @FXML
@@ -139,10 +139,32 @@ public class FinanzasController {
                 .max(Comparator.comparing(Pago::getFecha, Comparator.nullsFirst(Comparator.naturalOrder()))
                         .thenComparing(Pago::getId, Comparator.nullsFirst(Comparator.naturalOrder())))
                 .orElse(pagos.get(pagos.size() - 1));
-        imprimirRecibo(ultimoPago, cargo);
+        mostrarVistaPrevia(ultimoPago, cargo);
     }
 
-    private void imprimirRecibo(Pago pago, Cargo cargo) {
+    private void mostrarVistaPrevia(Pago pago, Cargo cargo) {
+        VBox ticket = construirTicket(pago, cargo);
+        ScrollPane scroll = new ScrollPane(ticket);
+        scroll.setFitToWidth(true);
+        scroll.setFitToHeight(true);
+        scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scroll.setStyle("-fx-background-color: white;");
+
+        Dialog<ButtonType> dialogo = new Dialog<>();
+        dialogo.setTitle("Vista previa del recibo");
+        dialogo.setHeaderText("Vista previa del recibo de pago");
+        dialogo.getDialogPane().setContent(scroll);
+        dialogo.getDialogPane().setPrefWidth(380);
+        dialogo.getDialogPane().setPrefHeight(620);
+        ButtonType imprimir = new ButtonType("Imprimir", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancelar = new ButtonType("Cerrar", ButtonBar.ButtonData.CANCEL_CLOSE);
+        dialogo.getDialogPane().getButtonTypes().setAll(imprimir, cancelar);
+        dialogo.showAndWait().ifPresent(resultado -> {
+            if (resultado == imprimir) imprimirTicket(ticket);
+        });
+    }
+
+    private VBox construirTicket(Pago pago, Cargo cargo) {
         ConfiguracionConsultorio configuracion = configuracionService.obtener();
         Paciente paciente = pacientes.get(cargo.getPacienteId());
         String nombre = paciente == null ? "Paciente #" + cargo.getPacienteId() : nombrePaciente(cargo.getPacienteId());
@@ -169,11 +191,13 @@ public class FinanzasController {
         agregarTexto(ticket, "Pago recibido: " + moneda(pago.getMonto()), "-fx-font-size: 13px; -fx-font-weight: bold;");
         agregarTexto(ticket, "Saldo pendiente: " + moneda(pendiente), "-fx-font-size: 11px;");
         if (!vacio(configuracion.getPieRecibo())) agregarTexto(ticket, configuracion.getPieRecibo(), "-fx-font-size: 11px; -fx-padding: 10px 0 0 0;");
+        return ticket;
+    }
 
+    private void imprimirTicket(VBox ticket) {
         ticket.applyCss();
         ticket.autosize();
         ticket.layout();
-
         PrinterJob job = PrinterJob.createPrinterJob();
         if (job == null) { mostrarError("Impresión", "No hay una impresora disponible en el sistema."); return; }
         if (!job.showPrintDialog(cargosTable.getScene().getWindow())) return;

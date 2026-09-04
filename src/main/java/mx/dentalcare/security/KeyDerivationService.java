@@ -1,10 +1,13 @@
 package mx.dentalcare.security;
 
+import org.springframework.stereotype.Service;
+
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
+@Service
 public class KeyDerivationService {
 
     public SecretKey deriveKey(String password, byte[] salt) {

@@ -12,7 +12,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import mx.dentalcare.domain.paciente.Paciente;
-import mx.dentalcare.service.CitaService;
 import mx.dentalcare.service.PacientesService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -38,16 +37,13 @@ public class PacientesController {
     @FXML private TableColumn<Paciente, String> emailColumn;
 
     private final PacientesService pacienteService;
-    private final CitaService citaService;
     private final ApplicationContext applicationContext;
     private FilteredList<Paciente> pacientesFiltrados;
 
     public PacientesController(
             PacientesService pacienteService,
-            CitaService citaService,
             ApplicationContext applicationContext) {
         this.pacienteService = pacienteService;
-        this.citaService = citaService;
         this.applicationContext = applicationContext;
     }
 
@@ -240,26 +236,31 @@ public class PacientesController {
 
         try {
             FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/ui/fxml/HistorialPacienteDialog.fxml"));
+                    getClass().getResource("/ui/fxml/HistorialView.fxml"));
             loader.setControllerFactory(applicationContext::getBean);
 
             Parent root = loader.load();
-            HistorialPacienteController controller = loader.getController();
-            controller.setPaciente(pacienteSeleccionado);
+            HistorialController controller = loader.getController();
+            controller.setPacienteFiltro(obtenerNombrePaciente(pacienteSeleccionado));
 
             Stage stage = new Stage();
             stage.setTitle("Historial clínico");
             stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setScene(new Scene(root, 980, 620));
-            stage.setMinWidth(980);
-            stage.setMinHeight(620);
-            stage.setMaxWidth(980);
-            stage.setMaxHeight(620);
-            stage.setResizable(false);
+            stage.setScene(new Scene(root, 1200, 700));
+            stage.setMinWidth(1100);
+            stage.setMinHeight(650);
+            stage.setResizable(true);
             stage.showAndWait();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private String obtenerNombrePaciente(Paciente paciente) {
+        String nombre = paciente.getNombre() != null ? paciente.getNombre().trim() : "";
+        String paterno = paciente.getApellidoPaterno() != null ? paciente.getApellidoPaterno().trim() : "";
+        String materno = paciente.getApellidoMaterno() != null ? paciente.getApellidoMaterno().trim() : "";
+        return (nombre + " " + paterno + " " + materno).trim();
     }
 
     private void eliminarPaciente() {

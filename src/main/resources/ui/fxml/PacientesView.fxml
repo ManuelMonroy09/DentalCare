@@ -35,6 +35,11 @@
         <HBox spacing="10">
 
             <Button
+                    fx:id="historialButton"
+                    text="Historial"
+                    styleClass="secondary-button"/>
+
+            <Button
                     fx:id="nuevoButton"
                     text="+ Nuevo paciente"
                     styleClass="primary-button"/>

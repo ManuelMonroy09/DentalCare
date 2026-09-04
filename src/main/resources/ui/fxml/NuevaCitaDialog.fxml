@@ -17,6 +17,7 @@
         xmlns="http://javafx.com/javafx/21"
         xmlns:fx="http://javafx.com/fxml/1"
         fx:controller="mx.dentalcare.ui.controller.NuevaCitaController"
+        stylesheets="@../css/dentalcare.css,@../css/dentalcare-overrides.css"
         styleClass="root"
         spacing="17"
         prefWidth="720"

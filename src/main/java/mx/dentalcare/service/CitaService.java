@@ -7,15 +7,16 @@ import mx.dentalcare.domain.tratamiento.Tratamiento;
 import mx.dentalcare.domain.tratamiento.TratamientoAplicado;
 import mx.dentalcare.repository.CitaRepository;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class CitaService {
@@ -30,7 +31,9 @@ public class CitaService {
     }
 
     public List<Cita> obtenerTodas() {
-        return citaRepository.findAll().stream().sorted(Comparator.comparing(Cita::getInicio, Comparator.nullsLast(Comparator.naturalOrder()))).collect(Collectors.toList());
+        return citaRepository.findAll().stream()
+                .sorted(Comparator.comparing(Cita::getInicio, Comparator.nullsLast(Comparator.naturalOrder())))
+                .collect(Collectors.toList());
     }
 
     public Optional<Cita> obtenerPorId(Long id) {
@@ -52,20 +55,25 @@ public class CitaService {
         validarPaciente(paciente);
         validarInicio(inicio);
         validarDuracion(duracionMinutos);
+
         LocalDateTime fin = inicio.plusMinutes(duracionMinutos);
         Cita cita = new Cita(paciente, inicio, fin);
         cita.setEstado(EstadoCita.PROGRAMADA);
+
         if (motivo != null && !motivo.isBlank()) {
             cita.setMotivo(motivo.trim());
         }
         if (notas != null && !notas.isBlank()) {
             cita.setNotas(notas.trim());
         }
+
         validarSolapamiento(cita);
         return cita;
     }
 
-    public Cita guardar(Cita cita) {validarCita(cita);validarSolapamiento(cita);
+    public Cita guardar(Cita cita) {
+        validarCita(cita);
+        validarSolapamiento(cita);
         return citaRepository.save(cita);
     }
 
@@ -75,33 +83,46 @@ public class CitaService {
         validarSolapamiento(cita);
         return citaRepository.save(cita);
     }
+
     private void sincronizarTratamientos(Cita cita, List<Long> tratamientoIds) {
         if (cita.getTratamientos() == null) {
             cita.setTratamientos(new ArrayList<>());
         }
-        Set<Long> seleccionados = tratamientoIds == null ? new HashSet<>() : new HashSet<>(tratamientoIds);
-        cita.getTratamientos().removeIf(tratamientoAplicado -> tratamientoAplicado == null || tratamientoAplicado.getTratamientoId() == null || !seleccionados.contains(tratamientoAplicado.getTratamientoId()));
+
+        Set<Long> seleccionados = tratamientoIds == null
+                ? new HashSet<>()
+                : new HashSet<>(tratamientoIds);
+
+        cita.getTratamientos().removeIf(tratamientoAplicado ->
+                tratamientoAplicado == null
+                        || tratamientoAplicado.getTratamientoId() == null
+                        || !seleccionados.contains(tratamientoAplicado.getTratamientoId()));
+
         Set<Long> existentes = new HashSet<>();
         for (TratamientoAplicado tratamientoAplicado : cita.getTratamientos()) {
             if (tratamientoAplicado != null && tratamientoAplicado.getTratamientoId() != null) {
                 existentes.add(tratamientoAplicado.getTratamientoId());
             }
         }
+
         for (Long tratamientoId : seleccionados) {
-            if (tratamientoId == null) {
+            if (tratamientoId == null || existentes.contains(tratamientoId)) {
                 continue;
             }
 
-            if (existentes.contains(tratamientoId)) {
-                continue;
-            }
             Tratamiento tratamiento = tratamientoService.obtenerPorId(tratamientoId);
 
             if (!tratamiento.isActivo()) {
                 throw new IllegalStateException("No se puede aplicar un tratamiento inactivo.");
             }
 
-            TratamientoAplicado tratamientoAplicado = new TratamientoAplicado(tratamiento.getId(), tratamiento.getNombre(), tratamiento.getPrecio(), tratamiento.getDuracionMinutos());
+            TratamientoAplicado tratamientoAplicado = new TratamientoAplicado(
+                    tratamiento.getId(),
+                    tratamiento.getNombre(),
+                    tratamiento.getPrecio(),
+                    tratamiento.getDuracionMinutos()
+            );
+
             cita.agregarTratamiento(tratamientoAplicado);
             existentes.add(tratamientoId);
         }
@@ -110,10 +131,12 @@ public class CitaService {
     public Cita cambiarInicio(Long id, LocalDateTime nuevoInicio) {
         Cita cita = obtenerExistente(id);
         validarInicio(nuevoInicio);
+
         long duracion = cita.getDuracionMinutos();
         if (duracion <= 0) {
             duracion = DURACION_POR_DEFECTO_MINUTOS;
         }
+
         cita.setInicio(nuevoInicio);
         cita.setFin(nuevoInicio.plusMinutes(duracion));
         return guardar(cita);
@@ -131,11 +154,19 @@ public class CitaService {
         if (tratamientoId == null) {
             throw new IllegalArgumentException("El identificador del tratamiento es obligatorio.");
         }
+
         Tratamiento tratamiento = tratamientoService.obtenerPorId(tratamientoId);
         if (!tratamiento.isActivo()) {
             throw new IllegalStateException("No se puede aplicar un tratamiento inactivo.");
         }
-        TratamientoAplicado tratamientoAplicado = new TratamientoAplicado(tratamiento.getId(), tratamiento.getNombre(), tratamiento.getPrecio(), tratamiento.getDuracionMinutos());
+
+        TratamientoAplicado tratamientoAplicado = new TratamientoAplicado(
+                tratamiento.getId(),
+                tratamiento.getNombre(),
+                tratamiento.getPrecio(),
+                tratamiento.getDuracionMinutos()
+        );
+
         cita.agregarTratamiento(tratamientoAplicado);
         return citaRepository.save(cita);
     }
@@ -148,7 +179,10 @@ public class CitaService {
         if (cita.getTratamientos() == null) {
             return cita;
         }
-        cita.getTratamientos().removeIf(tratamiento -> tratamiento != null && tratamientoId.equals(tratamiento.getTratamientoId()));
+
+        cita.getTratamientos().removeIf(tratamiento ->
+                tratamiento != null && tratamientoId.equals(tratamiento.getTratamientoId()));
+
         return citaRepository.save(cita);
     }
 
@@ -164,6 +198,7 @@ public class CitaService {
         if (fecha == null) {
             throw new IllegalArgumentException("La fecha no puede ser nula.");
         }
+
         LocalDateTime inicio = fecha.atStartOfDay();
         LocalDateTime fin = fecha.plusDays(1).atStartOfDay();
         return obtenerPorRango(inicio, fin);
@@ -171,16 +206,38 @@ public class CitaService {
 
     public List<Cita> obtenerPorRango(LocalDateTime inicio, LocalDateTime fin) {
         validarRango(inicio, fin);
-        return citaRepository.findAll().stream().filter(cita -> intersecta(cita.getInicio(), cita.getFin(), inicio, fin)).sorted(
-                        Comparator.comparing(Cita::getInicio, Comparator.nullsLast(Comparator.naturalOrder()))).collect(Collectors.toList());
+
+        return citaRepository.findAll().stream()
+                .filter(cita -> intersecta(cita.getInicio(), cita.getFin(), inicio, fin))
+                .sorted(Comparator.comparing(Cita::getInicio, Comparator.nullsLast(Comparator.naturalOrder())))
+                .collect(Collectors.toList());
     }
 
     public List<Cita> obtenerPorPaciente(Long pacienteId) {
         if (pacienteId == null) {
             throw new IllegalArgumentException("El identificador del paciente no puede ser nulo.");
         }
-        return citaRepository.findAll().stream().filter(cita -> cita.getPaciente() != null && cita.getPaciente().getId() != null && cita.getPaciente().getId().equals(pacienteId))
-                .sorted(Comparator.comparing(Cita::getInicio, Comparator.nullsLast(Comparator.naturalOrder()))).collect(Collectors.toList());
+
+        return citaRepository.findAll().stream()
+                .filter(cita -> cita.getPaciente() != null
+                        && cita.getPaciente().getId() != null
+                        && cita.getPaciente().getId().equals(pacienteId))
+                .sorted(Comparator.comparing(Cita::getInicio, Comparator.nullsLast(Comparator.naturalOrder())))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Obtiene el historial clínico derivado de las citas que ya fueron atendidas.
+     * Las citas canceladas o con inasistencia no forman parte del historial clínico.
+     */
+    public List<Cita> obtenerHistorialPorPaciente(Long pacienteId) {
+        return obtenerPorPaciente(pacienteId).stream()
+                .filter(cita -> cita.getEstado() == EstadoCita.ATENDIDA)
+                .sorted(Comparator.comparing(
+                        Cita::getInicio,
+                        Comparator.nullsLast(Comparator.reverseOrder())
+                ))
+                .collect(Collectors.toList());
     }
 
     public Cita cancelar(Long id) {
@@ -218,8 +275,10 @@ public class CitaService {
         if (cita == null) {
             throw new IllegalArgumentException("La cita no puede ser nula.");
         }
+
         validarPaciente(cita.getPaciente());
         validarInicio(cita.getInicio());
+
         if (cita.getFin() == null) {
             throw new IllegalArgumentException("La cita debe tener una fecha y hora de finalización.");
         }
@@ -238,7 +297,6 @@ public class CitaService {
     }
 
     private void validarPaciente(Paciente paciente) {
-
         if (paciente == null) {
             throw new IllegalArgumentException("El paciente es obligatorio para crear una cita.");
         }
@@ -249,21 +307,18 @@ public class CitaService {
     }
 
     private void validarInicio(LocalDateTime inicio) {
-
         if (inicio == null) {
             throw new IllegalArgumentException("La fecha y hora de inicio son obligatorias.");
         }
     }
 
     private void validarDuracion(long duracionMinutos) {
-
         if (duracionMinutos <= 0) {
             throw new IllegalArgumentException("La duración de la cita debe ser mayor a 0 minutos.");
         }
     }
 
     private void validarRango(LocalDateTime inicio, LocalDateTime fin) {
-
         if (inicio == null || fin == null) {
             throw new IllegalArgumentException("El inicio y fin del rango son obligatorios.");
         }
@@ -284,19 +339,28 @@ public class CitaService {
         if (cita == null || cita.getInicio() == null || cita.getFin() == null) {
             return;
         }
-        boolean existeConflicto = citaRepository.findAll().stream().filter(existente -> {
-                            if (existente.getInicio() == null || existente.getFin() == null) {
-                                return false;
-                            }
-                            if (existente.getEstado() == EstadoCita.CANCELADA) {
-                                return false;
-                            }
-                            if (cita.getId() != null && existente.getId() != null && existente.getId().equals(cita.getId())) {
-                                return false;
-                            }
-                            return true;
-                        })
-                        .anyMatch(existente -> intersecta(cita.getInicio(), cita.getFin(), existente.getInicio(), existente.getFin()));
+
+        boolean existeConflicto = citaRepository.findAll().stream()
+                .filter(existente -> {
+                    if (existente.getInicio() == null || existente.getFin() == null) {
+                        return false;
+                    }
+                    if (existente.getEstado() == EstadoCita.CANCELADA) {
+                        return false;
+                    }
+                    if (cita.getId() != null
+                            && existente.getId() != null
+                            && existente.getId().equals(cita.getId())) {
+                        return false;
+                    }
+                    return true;
+                })
+                .anyMatch(existente -> intersecta(
+                        cita.getInicio(),
+                        cita.getFin(),
+                        existente.getInicio(),
+                        existente.getFin()
+                ));
 
         if (existeConflicto) {
             throw new IllegalStateException("El horario seleccionado entra en conflicto con otra cita.");
@@ -304,10 +368,13 @@ public class CitaService {
     }
 
     private Cita obtenerExistente(Long id) {
-
         if (id == null) {
             throw new IllegalArgumentException("El identificador de la cita no puede ser nulo.");
         }
-        return citaRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("No existe una cita con el identificador: " + id));
+
+        return citaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "No existe una cita con el identificador: " + id
+                ));
     }
 }

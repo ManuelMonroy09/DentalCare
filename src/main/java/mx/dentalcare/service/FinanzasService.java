@@ -46,6 +46,14 @@ public class FinanzasService {
                 .toList();
     }
 
+    public Pago obtenerPagoPorId(Long pagoId) {
+        if (pagoId == null) {
+            throw new IllegalArgumentException("El identificador del pago es obligatorio.");
+        }
+        return pagoRepository.findById(pagoId)
+                .orElseThrow(() -> new IllegalArgumentException("No existe el pago seleccionado."));
+    }
+
     public Cargo obtenerOCrearCargo(Cita cita) {
         if (cita == null || cita.getId() == null) {
             throw new IllegalArgumentException("La cita debe estar guardada.");
@@ -104,19 +112,10 @@ public class FinanzasService {
     }
 
     public void cancelarPago(Long pagoId) {
-        if (pagoId == null) {
-            throw new IllegalArgumentException("El identificador del pago es obligatorio.");
-        }
-
-        Pago pago = pagoRepository.findAll().stream()
-                .filter(p -> pagoId.equals(p.getId()))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("No existe el pago seleccionado."));
-
+        Pago pago = obtenerPagoPorId(pagoId);
         if (pago.getEstado() == EstadoPago.CANCELADO) {
             throw new IllegalStateException("El pago seleccionado ya está cancelado.");
         }
-
         pago.setEstado(EstadoPago.CANCELADO);
         pagoRepository.save(pago);
     }
@@ -159,9 +158,23 @@ public class FinanzasService {
 
     public BigDecimal obtenerPorCobrar() {
         return dinero(obtenerCargos().stream()
-                .map(c -> c.getImporte().subtract(obtenerTotalPagado(c.getId())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add)
-                .max(BigDecimal.ZERO));
+                .map(c -> dinero(c.getImporte()).subtract(obtenerTotalPagado(c.getId())).max(BigDecimal.ZERO))
+                .reduce(BigDecimal.ZERO, BigDecimal::add));
+    }
+
+    public List<Cargo> obtenerCargosPorPaciente(Long pacienteId) {
+        if (pacienteId == null) {
+            throw new IllegalArgumentException("El identificador del paciente es obligatorio.");
+        }
+        return obtenerCargos().stream()
+                .filter(c -> pacienteId.equals(c.getPacienteId()))
+                .toList();
+    }
+
+    public BigDecimal obtenerSaldoPaciente(Long pacienteId) {
+        return dinero(obtenerCargosPorPaciente(pacienteId).stream()
+                .map(c -> dinero(c.getImporte()).subtract(obtenerTotalPagado(c.getId())).max(BigDecimal.ZERO))
+                .reduce(BigDecimal.ZERO, BigDecimal::add));
     }
 
     private String construirConcepto(Cita cita) {

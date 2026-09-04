@@ -19,22 +19,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class LoginController {
 
-    @FXML
-    private StackPane authRoot;
-
-    @FXML
-    private PasswordField txtPassword;
-
-    @FXML
-    private Label lblError;
+    @FXML private StackPane authRoot;
+    @FXML private PasswordField txtPassword;
+    @FXML private Label lblError;
 
     private final AuthenticationService authenticationService;
     private final ApplicationContext context;
 
-    public LoginController(
-            AuthenticationService authenticationService,
-            ApplicationContext context
-    ) {
+    public LoginController(AuthenticationService authenticationService, ApplicationContext context) {
         this.authenticationService = authenticationService;
         this.context = context;
     }
@@ -42,7 +34,6 @@ public class LoginController {
     @FXML
     private void iniciarSesion() {
         ocultarError();
-
         String password = txtPassword.getText();
 
         try {
@@ -57,6 +48,12 @@ public class LoginController {
         } catch (Exception e) {
             mostrarError("No fue posible iniciar DentalCare. Verifica la configuración de seguridad.");
         }
+    }
+
+    @FXML
+    private void cerrarVentana() {
+        Stage stage = (Stage) authRoot.getScene().getWindow();
+        stage.close();
     }
 
     private void mostrarTransicion() {
@@ -75,13 +72,11 @@ public class LoginController {
 
         Label titulo = new Label("DentalCare");
         titulo.getStyleClass().add("auth-transition-title");
-
         Label mensaje = new Label("Preparando tu espacio de trabajo...");
         mensaje.getStyleClass().add("auth-transition-message");
 
         javafx.scene.layout.VBox textos = new javafx.scene.layout.VBox(6, titulo, mensaje);
         textos.setAlignment(javafx.geometry.Pos.CENTER);
-
         javafx.scene.layout.VBox grupo = new javafx.scene.layout.VBox(18, indicador, textos);
         grupo.setAlignment(javafx.geometry.Pos.CENTER);
 
@@ -110,9 +105,7 @@ public class LoginController {
     private void abrirAplicacion() throws Exception {
         Stage stage = (Stage) txtPassword.getScene().getWindow();
 
-        FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/ui/fxml/MainView.fxml")
-        );
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/ui/fxml/MainView.fxml"));
         loader.setControllerFactory(context::getBean);
 
         Parent root = loader.load();
@@ -124,6 +117,7 @@ public class LoginController {
         stage.setMinHeight(650);
         stage.setResizable(true);
         stage.show();
+        stage.centerOnScreen();
 
         root.setOpacity(0);
         FadeTransition salida = new FadeTransition(Duration.millis(260), root);

@@ -10,6 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
@@ -49,7 +50,7 @@ public class NuevaCitaController {
     private ComboBox<Integer> cmbDuracion;
 
     @FXML
-    private ComboBox<String> cmbMotivo;
+    private TextField txtMotivo;
 
     @FXML
     private ComboBox<Tratamiento> cmbTratamiento;
@@ -79,11 +80,13 @@ public class NuevaCitaController {
     private final CitaService citaService;
     private final TratamientoService tratamientoService;
     private Cita citaEditar;
-    private boolean modoEdicion = false;
+    private boolean modoEdicion;
     private final ObservableList<TratamientoAplicado> tratamientosSeleccionados = FXCollections.observableArrayList();
     private static final DateTimeFormatter FORMATO_HORA = DateTimeFormatter.ofPattern("HH:mm");
 
-    public NuevaCitaController(PacientesService pacientesService, CitaService citaService, TratamientoService tratamientoService) {
+    public NuevaCitaController(PacientesService pacientesService,
+                               CitaService citaService,
+                               TratamientoService tratamientoService) {
         this.pacientesService = pacientesService;
         this.citaService = citaService;
         this.tratamientoService = tratamientoService;
@@ -94,71 +97,52 @@ public class NuevaCitaController {
         configurarPacientes();
         configurarHoras();
         configurarDuraciones();
-        configurarMotivos();
         configurarTratamientos();
         configurarListaTratamientos();
         configurarEventos();
+
         dateFecha.setValue(LocalDate.now());
         cmbDuracion.getSelectionModel().select(Integer.valueOf(60));
         actualizarTotalTratamientos();
     }
+
     private void configurarPacientes() {
         List<Paciente> pacientes = pacientesService.obtenerTodos();
-        pacientes.sort(Comparator.comparing(Paciente::getNombre, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)));
+        pacientes.sort(Comparator.comparing(
+                Paciente::getNombre,
+                Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)
+        ));
+
         cmbPaciente.getItems().setAll(pacientes);
+
         cmbPaciente.setCellFactory(listView -> new ListCell<>() {
             @Override
             protected void updateItem(Paciente paciente, boolean empty) {
-                        super.updateItem(paciente, empty);
-                        if (empty || paciente == null) {
-                            setText(null);
-                        } else {
-                            setText(formatearPaciente(paciente));
-                        }
-                    }
-                }
-        );
+                super.updateItem(paciente, empty);
+                setText(empty || paciente == null ? null : formatearPaciente(paciente));
+            }
+        });
 
         cmbPaciente.setButtonCell(new ListCell<>() {
             @Override
             protected void updateItem(Paciente paciente, boolean empty) {
                 super.updateItem(paciente, empty);
-                if (empty || paciente == null) {
-                    setText(null);
-                } else {
-                    setText(formatearPaciente(paciente));
-                }
+                setText(empty || paciente == null ? null : formatearPaciente(paciente));
             }
         });
     }
 
     private String formatearPaciente(Paciente paciente) {
+        String nombre = paciente.getNombre() != null ? paciente.getNombre().trim() : "";
+        String apellidoPaterno = paciente.getApellidoPaterno() != null ? paciente.getApellidoPaterno().trim() : "";
+        String apellidoMaterno = paciente.getApellidoMaterno() != null ? paciente.getApellidoMaterno().trim() : "";
 
-        String nombre = paciente.getNombre() != null
-                ? paciente.getNombre().trim()
-                : "";
-
-        String apellidoPaterno = paciente.getApellidoPaterno() != null
-                ? paciente.getApellidoPaterno().trim()
-                : "";
-
-        String apellidoMaterno = paciente.getApellidoMaterno() != null
-                ? paciente.getApellidoMaterno().trim()
-                : "";
-
-        return (nombre + " "
-                + apellidoPaterno + " "
-                + apellidoMaterno)
+        return (nombre + " " + apellidoPaterno + " " + apellidoMaterno)
                 .trim()
                 .replaceAll("\\s+", " ");
     }
 
-    // =========================================================
-    // HORAS
-    // =========================================================
-
     private void configurarHoras() {
-
         cmbHora.getItems().clear();
 
         for (int hora = 8; hora <= 19; hora++) {
@@ -170,104 +154,39 @@ public class NuevaCitaController {
     }
 
     private void agregarHora(int hora, int minutos) {
-
-        cmbHora.getItems().add(
-                String.format("%02d:%02d", hora, minutos)
-        );
+        cmbHora.getItems().add(String.format("%02d:%02d", hora, minutos));
     }
-
-    // =========================================================
-    // DURACIONES
-    // =========================================================
 
     private void configurarDuraciones() {
-
-        cmbDuracion.getItems().setAll(
-                30,
-                45,
-                60,
-                90,
-                120,
-                150,
-                180
-        );
+        cmbDuracion.getItems().setAll(30, 45, 60, 90, 120, 150, 180);
     }
-
-    // =========================================================
-    // MOTIVOS
-    // =========================================================
-
-    private void configurarMotivos() {
-
-        cmbMotivo.getItems().setAll(
-                "Valoración",
-                "Limpieza dental",
-                "Consulta",
-                "Dolor dental",
-                "Revisión",
-                "Resina",
-                "Extracción",
-                "Endodoncia",
-                "Ortodoncia",
-                "Prótesis",
-                "Blanqueamiento",
-                "Otro"
-        );
-    }
-
-    // =========================================================
-    // TRATAMIENTOS
-    // =========================================================
 
     private void configurarTratamientos() {
-
         List<Tratamiento> tratamientos = new ArrayList<>(tratamientoService.obtenerActivos());
-        tratamientos.sort(Comparator.comparing(Tratamiento::getNombre, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)));
+        tratamientos.sort(Comparator.comparing(
+                Tratamiento::getNombre,
+                Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)
+        ));
         cmbTratamiento.getItems().setAll(tratamientos);
 
-        cmbTratamiento.setCellFactory(listView ->
-                new ListCell<>() {
+        cmbTratamiento.setCellFactory(listView -> new ListCell<>() {
+            @Override
+            protected void updateItem(Tratamiento tratamiento, boolean empty) {
+                super.updateItem(tratamiento, empty);
+                setText(empty || tratamiento == null ? null : formatearTratamiento(tratamiento));
+            }
+        });
 
-                    @Override
-                    protected void updateItem(
-                            Tratamiento tratamiento,
-                            boolean empty
-                    ) {
-
-                        super.updateItem(tratamiento, empty);
-
-                        if (empty || tratamiento == null) {
-                            setText(null);
-                        } else {
-                            setText(formatearTratamiento(tratamiento));
-                        }
-                    }
-                }
-        );
-
-        cmbTratamiento.setButtonCell(
-                new ListCell<>() {
-
-                    @Override
-                    protected void updateItem(
-                            Tratamiento tratamiento,
-                            boolean empty
-                    ) {
-
-                        super.updateItem(tratamiento, empty);
-
-                        if (empty || tratamiento == null) {
-                            setText(null);
-                        } else {
-                            setText(formatearTratamiento(tratamiento));
-                        }
-                    }
-                }
-        );
+        cmbTratamiento.setButtonCell(new ListCell<>() {
+            @Override
+            protected void updateItem(Tratamiento tratamiento, boolean empty) {
+                super.updateItem(tratamiento, empty);
+                setText(empty || tratamiento == null ? null : formatearTratamiento(tratamiento));
+            }
+        });
     }
 
     private String formatearTratamiento(Tratamiento tratamiento) {
-
         if (tratamiento == null) {
             return "";
         }
@@ -276,97 +195,56 @@ public class NuevaCitaController {
                 ? tratamiento.getPrecio()
                 : BigDecimal.ZERO;
 
-        return tratamiento.getNombre()
-                + "  ·  $"
-                + precio.setScale(2).toPlainString();
+        return tratamiento.getNombre() + "  ·  $" + precio.setScale(2).toPlainString();
     }
 
     private void configurarListaTratamientos() {
-
         lstTratamientos.setItems(tratamientosSeleccionados);
+        lstTratamientos.setCellFactory(listView -> new ListCell<>() {
+            private final Label lblNombre = new Label();
+            private final Label lblPrecio = new Label();
+            private final Button btnEliminar = new Button("×");
+            private final HBox contenedor = new HBox(10, lblNombre, lblPrecio, btnEliminar);
 
-        lstTratamientos.setCellFactory(listView ->
-                new ListCell<>() {
+            {
+                HBox.setHgrow(lblNombre, Priority.ALWAYS);
+                btnEliminar.setFocusTraversable(false);
+                btnEliminar.getStyleClass().add("danger-button");
+                contenedor.setMaxWidth(Double.MAX_VALUE);
+                contenedor.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
 
-                    private final Label lblNombre = new Label();
-                    private final Label lblPrecio = new Label();
-                    private final Button btnEliminar = new Button("×");
-                    private final HBox contenedor = new HBox(
-                            10,
-                            lblNombre,
-                            lblPrecio,
-                            btnEliminar
-                    );
-
-                    {
-                        HBox.setHgrow(lblNombre, Priority.ALWAYS);
-
-                        btnEliminar.setFocusTraversable(false);
-                        btnEliminar.getStyleClass().add("danger-button");
-
-                        contenedor.setMaxWidth(Double.MAX_VALUE);
-                        contenedor.setAlignment(
-                                javafx.geometry.Pos.CENTER_LEFT
-                        );
-
-                        btnEliminar.setOnAction(event -> {
-
-                            TratamientoAplicado tratamiento =
-                                    getItem();
-
-                            if (tratamiento != null) {
-                                tratamientosSeleccionados.remove(
-                                        tratamiento
-                                );
-
-                                actualizarTotalTratamientos();
-                            }
-                        });
+                btnEliminar.setOnAction(event -> {
+                    TratamientoAplicado tratamiento = getItem();
+                    if (tratamiento != null) {
+                        tratamientosSeleccionados.remove(tratamiento);
+                        actualizarTotalTratamientos();
                     }
+                });
+            }
 
-                    @Override
-                    protected void updateItem(
-                            TratamientoAplicado tratamiento,
-                            boolean empty
-                    ) {
+            @Override
+            protected void updateItem(TratamientoAplicado tratamiento, boolean empty) {
+                super.updateItem(tratamiento, empty);
 
-                        super.updateItem(tratamiento, empty);
-
-                        if (empty || tratamiento == null) {
-
-                            setGraphic(null);
-
-                        } else {
-
-                            lblNombre.setText(
-                                    tratamiento.getNombre()
-                            );
-
-                            BigDecimal precio =
-                                    tratamiento.getPrecio() != null
-                                            ? tratamiento.getPrecio()
-                                            : BigDecimal.ZERO;
-
-                            lblPrecio.setText(
-                                    "$"
-                                            + precio
-                                            .setScale(2)
-                                            .toPlainString()
-                            );
-
-                            setGraphic(contenedor);
-                        }
-                    }
+                if (empty || tratamiento == null) {
+                    setGraphic(null);
+                    return;
                 }
-        );
+
+                lblNombre.setText(tratamiento.getNombre());
+                BigDecimal precio = tratamiento.getPrecio() != null
+                        ? tratamiento.getPrecio()
+                        : BigDecimal.ZERO;
+                lblPrecio.setText("$" + precio.setScale(2).toPlainString());
+                setGraphic(contenedor);
+            }
+        });
     }
 
     private void agregarTratamientoSeleccionado() {
-
         limpiarError();
 
-        Tratamiento tratamiento =
-                cmbTratamiento.getSelectionModel().getSelectedItem();
+        Tratamiento tratamiento = cmbTratamiento.getSelectionModel().getSelectedItem();
 
         if (tratamiento == null) {
             mostrarError("Selecciona un tratamiento.");
@@ -374,435 +252,217 @@ public class NuevaCitaController {
         }
 
         if (!tratamiento.isActivo()) {
-            mostrarError(
-                    "No se puede agregar un tratamiento inactivo."
-            );
+            mostrarError("No se puede agregar un tratamiento inactivo.");
             return;
         }
 
-        boolean yaSeleccionado =
-                tratamientosSeleccionados.stream()
-                        .anyMatch(aplicado ->
-                                aplicado != null
-                                        && tratamiento.getId() != null
-                                        && tratamiento.getId().equals(
-                                        aplicado.getTratamientoId()
-                                )
-                        );
+        boolean yaSeleccionado = tratamientosSeleccionados.stream()
+                .anyMatch(aplicado -> aplicado != null
+                        && tratamiento.getId() != null
+                        && tratamiento.getId().equals(aplicado.getTratamientoId()));
 
         if (yaSeleccionado) {
-            mostrarError(
-                    "Ese tratamiento ya está agregado a la cita."
-            );
+            mostrarError("Ese tratamiento ya está agregado a la cita.");
             return;
         }
 
-        TratamientoAplicado aplicado =
-                new TratamientoAplicado(
-                        tratamiento.getId(),
-                        tratamiento.getNombre(),
-                        tratamiento.getPrecio(),
-                        tratamiento.getDuracionMinutos()
-                );
-
-        tratamientosSeleccionados.add(aplicado);
+        tratamientosSeleccionados.add(new TratamientoAplicado(
+                tratamiento.getId(),
+                tratamiento.getNombre(),
+                tratamiento.getPrecio(),
+                tratamiento.getDuracionMinutos()
+        ));
 
         cmbTratamiento.getSelectionModel().clearSelection();
-
         actualizarTotalTratamientos();
     }
 
     private void actualizarTotalTratamientos() {
-
-        BigDecimal total = tratamientosSeleccionados
-                .stream()
+        BigDecimal total = tratamientosSeleccionados.stream()
                 .map(TratamientoAplicado::obtenerImporte)
-                .reduce(
-                        BigDecimal.ZERO,
-                        BigDecimal::add
-                );
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        lblTotalTratamientos.setText(
-                "$" + total.setScale(2).toPlainString()
-        );
+        lblTotalTratamientos.setText("$" + total.setScale(2).toPlainString());
     }
-
-    // =========================================================
-    // EVENTOS
-    // =========================================================
 
     private void configurarEventos() {
-
         btnGuardar.setOnAction(event -> guardarCita());
-
         btnCancelar.setOnAction(event -> cerrarVentana());
-
-        btnAgregarTratamiento.setOnAction(
-                event -> agregarTratamientoSeleccionado()
-        );
+        btnAgregarTratamiento.setOnAction(event -> agregarTratamientoSeleccionado());
     }
 
-    // =========================================================
-    // EDICIÓN
-    // =========================================================
-
     public void prepararParaEdicion(Cita cita) {
-
         if (cita == null) {
             return;
         }
 
         this.citaEditar = cita;
         this.modoEdicion = true;
-
         cargarDatosCita();
-
         btnGuardar.setText("Guardar cambios");
     }
 
     private void cargarDatosCita() {
-
         if (citaEditar == null) {
             return;
         }
 
-        // Paciente
-        if (citaEditar.getPaciente() != null
-                && citaEditar.getPaciente().getId() != null) {
-
-            Long pacienteId =
-                    citaEditar.getPaciente().getId();
-
-            for (Paciente paciente : cmbPaciente.getItems()) {
-
-                if (paciente.getId() != null
-                        && paciente.getId().equals(pacienteId)) {
-
-                    cmbPaciente.getSelectionModel()
-                            .select(paciente);
-
-                    break;
-                }
-            }
+        if (citaEditar.getPaciente() != null && citaEditar.getPaciente().getId() != null) {
+            Long pacienteId = citaEditar.getPaciente().getId();
+            cmbPaciente.getItems().stream()
+                    .filter(paciente -> paciente.getId() != null && paciente.getId().equals(pacienteId))
+                    .findFirst()
+                    .ifPresent(paciente -> cmbPaciente.getSelectionModel().select(paciente));
         }
 
-        // Fecha y hora
         if (citaEditar.getInicio() != null) {
-
-            dateFecha.setValue(
-                    citaEditar.getInicio().toLocalDate()
-            );
-
-            cmbHora.getSelectionModel().select(
-                    citaEditar
-                            .getInicio()
-                            .toLocalTime()
-                            .format(FORMATO_HORA)
-            );
+            dateFecha.setValue(citaEditar.getInicio().toLocalDate());
+            cmbHora.getSelectionModel().select(citaEditar.getInicio().toLocalTime().format(FORMATO_HORA));
         }
 
-        // Duración
-        long duracion =
-                citaEditar.getDuracionMinutos();
-
-        if (cmbDuracion.getItems().contains((int) duracion)) {
-
-            cmbDuracion.getSelectionModel()
-                    .select((int) duracion);
-
-        } else {
-
-            cmbDuracion.getItems().add((int) duracion);
-
-            cmbDuracion.getSelectionModel()
-                    .select((int) duracion);
+        int duracion = (int) citaEditar.getDuracionMinutos();
+        if (!cmbDuracion.getItems().contains(duracion)) {
+            cmbDuracion.getItems().add(duracion);
         }
+        cmbDuracion.getSelectionModel().select(duracion);
 
-        // Motivo
-        if (citaEditar.getMotivo() != null) {
+        txtMotivo.setText(citaEditar.getMotivo() != null ? citaEditar.getMotivo() : "");
+        txtNotas.setText(citaEditar.getNotas() != null ? citaEditar.getNotas() : "");
 
-            cmbMotivo.getEditor()
-                    .setText(citaEditar.getMotivo());
-
-        } else {
-
-            cmbMotivo.getEditor().clear();
-        }
-
-        // Notas
-        if (citaEditar.getNotas() != null) {
-
-            txtNotas.setText(citaEditar.getNotas());
-
-        } else {
-
-            txtNotas.clear();
-        }
-
-        // Tratamientos existentes
         tratamientosSeleccionados.clear();
-
         if (citaEditar.getTratamientos() != null) {
-
-            tratamientosSeleccionados.addAll(
-                    citaEditar.getTratamientos()
-            );
+            tratamientosSeleccionados.addAll(citaEditar.getTratamientos());
         }
-
         actualizarTotalTratamientos();
     }
 
-    public void prepararNuevaCita(
-            LocalDate fecha,
-            LocalTime hora
-    ) {
-
+    public void prepararNuevaCita(LocalDate fecha, LocalTime hora) {
         if (fecha != null) {
             dateFecha.setValue(fecha);
         }
 
         if (hora != null) {
-
-            String horaFormateada =
-                    hora.format(FORMATO_HORA);
-
-            if (cmbHora.getItems()
-                    .contains(horaFormateada)) {
-
-                cmbHora.getSelectionModel()
-                        .select(horaFormateada);
+            String horaFormateada = hora.format(FORMATO_HORA);
+            if (cmbHora.getItems().contains(horaFormateada)) {
+                cmbHora.getSelectionModel().select(horaFormateada);
             }
         }
 
         modoEdicion = false;
         citaEditar = null;
-
+        txtMotivo.clear();
+        txtNotas.clear();
         tratamientosSeleccionados.clear();
-
         actualizarTotalTratamientos();
-
         btnGuardar.setText("Guardar cita");
     }
 
-    // =========================================================
-    // GUARDAR
-    // =========================================================
-
     private void guardarCita() {
-
         limpiarError();
 
         try {
-
-            Paciente paciente =
-                    cmbPaciente.getSelectionModel()
-                            .getSelectedItem();
-
+            Paciente paciente = cmbPaciente.getSelectionModel().getSelectedItem();
             if (paciente == null) {
                 mostrarError("Selecciona un paciente.");
                 return;
             }
 
-            LocalDate fecha =
-                    dateFecha.getValue();
-
+            LocalDate fecha = dateFecha.getValue();
             if (fecha == null) {
-                mostrarError(
-                        "Selecciona una fecha para la cita."
-                );
+                mostrarError("Selecciona una fecha para la cita.");
                 return;
             }
 
-            String horaSeleccionada =
-                    cmbHora.getSelectionModel()
-                            .getSelectedItem();
-
-            if (horaSeleccionada == null
-                    || horaSeleccionada.isBlank()) {
-
-                mostrarError(
-                        "Selecciona una hora de inicio."
-                );
-
+            String horaSeleccionada = cmbHora.getSelectionModel().getSelectedItem();
+            if (horaSeleccionada == null || horaSeleccionada.isBlank()) {
+                mostrarError("Selecciona una hora de inicio.");
                 return;
             }
 
-            Integer duracion =
-                    cmbDuracion.getSelectionModel()
-                            .getSelectedItem();
-
+            Integer duracion = cmbDuracion.getSelectionModel().getSelectedItem();
             if (duracion == null || duracion <= 0) {
-
-                mostrarError(
-                        "Selecciona una duración válida."
-                );
-
+                mostrarError("Selecciona una duración válida.");
                 return;
             }
 
-            LocalTime hora =
-                    LocalTime.parse(horaSeleccionada);
-
-            LocalDateTime inicio =
-                    LocalDateTime.of(fecha, hora);
-
+            LocalDateTime inicio = LocalDateTime.of(fecha, LocalTime.parse(horaSeleccionada));
             String motivo = obtenerMotivo();
-
             String notas = txtNotas.getText();
-
-            List<Long> tratamientoIds =
-                    obtenerTratamientoIdsSeleccionados();
+            List<Long> tratamientoIds = obtenerTratamientoIdsSeleccionados();
 
             if (modoEdicion) {
-
                 citaEditar.setPaciente(paciente);
-
                 citaEditar.setInicio(inicio);
-
-                citaEditar.establecerDuracion(
-                        duracion
-                );
-
-                citaEditar.setMotivo(
-                        motivo != null && !motivo.isBlank()
-                                ? motivo.trim()
-                                : null
-                );
-
-                citaEditar.setNotas(
-                        notas != null && !notas.isBlank()
-                                ? notas.trim()
-                                : null
-                );
-
-                citaService.guardarConTratamientos(
-                        citaEditar,
-                        tratamientoIds
-                );
-
+                citaEditar.establecerDuracion(duracion);
+                citaEditar.setMotivo(motivo);
+                citaEditar.setNotas(limpiarTexto(notas));
+                citaService.guardarConTratamientos(citaEditar, tratamientoIds);
             } else {
-
-                Cita cita =
-                        citaService.crear(
-                                paciente,
-                                inicio,
-                                duracion
-                        );
-
-                if (motivo != null
-                        && !motivo.isBlank()) {
-
-                    cita.setMotivo(
-                            motivo.trim()
-                    );
-                }
-
-                if (notas != null
-                        && !notas.isBlank()) {
-
-                    cita.setNotas(
-                            notas.trim()
-                    );
-                }
-
-                citaService.guardarConTratamientos(
-                        cita,
-                        tratamientoIds
-                );
+                Cita cita = citaService.crear(paciente, inicio, duracion);
+                cita.setMotivo(motivo);
+                cita.setNotas(limpiarTexto(notas));
+                citaService.guardarConTratamientos(cita, tratamientoIds);
             }
 
             cerrarVentana();
 
-        } catch (IllegalStateException e) {
-
+        } catch (IllegalStateException | IllegalArgumentException e) {
             mostrarError(e.getMessage());
-
-        } catch (IllegalArgumentException e) {
-
-            mostrarError(e.getMessage());
-
         } catch (Exception e) {
-
             e.printStackTrace();
-
-            mostrarError(
-                    "No fue posible guardar la cita. "
-                            + "Revisa los datos e inténtalo nuevamente."
-            );
+            mostrarError("No fue posible guardar la cita. Revisa los datos e inténtalo nuevamente.");
         }
     }
 
     private List<Long> obtenerTratamientoIdsSeleccionados() {
-
         Set<Long> ids = new HashSet<>();
 
-        for (TratamientoAplicado tratamiento :
-                tratamientosSeleccionados) {
-
-            if (tratamiento != null
-                    && tratamiento.getTratamientoId() != null) {
-
-                ids.add(
-                        tratamiento.getTratamientoId()
-                );
+        for (TratamientoAplicado tratamiento : tratamientosSeleccionados) {
+            if (tratamiento != null && tratamiento.getTratamientoId() != null) {
+                ids.add(tratamiento.getTratamientoId());
             }
         }
 
         return new ArrayList<>(ids);
     }
 
-    // =========================================================
-    // UTILIDADES
-    // =========================================================
-
     private String obtenerMotivo() {
+        return limpiarTexto(txtMotivo.getText());
+    }
 
-        String motivo =
-                cmbMotivo.getEditor().getText();
-
-        if (motivo == null || motivo.isBlank()) {
+    private String limpiarTexto(String texto) {
+        if (texto == null || texto.isBlank()) {
             return null;
         }
-
-        return motivo.trim();
+        return texto.trim();
     }
 
     private void mostrarError(String mensaje) {
-
-        lblError.setText(
-                mensaje != null
-                        ? mensaje
-                        : "Ocurrió un error inesperado."
-        );
-
+        lblError.setText(mensaje != null ? mensaje : "Ocurrió un error inesperado.");
         lblError.setVisible(true);
         lblError.setManaged(true);
     }
 
     private void limpiarError() {
-
         lblError.setText("");
         lblError.setVisible(false);
         lblError.setManaged(false);
     }
 
     private void cerrarVentana() {
-
-        Stage stage =
-                (Stage) btnCancelar
-                        .getScene()
-                        .getWindow();
-
+        Stage stage = (Stage) btnCancelar.getScene().getWindow();
         stage.close();
     }
 
     public void setCitaEditar(Cita citaEditar) {
+        if (citaEditar == null) {
+            return;
+        }
 
         this.citaEditar = citaEditar;
+        this.modoEdicion = true;
 
-        if (citaEditar != null
-                && cmbPaciente != null) {
-
+        if (cmbPaciente != null) {
             cargarDatosCita();
         }
     }

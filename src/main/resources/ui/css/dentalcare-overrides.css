@@ -34,12 +34,6 @@
     -fx-text-overrun: ellipsis;
 }
 
-/*
- * La tarjeta de agenda muestra únicamente información esencial.
- * Motivo y notas se conservan en la cita y se consultan desde el
- * detalle de la cita, evitando que el contenido invada la siguiente
- * franja horaria cuando la cita es corta.
- */
 .agenda-event-notes,
 .agenda-event-reason {
     -fx-font-size: 0px;
@@ -76,4 +70,80 @@
 
 .dashboard-appointment:hover {
     -fx-background-color: #f3f4f6;
+}
+
+/* =========================================================
+   AUTENTICACIÓN
+   ========================================================= */
+
+.auth-root {
+    -fx-background-color: #f6f7f9;
+}
+
+.auth-card {
+    -fx-background-color: white;
+    -fx-background-radius: 14px;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1px;
+    -fx-border-radius: 14px;
+    -fx-padding: 36px;
+    -fx-effect: dropshadow(gaussian, rgba(17,24,39,0.10), 24, 0.15, 0, 6);
+}
+
+.auth-logo {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #111827;
+}
+
+.auth-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #111827;
+}
+
+.auth-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #6b7280;
+    -fx-wrap-text: true;
+}
+
+.auth-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #374151;
+}
+
+.auth-field {
+    -fx-pref-height: 44px;
+    -fx-min-height: 44px;
+    -fx-background-color: white;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 0 12px;
+    -fx-font-size: 14px;
+}
+
+.auth-field:focused {
+    -fx-border-color: #2563eb;
+    -fx-border-width: 2px;
+}
+
+.auth-error {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #dc2626;
+    -fx-wrap-text: true;
+}
+
+.auth-warning {
+    -fx-background-color: #fff7ed;
+    -fx-background-radius: 8px;
+    -fx-border-color: #fed7aa;
+    -fx-border-radius: 8px;
+    -fx-padding: 12px;
+    -fx-text-fill: #9a3412;
+    -fx-font-size: 12px;
 }

@@ -14,9 +14,7 @@
       spacing="20"
       styleClass="content"
       stylesheets="@../css/dentalcare.css">
-    <padding>
-        <Insets top="5" right="0" bottom="5" left="0"/>
-    </padding>
+    <padding><Insets top="5" right="0" bottom="5" left="0"/></padding>
 
     <VBox spacing="5">
         <Label text="Finanzas" styleClass="page-title"/>
@@ -40,6 +38,7 @@
 
     <HBox alignment="CENTER_LEFT" spacing="10">
         <Button text="Registrar pago" onAction="#registrarPago" styleClass="primary-button"/>
+        <Button text="Imprimir recibo" onAction="#imprimirRecibo" styleClass="secondary-button"/>
         <Button text="Ver detalle" onAction="#verDetalle" styleClass="secondary-button"/>
         <Button text="Sincronizar cargos" onAction="#sincronizarCargos" styleClass="secondary-button"/>
         <Label fx:id="mensajeLabel" text="" styleClass="page-subtitle" HBox.hgrow="ALWAYS"/>

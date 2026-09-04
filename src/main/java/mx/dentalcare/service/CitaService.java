@@ -6,6 +6,7 @@ import mx.dentalcare.domain.paciente.Paciente;
 import mx.dentalcare.domain.tratamiento.Tratamiento;
 import mx.dentalcare.domain.tratamiento.TratamientoAplicado;
 import mx.dentalcare.event.CitaEstadoCambiadoEvent;
+import mx.dentalcare.repository.CargoRepository;
 import mx.dentalcare.repository.CitaRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -26,12 +27,14 @@ public class CitaService {
     private static final long DURACION_POR_DEFECTO_MINUTOS = 60;
     private final CitaRepository citaRepository;
     private final TratamientoService tratamientoService;
+    private final CargoRepository cargoRepository;
     private final ApplicationEventPublisher eventPublisher;
 
     public CitaService(CitaRepository citaRepository, TratamientoService tratamientoService,
-                       ApplicationEventPublisher eventPublisher) {
+                       CargoRepository cargoRepository, ApplicationEventPublisher eventPublisher) {
         this.citaRepository = citaRepository;
         this.tratamientoService = tratamientoService;
+        this.cargoRepository = cargoRepository;
         this.eventPublisher = eventPublisher;
     }
 
@@ -230,6 +233,10 @@ public class CitaService {
 
     public void eliminar(Long id) {
         if (id == null) throw new IllegalArgumentException("El identificador de la cita no puede ser nulo.");
+        obtenerExistente(id);
+        if (cargoRepository.findByCitaId(id).isPresent()) {
+            throw new IllegalStateException("No se puede eliminar una cita que ya tiene un cargo financiero asociado. Puedes cancelarla para conservar su historial.");
+        }
         citaRepository.deleteById(id);
     }
 

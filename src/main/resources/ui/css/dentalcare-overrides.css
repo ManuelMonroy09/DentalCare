@@ -20,12 +20,12 @@
 .agenda-event-notes, .agenda-event-reason { -fx-font-size: 0px; -fx-padding: 0; -fx-min-height: 0; -fx-pref-height: 0; -fx-max-height: 0; -fx-opacity: 0; }
 
 /* =========================================================
-   DASHBOARD - TRATAMIENTO
+   DASHBOARD
    ========================================================= */
 .dashboard-next-treatment { -fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #374151; }
-.dashboard-appointment-treatment { -fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #374151; }
-.dashboard-appointment { -fx-padding: 10px 12px; -fx-background-color: #f8f9fa; -fx-background-radius: 8px; -fx-border-color: transparent; -fx-border-radius: 8px; }
-.dashboard-appointment:hover { -fx-background-color: #f3f4f6; }
+.dashboard-summary-item { -fx-padding: 4px 0; }
+.dashboard-summary-label { -fx-font-size: 12px; -fx-text-fill: #6b7280; }
+.dashboard-summary-value { -fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #111827; }
 
 /* =========================================================
    AUTENTICACIÓN
@@ -62,6 +62,8 @@
 .auth-transition-title { -fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #111827; }
 .auth-transition-message { -fx-font-size: 13px; -fx-text-fill: #6b7280; }
 .auth-warning { -fx-background-color: #fff7ed; -fx-background-radius: 8px; -fx-border-color: #fed7aa; -fx-border-radius: 8px; -fx-padding: 12px; -fx-text-fill: #9a3412; -fx-font-size: 12px; }
+.auth-close-button { -fx-background-color: transparent; -fx-text-fill: #6b7280; -fx-font-size: 22px; -fx-font-weight: bold; -fx-padding: 4px 8px; -fx-cursor: hand; -fx-background-radius: 8px; }
+.auth-close-button:hover { -fx-background-color: #f3f4f6; -fx-text-fill: #111827; }
 
 /* =========================================================
    FINANZAS

@@ -18,7 +18,7 @@ public class Pago implements Serializable {
     private EstadoPago estado;
 
     public Pago() {
-        this.estado = EstadoPago.PAGADO;
+        this.estado = EstadoPago.REGISTRADO;
     }
 
     public Pago(Long pacienteId, Long cargoId, LocalDateTime fecha, BigDecimal monto, MetodoPago metodoPago, String notas) {
@@ -28,7 +28,7 @@ public class Pago implements Serializable {
         this.monto = monto;
         this.metodoPago = metodoPago;
         this.notas = notas;
-        this.estado = EstadoPago.PAGADO;
+        this.estado = EstadoPago.REGISTRADO;
     }
 
     public Long getId() { return id; }
@@ -54,6 +54,6 @@ public class Pago implements Serializable {
         if (fecha == null) throw new IllegalStateException("El pago debe tener fecha.");
         if (monto == null || monto.compareTo(BigDecimal.ZERO) <= 0) throw new IllegalStateException("El monto del pago debe ser mayor a 0.");
         if (metodoPago == null) throw new IllegalStateException("El método de pago es obligatorio.");
-        if (estado == null) estado = EstadoPago.PAGADO;
+        if (estado == null) estado = EstadoPago.REGISTRADO;
     }
 }

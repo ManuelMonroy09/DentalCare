@@ -32,6 +32,14 @@ public class LoginController {
     }
 
     @FXML
+    private void initialize() {
+        String overrides = getClass().getResource("/ui/css/dentalcare-overrides.css").toExternalForm();
+        if (!authRoot.getStylesheets().contains(overrides)) {
+            authRoot.getStylesheets().add(overrides);
+        }
+    }
+
+    @FXML
     private void iniciarSesion() {
         ocultarError();
         String password = txtPassword.getText();
@@ -103,7 +111,7 @@ public class LoginController {
     }
 
     private void abrirAplicacion() throws Exception {
-        Stage stage = (Stage) txtPassword.getScene().getWindow();
+        Stage loginStage = (Stage) txtPassword.getScene().getWindow();
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/ui/fxml/MainView.fxml"));
         loader.setControllerFactory(context::getBean);
@@ -111,13 +119,16 @@ public class LoginController {
         Parent root = loader.load();
         Scene scene = new Scene(root, 1200, 750);
 
-        stage.setTitle("DentalCare");
-        stage.setScene(scene);
-        stage.setMinWidth(1000);
-        stage.setMinHeight(650);
-        stage.setResizable(true);
-        stage.show();
-        stage.centerOnScreen();
+        Stage applicationStage = new Stage();
+        applicationStage.setTitle("DentalCare");
+        applicationStage.setScene(scene);
+        applicationStage.setMinWidth(1000);
+        applicationStage.setMinHeight(650);
+        applicationStage.setResizable(true);
+        applicationStage.show();
+        applicationStage.centerOnScreen();
+
+        loginStage.close();
 
         root.setOpacity(0);
         FadeTransition salida = new FadeTransition(Duration.millis(260), root);

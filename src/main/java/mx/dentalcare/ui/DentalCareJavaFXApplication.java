@@ -44,6 +44,8 @@ public class DentalCareJavaFXApplication extends Application {
 
         if (ruta.endsWith("LoginView.fxml")) {
             scene.setFill(Color.TRANSPARENT);
+            String overrides = getClass().getResource("/ui/css/dentalcare-overrides.css").toExternalForm();
+            scene.getStylesheets().add(overrides);
         }
 
         stage.setTitle(titulo);

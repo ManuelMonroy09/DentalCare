@@ -46,8 +46,9 @@ public class EncryptedFileTratamientoRepository implements TratamientoRepository
             boolean idExiste;
 
             do {
+                final Long idBuscado = nuevoId;
                 idExiste = data.getTratamientos().stream()
-                        .anyMatch(t -> t.getId() != null && t.getId().equals(nuevoId));
+                        .anyMatch(t -> t.getId() != null && t.getId().equals(idBuscado));
 
                 if (idExiste) {
                     nuevoId++;

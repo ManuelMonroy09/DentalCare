@@ -27,39 +27,45 @@
         <Label text="Consulta y seguimiento de las atenciones realizadas en el consultorio." styleClass="page-subtitle"/>
     </VBox>
 
-    <HBox alignment="CENTER_LEFT" spacing="10">
-        <TextField
-                fx:id="buscarField"
-                promptText="Buscar paciente, motivo o tratamiento..."
-                prefWidth="320"
-                styleClass="search-field"/>
+    <VBox spacing="10">
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <TextField
+                    fx:id="buscarField"
+                    promptText="Buscar paciente, motivo o tratamiento..."
+                    HBox.hgrow="ALWAYS"
+                    styleClass="search-field"/>
 
-        <ComboBox
-                fx:id="pacienteCombo"
-                promptText="Paciente"
-                prefWidth="190"/>
+            <ComboBox
+                    fx:id="pacienteCombo"
+                    promptText="Paciente"
+                    prefWidth="220"/>
 
-        <ComboBox
-                fx:id="tratamientoCombo"
-                promptText="Tratamiento"
-                prefWidth="190"/>
+            <ComboBox
+                    fx:id="tratamientoCombo"
+                    promptText="Tratamiento"
+                    prefWidth="220"/>
+        </HBox>
 
-        <DatePicker
-                fx:id="fechaDesdePicker"
-                promptText="Desde"
-                prefWidth="125"/>
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <Label text="Periodo" styleClass="form-label"/>
 
-        <DatePicker
-                fx:id="fechaHastaPicker"
-                promptText="Hasta"
-                prefWidth="125"/>
+            <DatePicker
+                    fx:id="fechaDesdePicker"
+                    promptText="Desde"
+                    prefWidth="150"/>
 
-        <Button
-                fx:id="limpiarFiltrosButton"
-                text="Limpiar"
-                mnemonicParsing="false"
-                styleClass="secondary-button"/>
-    </HBox>
+            <DatePicker
+                    fx:id="fechaHastaPicker"
+                    promptText="Hasta"
+                    prefWidth="150"/>
+
+            <Button
+                    fx:id="limpiarFiltrosButton"
+                    text="Limpiar filtros"
+                    mnemonicParsing="false"
+                    styleClass="secondary-button"/>
+        </HBox>
+    </VBox>
 
     <TableView
             fx:id="historialTable"

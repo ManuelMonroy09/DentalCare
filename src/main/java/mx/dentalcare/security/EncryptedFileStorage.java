@@ -25,11 +25,26 @@ public class EncryptedFileStorage {
     }
 
     /**
-     * Esquema legado. Se conserva únicamente para migrar los datos existentes.
+     * Esquema legado. Se conserva para compatibilidad durante la migración.
      */
     public <T> void save(Path path, T data, String password) {
-        saveWithDerivedKey(path, data, keyDerivationService.deriveLegacyKey(password,
-                CryptoUtils.randomBytes(EncryptionConstants.SALT_LENGTH)));
+        try {
+            byte[] jsonBytes = objectMapper.writeValueAsBytes(data);
+            byte[] salt = CryptoUtils.randomBytes(EncryptionConstants.SALT_LENGTH);
+            byte[] iv = CryptoUtils.randomBytes(EncryptionConstants.IV_LENGTH);
+            SecretKey key = keyDerivationService.deriveLegacyKey(password, salt);
+            byte[] encrypted = aesEncryptionService.encrypt(jsonBytes, key, iv);
+
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            output.write(salt);
+            output.write(iv);
+            output.write(encrypted);
+
+            Files.createDirectories(path.getParent());
+            Files.write(path, output.toByteArray());
+        } catch (Exception e) {
+            throw new RuntimeException("No fue posible guardar el archivo cifrado.", e);
+        }
     }
 
     /**
@@ -37,57 +52,6 @@ public class EncryptedFileStorage {
      * La contraseña del administrador nunca llega a este método.
      */
     public <T> void save(Path path, T data, SecretKey key) {
-        saveWithKey(path, data, key);
-    }
-
-    /**
-     * Esquema legado. Se conserva únicamente para migrar los datos existentes.
-     */
-    public <T> T load(Path path, Class<T> type, String password) {
-        try {
-            if (!Files.exists(path)) {
-                return null;
-            }
-
-            byte[] fileBytes = Files.readAllBytes(path);
-            validateFile(fileBytes);
-
-            byte[] salt = extractSalt(fileBytes);
-            byte[] iv = extractIv(fileBytes);
-            byte[] encrypted = extractCiphertext(fileBytes);
-            SecretKey key = keyDerivationService.deriveLegacyKey(password, salt);
-            byte[] jsonBytes = aesEncryptionService.decrypt(encrypted, key, iv);
-
-            return objectMapper.readValue(jsonBytes, type);
-        } catch (Exception e) {
-            throw new RuntimeException("No fue posible leer el archivo cifrado.", e);
-        }
-    }
-
-    public <T> T load(Path path, Class<T> type, SecretKey key) {
-        try {
-            if (!Files.exists(path)) {
-                return null;
-            }
-
-            byte[] fileBytes = Files.readAllBytes(path);
-            validateFile(fileBytes);
-
-            byte[] iv = extractIv(fileBytes);
-            byte[] encrypted = extractCiphertext(fileBytes);
-            byte[] jsonBytes = aesEncryptionService.decrypt(encrypted, key, iv);
-
-            return objectMapper.readValue(jsonBytes, type);
-        } catch (Exception e) {
-            throw new RuntimeException("No fue posible leer el archivo cifrado.", e);
-        }
-    }
-
-    private <T> void saveWithDerivedKey(Path path, T data, SecretKey key) {
-        saveWithKey(path, data, key);
-    }
-
-    private <T> void saveWithKey(Path path, T data, SecretKey key) {
         try {
             byte[] jsonBytes = objectMapper.writeValueAsBytes(data);
             byte[] iv = CryptoUtils.randomBytes(EncryptionConstants.IV_LENGTH);
@@ -104,8 +68,53 @@ public class EncryptedFileStorage {
         }
     }
 
-    private void validateFile(byte[] fileBytes) {
-        int minimumLength = EncryptionConstants.IV_LENGTH + 16;
+    /**
+     * Lee archivos creados por el esquema anterior.
+     */
+    public <T> T load(Path path, Class<T> type, String password) {
+        try {
+            if (!Files.exists(path)) {
+                return null;
+            }
+
+            byte[] fileBytes = Files.readAllBytes(path);
+            validateFile(fileBytes, EncryptionConstants.SALT_LENGTH + EncryptionConstants.IV_LENGTH + 16);
+
+            byte[] salt = extractSalt(fileBytes);
+            byte[] iv = extractLegacyIv(fileBytes);
+            byte[] encrypted = extractLegacyCiphertext(fileBytes);
+            SecretKey key = keyDerivationService.deriveLegacyKey(password, salt);
+            byte[] jsonBytes = aesEncryptionService.decrypt(encrypted, key, iv);
+
+            return objectMapper.readValue(jsonBytes, type);
+        } catch (Exception e) {
+            throw new RuntimeException("No fue posible leer el archivo cifrado.", e);
+        }
+    }
+
+    /**
+     * Lee archivos creados con la clave maestra.
+     */
+    public <T> T load(Path path, Class<T> type, SecretKey key) {
+        try {
+            if (!Files.exists(path)) {
+                return null;
+            }
+
+            byte[] fileBytes = Files.readAllBytes(path);
+            validateFile(fileBytes, EncryptionConstants.IV_LENGTH + 16);
+
+            byte[] iv = Arrays.copyOfRange(fileBytes, 0, EncryptionConstants.IV_LENGTH);
+            byte[] encrypted = Arrays.copyOfRange(fileBytes, EncryptionConstants.IV_LENGTH, fileBytes.length);
+            byte[] jsonBytes = aesEncryptionService.decrypt(encrypted, key, iv);
+
+            return objectMapper.readValue(jsonBytes, type);
+        } catch (Exception e) {
+            throw new RuntimeException("No fue posible leer el archivo cifrado.", e);
+        }
+    }
+
+    private void validateFile(byte[] fileBytes, int minimumLength) {
         if (fileBytes == null || fileBytes.length < minimumLength) {
             throw new IllegalArgumentException("El archivo cifrado está incompleto o corrupto.");
         }
@@ -115,7 +124,7 @@ public class EncryptedFileStorage {
         return Arrays.copyOfRange(fileBytes, 0, EncryptionConstants.SALT_LENGTH);
     }
 
-    private byte[] extractIv(byte[] fileBytes) {
+    private byte[] extractLegacyIv(byte[] fileBytes) {
         return Arrays.copyOfRange(
                 fileBytes,
                 EncryptionConstants.SALT_LENGTH,
@@ -123,7 +132,7 @@ public class EncryptedFileStorage {
         );
     }
 
-    private byte[] extractCiphertext(byte[] fileBytes) {
+    private byte[] extractLegacyCiphertext(byte[] fileBytes) {
         int start = EncryptionConstants.SALT_LENGTH + EncryptionConstants.IV_LENGTH;
         return Arrays.copyOfRange(fileBytes, start, fileBytes.length);
     }

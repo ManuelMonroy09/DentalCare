@@ -11,6 +11,9 @@ import mx.dentalcare.service.BackupService;
 import mx.dentalcare.service.ConfiguracionService;
 import org.springframework.stereotype.Component;
 
+import java.awt.Desktop;
+import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -69,7 +72,7 @@ public class ConfiguracionController {
         chooser.setTitle("Guardar respaldo de DentalCare");
         chooser.setInitialFileName("DentalCare_backup.zip");
         chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Respaldo DentalCare (*.zip)", "*.zip"));
-        java.io.File archivo = chooser.showSaveDialog(null);
+        File archivo = chooser.showSaveDialog(null);
         if (archivo == null) return;
         try {
             Path respaldo = backupService.crearRespaldo(archivo.toPath());
@@ -80,11 +83,25 @@ public class ConfiguracionController {
     }
 
     @FXML
+    private void crearRespaldoAutomatico() {
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Seleccionar carpeta para el respaldo automático");
+        File directorio = chooser.showDialog(null);
+        if (directorio == null) return;
+        try {
+            Path respaldo = backupService.crearRespaldoAutomatico(directorio.toPath());
+            mostrarInformacion("Respaldo automático creado", "Se creó un respaldo con fecha y hora:\n" + respaldo);
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            mostrarError("No fue posible crear el respaldo automático", ex.getMessage());
+        }
+    }
+
+    @FXML
     private void restaurarRespaldo() {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Seleccionar respaldo de DentalCare");
         chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Respaldo DentalCare (*.zip)", "*.zip"));
-        java.io.File archivo = chooser.showOpenDialog(null);
+        File archivo = chooser.showOpenDialog(null);
         if (archivo == null) return;
 
         Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
@@ -103,10 +120,44 @@ public class ConfiguracionController {
     }
 
     @FXML
+    private void abrirCarpetaDatos() {
+        abrirDirectorio(Path.of("data"), "datos");
+    }
+
+    @FXML
     private void abrirCarpetaRespaldo() {
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("Seleccionar carpeta de respaldo");
-        chooser.showDialog(null);
+        File directorio = chooser.showDialog(null);
+        if (directorio == null) return;
+        abrirDirectorio(directorio.toPath(), "respaldo");
+    }
+
+    @FXML
+    private void mostrarInformacionSistema() {
+        String version = "0.0.1-SNAPSHOT";
+        String java = System.getProperty("java.version", "desconocida");
+        String sistema = System.getProperty("os.name", "desconocido") + " " + System.getProperty("os.version", "");
+        Path datos = Path.of("data").toAbsolutePath().normalize();
+
+        mostrarInformacion("Información de DentalCare",
+                "Versión: " + version +
+                "\nJava: " + java +
+                "\nSistema operativo: " + sistema +
+                "\n\nCarpeta de datos:\n" + datos);
+    }
+
+    private void abrirDirectorio(Path directorio, String descripcion) {
+        try {
+            Files.createDirectories(directorio);
+            if (!Desktop.isDesktopSupported()) {
+                mostrarError("Abrir carpeta", "El sistema no permite abrir automáticamente la carpeta de " + descripcion + ".");
+                return;
+            }
+            Desktop.getDesktop().open(directorio.toFile());
+        } catch (Exception ex) {
+            mostrarError("Abrir carpeta", "No fue posible abrir la carpeta de " + descripcion + ": " + ex.getMessage());
+        }
     }
 
     private void mostrarInformacion(String titulo, String mensaje) {

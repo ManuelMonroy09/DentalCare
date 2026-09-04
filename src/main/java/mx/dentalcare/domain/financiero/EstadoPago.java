@@ -1,9 +1,7 @@
 package mx.dentalcare.domain.financiero;
 
 public enum EstadoPago {
-    PENDIENTE("Pendiente"),
-    PARCIAL("Parcial"),
-    PAGADO("Pagado"),
+    REGISTRADO("Registrado"),
     CANCELADO("Cancelado");
 
     private final String descripcion;

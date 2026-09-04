@@ -8,8 +8,10 @@ import mx.dentalcare.domain.financiero.EstadoPago;
 import mx.dentalcare.domain.financiero.MetodoPago;
 import mx.dentalcare.domain.financiero.Pago;
 import mx.dentalcare.domain.tratamiento.TratamientoAplicado;
+import mx.dentalcare.event.CitaEstadoCambiadoEvent;
 import mx.dentalcare.repository.CargoRepository;
 import mx.dentalcare.repository.PagoRepository;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -46,30 +48,29 @@ public class FinanzasService {
                 .toList();
     }
 
+    public List<Pago> obtenerPagosPorCargo(Long cargoId) {
+        if (cargoId == null) throw new IllegalArgumentException("El identificador del cargo es obligatorio.");
+        return obtenerPagos().stream()
+                .filter(p -> cargoId.equals(p.getCargoId()))
+                .sorted(Comparator.comparing(Pago::getFecha, Comparator.nullsLast(Comparator.reverseOrder())))
+                .toList();
+    }
+
     public Pago obtenerPagoPorId(Long pagoId) {
-        if (pagoId == null) {
-            throw new IllegalArgumentException("El identificador del pago es obligatorio.");
-        }
+        if (pagoId == null) throw new IllegalArgumentException("El identificador del pago es obligatorio.");
         return pagoRepository.findById(pagoId)
                 .orElseThrow(() -> new IllegalArgumentException("No existe el pago seleccionado."));
     }
 
     /**
-     * Genera los cargos faltantes de citas confirmadas o atendidas con tratamientos cobrables.
-     * Es idempotente y permite registrar anticipos antes de la atención.
+     * Reconciliación de cargos faltantes para citas confirmadas o atendidas.
      */
     public int generarCargosPendientes() {
         int creados = 0;
         for (Cita cita : citaService.obtenerTodas()) {
-            if (cita.getEstado() != EstadoCita.CONFIRMADA
-                    && cita.getEstado() != EstadoCita.ATENDIDA) {
-                continue;
-            }
-
+            if (cita.getEstado() != EstadoCita.CONFIRMADA && cita.getEstado() != EstadoCita.ATENDIDA) continue;
             BigDecimal total = cita.obtenerTotalTratamientos();
-            if (cita.getId() == null || total == null || total.compareTo(BigDecimal.ZERO) <= 0) {
-                continue;
-            }
+            if (cita.getId() == null || total == null || total.compareTo(BigDecimal.ZERO) <= 0) continue;
             if (cargoRepository.findByCitaId(cita.getId()).isEmpty()) {
                 obtenerOCrearCargo(cita);
                 creados++;
@@ -78,15 +79,15 @@ public class FinanzasService {
         return creados;
     }
 
+    /**
+     * Crea el cargo histórico una sola vez. Los pagos posteriores no modifican el importe original.
+     */
     public Cargo obtenerOCrearCargo(Cita cita) {
-        if (cita == null || cita.getId() == null) {
-            throw new IllegalArgumentException("La cita debe estar guardada.");
-        }
+        if (cita == null || cita.getId() == null) throw new IllegalArgumentException("La cita debe estar guardada.");
         if (cita.getPaciente() == null || cita.getPaciente().getId() == null) {
             throw new IllegalArgumentException("La cita debe tener un paciente válido.");
         }
-        if (cita.getEstado() != EstadoCita.CONFIRMADA
-                && cita.getEstado() != EstadoCita.ATENDIDA) {
+        if (cita.getEstado() != EstadoCita.CONFIRMADA && cita.getEstado() != EstadoCita.ATENDIDA) {
             throw new IllegalStateException("Solo una cita confirmada o atendida puede generar un cargo.");
         }
 
@@ -108,18 +109,31 @@ public class FinanzasService {
         });
     }
 
+    /**
+     * Crea automáticamente el cargo al confirmar una cita. Si no hay tratamientos cobrables,
+     * simplemente no se crea nada y la cita sigue siendo válida.
+     */
+    @EventListener
+    public void alCambiarEstadoCita(CitaEstadoCambiadoEvent event) {
+        if (event == null || event.getCita() == null) return;
+        Cita cita = event.getCita();
+        if (cita.getEstado() != EstadoCita.CONFIRMADA && cita.getEstado() != EstadoCita.ATENDIDA) return;
+        if (cita.getId() == null) return;
+
+        BigDecimal total = cita.obtenerTotalTratamientos();
+        if (total == null || total.compareTo(BigDecimal.ZERO) <= 0) return;
+
+        obtenerOCrearCargo(cita);
+    }
+
     public Pago registrarPago(Long cargoId, BigDecimal monto, MetodoPago metodoPago, String notas) {
         Cargo cargo = cargoRepository.findById(cargoId)
                 .orElseThrow(() -> new IllegalArgumentException("No existe el cargo seleccionado."));
         BigDecimal importe = dinero(monto);
         BigDecimal pendiente = obtenerSaldoPendiente(cargoId);
 
-        if (importe.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("El monto debe ser mayor a 0.");
-        }
-        if (pendiente.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalStateException("El cargo seleccionado ya está pagado.");
-        }
+        if (importe.compareTo(BigDecimal.ZERO) <= 0) throw new IllegalArgumentException("El monto debe ser mayor a 0.");
+        if (pendiente.compareTo(BigDecimal.ZERO) <= 0) throw new IllegalStateException("El cargo seleccionado ya está pagado.");
         if (importe.compareTo(pendiente) > 0) {
             throw new IllegalArgumentException("El pago no puede superar el saldo pendiente de $" + pendiente.toPlainString());
         }
@@ -132,9 +146,7 @@ public class FinanzasService {
 
     public void cancelarPago(Long pagoId) {
         Pago pago = obtenerPagoPorId(pagoId);
-        if (pago.getEstado() == EstadoPago.CANCELADO) {
-            throw new IllegalStateException("El pago seleccionado ya está cancelado.");
-        }
+        if (pago.getEstado() == EstadoPago.CANCELADO) throw new IllegalStateException("El pago seleccionado ya está cancelado.");
         pago.setEstado(EstadoPago.CANCELADO);
         pagoRepository.save(pago);
     }
@@ -167,6 +179,10 @@ public class FinanzasService {
                 .map(Pago::getMonto)
                 .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add));
+    }
+
+    public int obtenerCantidadPagos(LocalDate desde, LocalDate hasta) {
+        return (int) obtenerPagos().stream().filter(p -> dentroDe(p.getFecha(), desde, hasta)).count();
     }
 
     public BigDecimal obtenerPorCobrar() {

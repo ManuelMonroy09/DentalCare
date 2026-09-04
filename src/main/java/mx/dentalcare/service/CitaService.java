@@ -227,16 +227,27 @@ public class CitaService {
     }
 
     /**
-     * Obtiene el historial clínico derivado de las citas que ya fueron atendidas.
+     * Obtiene todas las consultas que ya fueron atendidas, ordenadas de la más reciente a la más antigua.
      * Las citas canceladas o con inasistencia no forman parte del historial clínico.
      */
-    public List<Cita> obtenerHistorialPorPaciente(Long pacienteId) {
-        return obtenerPorPaciente(pacienteId).stream()
+    public List<Cita> obtenerHistorial() {
+        return obtenerTodas().stream()
                 .filter(cita -> cita.getEstado() == EstadoCita.ATENDIDA)
                 .sorted(Comparator.comparing(
                         Cita::getInicio,
                         Comparator.nullsLast(Comparator.reverseOrder())
                 ))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Obtiene el historial clínico de un paciente concreto.
+     */
+    public List<Cita> obtenerHistorialPorPaciente(Long pacienteId) {
+        return obtenerHistorial().stream()
+                .filter(cita -> cita.getPaciente() != null
+                        && cita.getPaciente().getId() != null
+                        && cita.getPaciente().getId().equals(pacienteId))
                 .collect(Collectors.toList());
     }
 

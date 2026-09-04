@@ -12,7 +12,7 @@
         fx:controller="mx.dentalcare.ui.controller.DetalleCitaController"
         stylesheets="@../css/dentalcare.css"
         styleClass="dialog-root"
-        spacing="18">
+        spacing="16">
 
     <padding>
         <Insets top="25" right="30" bottom="25" left="30"/>
@@ -29,10 +29,7 @@
     </VBox>
 
     <VBox spacing="5">
-        <Label
-                text="Paciente"
-                styleClass="form-label"/>
-
+        <Label text="Paciente" styleClass="form-label"/>
         <Label
                 fx:id="lblPaciente"
                 text="-"
@@ -77,9 +74,7 @@
     </VBox>
 
     <VBox spacing="5">
-        <Label
-                text="Tratamientos"
-                styleClass="form-label"/>
+        <Label text="Tratamientos" styleClass="form-label"/>
 
         <Label
                 fx:id="lblTratamientos"
@@ -98,9 +93,7 @@
     </VBox>
 
     <VBox spacing="5" VBox.vgrow="ALWAYS">
-        <Label
-                text="Notas"
-                styleClass="form-label"/>
+        <Label text="Notas" styleClass="form-label"/>
 
         <Label
                 fx:id="lblNotas"
@@ -109,6 +102,36 @@
                 maxWidth="Infinity"
                 VBox.vgrow="ALWAYS"
                 styleClass="detail-notes"/>
+    </VBox>
+
+    <VBox spacing="7">
+        <Label text="Flujo de atención" styleClass="form-label"/>
+
+        <HBox spacing="8">
+            <Button
+                    fx:id="btnConfirmar"
+                    text="Confirmar"
+                    mnemonicParsing="false"
+                    styleClass="secondary-button"/>
+
+            <Button
+                    fx:id="btnAtendida"
+                    text="Marcar atendida"
+                    mnemonicParsing="false"
+                    styleClass="primary-button"/>
+
+            <Button
+                    fx:id="btnNoAsistio"
+                    text="No asistió"
+                    mnemonicParsing="false"
+                    styleClass="secondary-button"/>
+
+            <Button
+                    fx:id="btnCancelarCita"
+                    text="Cancelar cita"
+                    mnemonicParsing="false"
+                    styleClass="danger-button"/>
+        </HBox>
     </VBox>
 
     <HBox spacing="10" alignment="CENTER_RIGHT">

@@ -77,6 +77,8 @@ public class SetupController {
             if (authenticationService.requiresLegacyMigration()) {
                 txtLegacyPassword.requestFocus();
             }
+        } catch (Exception e) {
+            mostrarError("La configuración se completó, pero no fue posible abrir DentalCare.");
         }
     }
 

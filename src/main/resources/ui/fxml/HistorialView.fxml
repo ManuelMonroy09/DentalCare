@@ -64,8 +64,7 @@
     <TableView
             fx:id="historialTable"
             VBox.vgrow="ALWAYS"
-            styleClass="patients-table"
-            onMouseClicked="#abrirDetalle">
+            styleClass="patients-table">
         <columns>
             <TableColumn fx:id="fechaColumn" text="Fecha" prefWidth="105"/>
             <TableColumn fx:id="pacienteColumn" text="Paciente" prefWidth="190"/>
@@ -77,9 +76,10 @@
     </TableView>
 
     <HBox alignment="CENTER_LEFT" spacing="15">
-        <Label fx:id="resumenLabel" text="0 consultas atendidas   ·   0 tratamientos   ·   Total: $0.00" styleClass="page-subtitle"/>
+        <Label fx:id="resumenLabel" text="0 consultas atendidas   ·   0 tratamientos   ·   Total: 0.00" styleClass="page-subtitle"/>
         <Label fx:id="vacioLabel" text="" styleClass="page-subtitle" HBox.hgrow="ALWAYS"/>
         <Button
+                fx:id="btnDetalle"
                 text="Ver detalle"
                 mnemonicParsing="false"
                 onAction="#abrirDetalle"

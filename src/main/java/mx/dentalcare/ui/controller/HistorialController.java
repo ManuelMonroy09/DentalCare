@@ -1,5 +1,6 @@
 package mx.dentalcare.ui.controller;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -12,7 +13,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import mx.dentalcare.domain.cita.Cita;
@@ -41,6 +41,7 @@ public class HistorialController {
     @FXML private DatePicker fechaDesdePicker;
     @FXML private DatePicker fechaHastaPicker;
     @FXML private Button limpiarFiltrosButton;
+    @FXML private Button btnDetalle;
     @FXML private TableView<Cita> historialTable;
     @FXML private TableColumn<Cita, String> fechaColumn;
     @FXML private TableColumn<Cita, String> pacienteColumn;
@@ -64,6 +65,7 @@ public class HistorialController {
     public void initialize() {
         configurarColumnas();
         configurarFiltros();
+        configurarSeleccion();
         cargarOpcionesFiltros();
         cargarHistorial();
     }
@@ -144,6 +146,21 @@ public class HistorialController {
         limpiarFiltrosButton.setOnAction(event -> limpiarFiltros());
     }
 
+    private void configurarSeleccion() {
+        btnDetalle.setDisable(true);
+
+        historialTable.getSelectionModel().selectedItemProperty().addListener(
+                (obs, anterior, actual) -> btnDetalle.setDisable(actual == null)
+        );
+
+        historialTable.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2
+                    && historialTable.getSelectionModel().getSelectedItem() != null) {
+                abrirDetalle();
+            }
+        });
+    }
+
     private void cargarOpcionesFiltros() {
         List<Cita> historial = citaService.obtenerHistorial();
 
@@ -183,7 +200,6 @@ public class HistorialController {
     private void cargarHistorial() {
         historialTable.setItems(FXCollections.observableArrayList(citaService.obtenerHistorial()));
         aplicarFiltros();
-        actualizarEstadoVacio();
     }
 
     private void aplicarFiltros() {
@@ -273,11 +289,7 @@ public class HistorialController {
 
     private void actualizarEstadoVacio() {
         if (historialTable.getItems().isEmpty()) {
-            String textoActual = vacioLabel.getText();
-            if (textoActual == null || textoActual.isBlank()
-                    || "La fecha final no puede ser anterior a la fecha inicial.".equals(textoActual)) {
-                vacioLabel.setText("No hay consultas atendidas que coincidan con los filtros.");
-            }
+            vacioLabel.setText("No hay consultas atendidas que coincidan con los filtros.");
         } else {
             vacioLabel.setText("");
         }

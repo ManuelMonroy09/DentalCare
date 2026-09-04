@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox
+        xmlns="http://javafx.com/javafx/21"
+        xmlns:fx="http://javafx.com/fxml/1"
+        fx:controller="mx.dentalcare.ui.controller.PacientesController"
+        spacing="20"
+        styleClass="content">
+
+    <HBox
+            alignment="CENTER_LEFT"
+            spacing="15">
+
+        <VBox
+                HBox.hgrow="ALWAYS"
+                spacing="5">
+
+            <Label
+                    text="Pacientes"
+                    styleClass="page-title"/>
+
+            <Label
+                    text="Consulta y administra los pacientes del consultorio."
+                    styleClass="page-subtitle"/>
+
+        </VBox>
+
+        <HBox spacing="10">
+
+            <Button
+                    fx:id="nuevoButton"
+                    text="+ Nuevo paciente"
+                    styleClass="primary-button"/>
+
+            <Button
+                    fx:id="editarButton"
+                    text="Editar"
+                    styleClass="secondary-button"/>
+
+            <Button
+                    fx:id="eliminarButton"
+                    text="Eliminar"
+                    styleClass="danger-button"/>
+
+        </HBox>
+
+    </HBox>
+
+    <HBox
+            alignment="CENTER_LEFT"
+            spacing="15">
+
+        <TextField
+                fx:id="buscarField"
+                promptText="Buscar paciente..."
+                prefWidth="300"
+                styleClass="search-field"/>
+
+        <Label
+                fx:id="contadorPacientesLabel"
+                text="Total de pacientes: 0"
+                styleClass="page-subtitle"/>
+
+    </HBox>
+
+    <TableView
+            fx:id="pacientesTable"
+            VBox.vgrow="ALWAYS"
+            styleClass="patients-table">
+
+        <columns>
+
+            <TableColumn
+                    fx:id="idColumn"
+                    text="ID"
+                    prefWidth="80"/>
+
+            <TableColumn
+                    fx:id="nombreColumn"
+                    text="Nombre(s)"
+                    prefWidth="180"/>
+
+            <TableColumn
+                    fx:id="apellidoPaternoColumn"
+                    text="Apellido Paterno"
+                    prefWidth="180"/>
+
+            <TableColumn
+                    fx:id="apellidoMaternoColumn"
+                    text="Apellido Materno"
+                    prefWidth="180"/>
+
+            <TableColumn
+                    fx:id="telefonoColumn"
+                    text="Teléfono"
+                    prefWidth="160"/>
+
+            <TableColumn
+                    fx:id="emailColumn"
+                    text="Correo"
+                    prefWidth="250"/>
+
+        </columns>
+
+    </TableView>
+</VBox>

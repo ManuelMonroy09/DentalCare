@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox
+        xmlns="http://javafx.com/javafx/21"
+        xmlns:fx="http://javafx.com/fxml/1"
+        fx:controller="mx.dentalcare.ui.controller.DashboardController"
+        spacing="20"
+        styleClass="content">
+
+    <Label
+            text="Bienvenido a DentalCare"
+            styleClass="page-title"/>
+
+    <Label
+            text="Gestiona tu consultorio desde un solo lugar."
+            styleClass="page-subtitle"/>
+
+    <HBox
+            spacing="15">
+
+        <VBox
+                spacing="8"
+                styleClass="card">
+
+            <Label
+                    text="Pacientes"
+                    styleClass="card-title"/>
+
+            <Label
+                    fx:id="lblTotalPacientes"
+                    text="0"
+                    styleClass="card-value"/>
+
+        </VBox>
+
+        <VBox
+                spacing="8"
+                styleClass="card">
+
+            <Label
+                    text="Citas de hoy"
+                    styleClass="card-title"/>
+
+            <Label
+                    fx:id="lblCitasHoy"
+                    text="0"
+                    styleClass="card-value"/>
+
+        </VBox>
+
+        <VBox
+                spacing="8"
+                styleClass="card">
+
+            <Label
+                    text="Próxima cita"
+                    styleClass="card-title"/>
+
+            <Label
+                    fx:id="lblProximaHora"
+                    text="--:--"
+                    styleClass="card-value"/>
+
+        </VBox>
+
+    </HBox>
+
+    <VBox
+            spacing="10"
+            styleClass="card">
+
+        <Label
+                text="Próxima cita"
+                styleClass="card-title"/>
+
+        <Label
+                fx:id="lblProximoPaciente"
+                text="No hay próximas citas"
+                styleClass="page-title"/>
+
+        <Label
+                fx:id="lblProximoMotivo"
+                text="Agenda libre"
+                styleClass="page-subtitle"/>
+
+        <Label
+                fx:id="lblProximoEstado"
+                text=""
+                styleClass="page-subtitle"/>
+
+    </VBox>
+
+    <VBox
+            spacing="10"
+            styleClass="card">
+
+        <Label
+                text="Citas de hoy"
+                styleClass="card-title"/>
+
+        <VBox
+                fx:id="contenedorCitasHoy"
+                spacing="6"/>
+
+    </VBox>
+
+</VBox>

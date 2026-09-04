@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.scene.control.TextField?>
+<BorderPane
+        xmlns="http://javafx.com/javafx/21"
+        xmlns:fx="http://javafx.com/fxml/1"
+        fx:controller="mx.dentalcare.ui.controller.AgendaController"
+        styleClass="agenda-root">
+
+    <top>
+
+        <VBox
+                spacing="10"
+                styleClass="agenda-header">
+
+            <HBox
+                    alignment="CENTER_LEFT"
+                    spacing="10"
+                    styleClass="agenda-toolbar">
+
+                <Button
+                        fx:id="btnAnterior"
+                        text="‹"
+                        mnemonicParsing="false"
+                        styleClass="agenda-navigation-button"/>
+
+                <Button
+                        fx:id="btnHoy"
+                        text="Hoy"
+                        mnemonicParsing="false"
+                        styleClass="agenda-today-button"/>
+
+                <Button
+                        fx:id="btnSiguiente"
+                        text="›"
+                        mnemonicParsing="false"
+                        styleClass="agenda-navigation-button"/>
+
+                <Separator
+                        orientation="VERTICAL"/>
+
+                <Label
+                        fx:id="lblRangoFecha"
+                        text="31 ago - 6 sep 2026"
+                        styleClass="agenda-date-range"/>
+
+                <HBox
+                        HBox.hgrow="ALWAYS"/>
+
+                <TextField
+                        fx:id="txtBuscarPaciente"
+                        promptText="Buscar paciente..."
+                        prefWidth="260"
+                        styleClass="agenda-search-field"/>
+                <ComboBox
+                        fx:id="cmbVista"
+                        promptText="Vista"
+                        styleClass="agenda-view-selector"/>
+
+                <Button
+                        fx:id="btnNuevaCita"
+                        text="+ Nueva cita"
+                        mnemonicParsing="false"
+                        styleClass="agenda-primary-button"/>
+
+            </HBox>
+
+            <Separator/>
+
+        </VBox>
+
+    </top>
+
+    <center>
+
+        <ScrollPane
+                fx:id="scrollAgenda"
+                fitToWidth="true"
+                fitToHeight="false"
+                hbarPolicy="AS_NEEDED"
+                vbarPolicy="AS_NEEDED"
+                styleClass="agenda-scroll-pane">
+
+            <content>
+
+                <VBox
+                        fx:id="contenedorAgenda"
+                        fillWidth="true"
+                        spacing="0"/>
+
+            </content>
+
+        </ScrollPane>
+
+    </center>
+
+</BorderPane>

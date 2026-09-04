@@ -44,7 +44,7 @@
     <VBox spacing="12" styleClass="stat-card">
         <Label text="Respaldo y restauración" styleClass="section-title"/>
         <Label text="Los respaldos conservan los archivos de datos cifrados de DentalCare. Guarda una copia fuera de la carpeta de instalación." styleClass="page-subtitle" wrapText="true"/>
-        <HBox spacing="10" wrapText="true">
+        <HBox spacing="10">
             <Button text="Crear respaldo" onAction="#crearRespaldo" styleClass="primary-button"/>
             <Button text="Respaldo automático" onAction="#crearRespaldoAutomatico" styleClass="primary-button"/>
             <Button text="Restaurar respaldo" onAction="#restaurarRespaldo" styleClass="secondary-button"/>

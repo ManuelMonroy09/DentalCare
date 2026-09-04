@@ -1,9 +1,12 @@
 package mx.dentalcare.security;
 
+import org.springframework.stereotype.Service;
+
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 
+@Service
 public class AesEncryptionService {
 
     private static final int TAG_LENGTH = EncryptionConstants.GCM_TAG_LENGTH;

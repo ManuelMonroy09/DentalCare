@@ -87,7 +87,7 @@
             <Label text="Total:" styleClass="form-label"/>
             <Label
                     fx:id="lblTotalTratamientos"
-                    text="0.00"
+                    text="$0.00"
                     styleClass="detail-value"/>
         </HBox>
     </VBox>
@@ -102,36 +102,6 @@
                 maxWidth="Infinity"
                 VBox.vgrow="ALWAYS"
                 styleClass="detail-notes"/>
-    </VBox>
-
-    <VBox spacing="7">
-        <Label text="Flujo de atención" styleClass="form-label"/>
-
-        <HBox spacing="8">
-            <Button
-                    fx:id="btnConfirmar"
-                    text="Confirmar"
-                    mnemonicParsing="false"
-                    styleClass="secondary-button"/>
-
-            <Button
-                    fx:id="btnAtendida"
-                    text="Marcar atendida"
-                    mnemonicParsing="false"
-                    styleClass="primary-button"/>
-
-            <Button
-                    fx:id="btnNoAsistio"
-                    text="No asistió"
-                    mnemonicParsing="false"
-                    styleClass="secondary-button"/>
-
-            <Button
-                    fx:id="btnCancelarCita"
-                    text="Cancelar cita"
-                    mnemonicParsing="false"
-                    styleClass="danger-button"/>
-        </HBox>
     </VBox>
 
     <HBox spacing="10" alignment="CENTER_RIGHT">

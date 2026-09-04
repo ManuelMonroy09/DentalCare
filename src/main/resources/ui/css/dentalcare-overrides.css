@@ -196,15 +196,86 @@
     -fx-wrap-text: true;
 }
 
+/* =========================================================
+   LOGIN - BOTÓN PRINCIPAL
+   ========================================================= */
+
 .auth-login-button {
+    -fx-background-color: #2563eb;
+    -fx-text-fill: white;
     -fx-pref-height: 46px;
+    -fx-min-height: 46px;
+    -fx-max-height: 46px;
     -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 24px;
+    -fx-background-radius: 9px;
+    -fx-border-radius: 9px;
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+}
+
+.auth-login-button:hover {
+    -fx-background-color: #1d4ed8;
+}
+
+.auth-login-button:pressed {
+    -fx-background-color: #1e40af;
+}
+
+.auth-login-button:focused {
+    -fx-border-color: #93c5fd;
+    -fx-border-width: 2px;
+}
+
+.auth-login-button:disabled {
+    -fx-opacity: 0.65;
 }
 
 .auth-footer {
     -fx-font-size: 11px;
     -fx-text-fill: #9ca3af;
     -fx-alignment: CENTER;
+}
+
+/* =========================================================
+   TRANSICIÓN DE AUTENTICACIÓN
+   ========================================================= */
+
+.auth-transition-overlay {
+    -fx-background-color: #f8fafc;
+}
+
+.auth-transition-content {
+    -fx-background-color: #f8fafc;
+}
+
+.auth-progress {
+    -fx-pref-width: 38px;
+    -fx-pref-height: 38px;
+    -fx-min-width: 38px;
+    -fx-min-height: 38px;
+    -fx-max-width: 38px;
+    -fx-max-height: 38px;
+}
+
+.auth-progress .percentage {
+    -fx-fill: transparent;
+}
+
+.auth-progress .indicator {
+    -fx-stroke: #2563eb;
+}
+
+.auth-transition-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #111827;
+}
+
+.auth-transition-message {
+    -fx-font-size: 13px;
+    -fx-text-fill: #6b7280;
 }
 
 .auth-warning {

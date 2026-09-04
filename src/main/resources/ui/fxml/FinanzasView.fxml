@@ -26,11 +26,11 @@
     <HBox spacing="15">
         <VBox spacing="4" styleClass="stat-card" HBox.hgrow="ALWAYS">
             <Label text="Ingresos de hoy" styleClass="page-subtitle"/>
-            <Label fx:id="ingresosLabel" text="$0.00" styleClass="stat-value"/>
+            <Label fx:id="ingresosLabel" text="MXN 0.00" styleClass="stat-value"/>
         </VBox>
         <VBox spacing="4" styleClass="stat-card" HBox.hgrow="ALWAYS">
             <Label text="Por cobrar" styleClass="page-subtitle"/>
-            <Label fx:id="pendienteLabel" text="$0.00" styleClass="stat-value"/>
+            <Label fx:id="pendienteLabel" text="MXN 0.00" styleClass="stat-value"/>
         </VBox>
     </HBox>
 

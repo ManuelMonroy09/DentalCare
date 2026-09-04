@@ -4,7 +4,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.print.PrinterJob;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import mx.dentalcare.domain.configuracion.ConfiguracionConsultorio;
@@ -19,8 +18,10 @@ import mx.dentalcare.service.PacientesService;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -134,7 +135,11 @@ public class FinanzasController {
         if (cargo == null) { mensajeLabel.setText("Selecciona un cargo para imprimir su recibo."); return; }
         List<Pago> pagos = finanzasService.obtenerPagosPorCargo(cargo.getId());
         if (pagos.isEmpty()) { mensajeLabel.setText("El cargo seleccionado no tiene pagos registrados."); return; }
-        imprimirRecibo(pagos.get(0), cargo);
+        Pago ultimoPago = pagos.stream()
+                .max(Comparator.comparing(Pago::getFecha, Comparator.nullsFirst(Comparator.naturalOrder()))
+                        .thenComparing(Pago::getId, Comparator.nullsFirst(Comparator.naturalOrder())))
+                .orElse(pagos.get(pagos.size() - 1));
+        imprimirRecibo(ultimoPago, cargo);
     }
 
     private void imprimirRecibo(Pago pago, Cargo cargo) {
@@ -145,6 +150,8 @@ public class FinanzasController {
 
         VBox ticket = new VBox(6);
         ticket.setPrefWidth(280);
+        ticket.setMinWidth(280);
+        ticket.setMaxWidth(280);
         ticket.setStyle("-fx-background-color: white; -fx-padding: 16px; -fx-font-family: 'Segoe UI';");
         agregarTexto(ticket, valor(configuracion.getNombreConsultorio()), "-fx-font-size: 18px; -fx-font-weight: bold; -fx-alignment: center;");
         if (!vacio(configuracion.getNombreOdontologo())) agregarTexto(ticket, configuracion.getNombreOdontologo(), "-fx-font-size: 12px; -fx-alignment: center;");
@@ -155,13 +162,17 @@ public class FinanzasController {
         agregarTexto(ticket, "Folio de pago: #" + valor(pago.getId()), "-fx-font-size: 11px;");
         agregarTexto(ticket, "Fecha: " + (pago.getFecha() == null ? "" : pago.getFecha().format(FECHA_HORA)), "-fx-font-size: 11px;");
         agregarTexto(ticket, "Paciente: " + nombre, "-fx-font-size: 11px;");
-        agregarTexto(ticket, "Concepto: " + valor(cargo.getConcepto()), "-fx-font-size: 11px; -fx-wrap-text: true;");
+        agregarTexto(ticket, "Concepto: " + valor(cargo.getConcepto()), "-fx-font-size: 11px;");
         agregarTexto(ticket, "Método: " + (pago.getMetodoPago() == null ? "" : pago.getMetodoPago().getDescripcion()), "-fx-font-size: 11px;");
         agregarTexto(ticket, "--------------------------------", "-fx-font-size: 10px;");
         agregarTexto(ticket, "Cargo total:  " + moneda(cargo.getImporte()), "-fx-font-size: 11px;");
         agregarTexto(ticket, "Pago recibido: " + moneda(pago.getMonto()), "-fx-font-size: 13px; -fx-font-weight: bold;");
         agregarTexto(ticket, "Saldo pendiente: " + moneda(pendiente), "-fx-font-size: 11px;");
-        if (!vacio(configuracion.getPieRecibo())) agregarTexto(ticket, configuracion.getPieRecibo(), "-fx-font-size: 11px; -fx-padding: 10px 0 0 0; -fx-wrap-text: true;");
+        if (!vacio(configuracion.getPieRecibo())) agregarTexto(ticket, configuracion.getPieRecibo(), "-fx-font-size: 11px; -fx-padding: 10px 0 0 0;");
+
+        ticket.applyCss();
+        ticket.autosize();
+        ticket.layout();
 
         PrinterJob job = PrinterJob.createPrinterJob();
         if (job == null) { mostrarError("Impresión", "No hay una impresora disponible en el sistema."); return; }
@@ -228,7 +239,7 @@ public class FinanzasController {
         return (p.getNombre() + " " + p.getApellidoPaterno() + " " + p.getApellidoMaterno()).trim().replaceAll("\\s+", " ");
     }
 
-    private String moneda(BigDecimal valor) { return "$" + (valor == null ? "0.00" : valor.setScale(2).toPlainString()); }
+    private String moneda(BigDecimal valor) { return "$" + (valor == null ? "0.00" : valor.setScale(2, RoundingMode.HALF_UP).toPlainString()); }
     private String valor(String valor) { return valor == null ? "" : valor; }
     private boolean vacio(String valor) { return valor == null || valor.isBlank(); }
 

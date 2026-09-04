@@ -5,10 +5,9 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import mx.dentalcare.domain.cita.Cita;
-import mx.dentalcare.domain.cita.EstadoCita;
 import mx.dentalcare.domain.financiero.Cargo;
+import mx.dentalcare.domain.financiero.EstadoCargo;
 import mx.dentalcare.domain.financiero.MetodoPago;
-import mx.dentalcare.domain.financiero.Pago;
 import mx.dentalcare.domain.paciente.Paciente;
 import mx.dentalcare.service.CitaService;
 import mx.dentalcare.service.FinanzasService;
@@ -63,22 +62,31 @@ public class FinanzasController {
         importeColumn.setCellValueFactory(data -> new SimpleStringProperty(moneda(data.getValue().getImporte())));
         pagadoColumn.setCellValueFactory(data -> new SimpleStringProperty(moneda(finanzasService.obtenerTotalPagado(data.getValue().getId()))));
         pendienteColumn.setCellValueFactory(data -> new SimpleStringProperty(moneda(finanzasService.obtenerSaldoPendiente(data.getValue().getId()))));
-        estadoColumn.setCellValueFactory(data -> new SimpleStringProperty(estado(data.getValue().getId())));
+        estadoColumn.setCellValueFactory(data -> new SimpleStringProperty(
+                finanzasService.obtenerEstadoCargo(data.getValue().getId()).getDescripcion()));
     }
 
     @FXML
     private void sincronizarCargos() {
         int creados = 0;
         for (Cita cita : citaService.obtenerHistorial()) {
-            if (cita.getId() == null || cita.obtenerTotalTratamientos().compareTo(BigDecimal.ZERO) <= 0) continue;
-            boolean existia = finanzasService.obtenerCargos().stream().anyMatch(c -> cita.getId().equals(c.getCitaId()));
+            if (cita.getId() == null || cita.obtenerTotalTratamientos().compareTo(BigDecimal.ZERO) <= 0) {
+                continue;
+            }
+
+            boolean existia = finanzasService.obtenerCargos().stream()
+                    .anyMatch(c -> cita.getId().equals(c.getCitaId()));
+
             if (!existia) {
                 finanzasService.obtenerOCrearCargo(cita);
                 creados++;
             }
         }
+
         cargarDatos();
-        mensajeLabel.setText(creados == 0 ? "No hay nuevos cargos por generar." : creados + " cargo(s) generado(s).");
+        mensajeLabel.setText(creados == 0
+                ? "No hay nuevos cargos por generar."
+                : creados + " cargo(s) generado(s).");
     }
 
     @FXML
@@ -88,13 +96,14 @@ public class FinanzasController {
             mensajeLabel.setText("Selecciona un cargo para registrar un pago.");
             return;
         }
+
         BigDecimal pendiente = finanzasService.obtenerSaldoPendiente(cargo.getId());
         if (pendiente.compareTo(BigDecimal.ZERO) <= 0) {
             mensajeLabel.setText("El cargo seleccionado ya está pagado.");
             return;
         }
 
-        TextInputDialog montoDialog = new TextInputDialog();
+        TextInputDialog montoDialog = new TextInputDialog(pendiente.toPlainString());
         montoDialog.setTitle("Registrar pago");
         montoDialog.setHeaderText("Saldo pendiente: " + moneda(pendiente));
         montoDialog.setContentText("Monto del pago:");
@@ -144,15 +153,11 @@ public class FinanzasController {
     private String nombrePaciente(Long id) {
         Paciente p = pacientes.get(id);
         if (p == null) return "Paciente #" + (id == null ? "?" : id);
-        return (p.getNombre() + " " + p.getApellidoPaterno() + " " + p.getApellidoMaterno()).trim().replaceAll("\\s+", " ");
+        return (p.getNombre() + " " + p.getApellidoPaterno() + " " + p.getApellidoMaterno())
+                .trim().replaceAll("\\s+", " ");
     }
 
-    private String estado(Long cargoId) {
-        BigDecimal saldo = finanzasService.obtenerSaldoPendiente(cargoId);
-        if (saldo.compareTo(BigDecimal.ZERO) == 0) return "Pagado";
-        BigDecimal pagado = finanzasService.obtenerTotalPagado(cargoId);
-        return pagado.compareTo(BigDecimal.ZERO) == 0 ? "Pendiente" : "Parcial";
+    private String moneda(BigDecimal valor) {
+        return "$" + (valor == null ? "0.00" : valor.setScale(2).toPlainString());
     }
-
-    private String moneda(BigDecimal valor) { return "$" + (valor == null ? "0.00" : valor.setScale(2).toPlainString()); }
 }

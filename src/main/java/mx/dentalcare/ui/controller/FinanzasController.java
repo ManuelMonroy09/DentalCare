@@ -54,6 +54,9 @@ public class FinanzasController {
     }
 
     private void configurarTabla() {
+        // Hace que las columnas ocupen todo el ancho disponible sin dejar una franja vacía.
+        cargosTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+
         fechaColumn.setCellValueFactory(data -> new SimpleStringProperty(
                 data.getValue().getFecha() == null ? "" : data.getValue().getFecha().format(FECHA)));
         pacienteColumn.setCellValueFactory(data -> new SimpleStringProperty(nombrePaciente(data.getValue().getPacienteId())));

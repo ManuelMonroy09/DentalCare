@@ -54,6 +54,22 @@ public class FinanzasService {
                 .orElseThrow(() -> new IllegalArgumentException("No existe el pago seleccionado."));
     }
 
+    /** Genera los cargos faltantes de citas atendidas con tratamientos cobrables. Es idempotente. */
+    public int generarCargosPendientes() {
+        int creados = 0;
+        for (Cita cita : citaService.obtenerHistorial()) {
+            BigDecimal total = cita.obtenerTotalTratamientos();
+            if (cita.getId() == null || total == null || total.compareTo(BigDecimal.ZERO) <= 0) {
+                continue;
+            }
+            if (cargoRepository.findByCitaId(cita.getId()).isEmpty()) {
+                obtenerOCrearCargo(cita);
+                creados++;
+            }
+        }
+        return creados;
+    }
+
     public Cargo obtenerOCrearCargo(Cita cita) {
         if (cita == null || cita.getId() == null) {
             throw new IllegalArgumentException("La cita debe estar guardada.");
@@ -99,14 +115,8 @@ public class FinanzasService {
             throw new IllegalArgumentException("El pago no puede superar el saldo pendiente de $" + pendiente.toPlainString());
         }
 
-        Pago pago = new Pago(
-                cargo.getPacienteId(),
-                cargoId,
-                LocalDateTime.now(),
-                importe,
-                metodoPago,
-                notas == null ? null : notas.trim()
-        );
+        Pago pago = new Pago(cargo.getPacienteId(), cargoId, LocalDateTime.now(), importe, metodoPago,
+                notas == null ? null : notas.trim());
         pago.validar();
         return pagoRepository.save(pago);
     }
@@ -132,20 +142,14 @@ public class FinanzasService {
     public BigDecimal obtenerSaldoPendiente(Long cargoId) {
         Cargo cargo = cargoRepository.findById(cargoId)
                 .orElseThrow(() -> new IllegalArgumentException("No existe el cargo seleccionado."));
-        BigDecimal importe = dinero(cargo.getImporte());
-        return dinero(importe.subtract(obtenerTotalPagado(cargoId)).max(BigDecimal.ZERO));
+        return dinero(dinero(cargo.getImporte()).subtract(obtenerTotalPagado(cargoId)).max(BigDecimal.ZERO));
     }
 
     public EstadoCargo obtenerEstadoCargo(Long cargoId) {
         BigDecimal pagado = obtenerTotalPagado(cargoId);
         BigDecimal pendiente = obtenerSaldoPendiente(cargoId);
-
-        if (pendiente.compareTo(BigDecimal.ZERO) == 0) {
-            return EstadoCargo.PAGADO;
-        }
-        return pagado.compareTo(BigDecimal.ZERO) == 0
-                ? EstadoCargo.PENDIENTE
-                : EstadoCargo.PARCIAL;
+        if (pendiente.compareTo(BigDecimal.ZERO) == 0) return EstadoCargo.PAGADO;
+        return pagado.compareTo(BigDecimal.ZERO) == 0 ? EstadoCargo.PENDIENTE : EstadoCargo.PARCIAL;
     }
 
     public BigDecimal obtenerIngresos(LocalDate desde, LocalDate hasta) {
@@ -163,12 +167,8 @@ public class FinanzasService {
     }
 
     public List<Cargo> obtenerCargosPorPaciente(Long pacienteId) {
-        if (pacienteId == null) {
-            throw new IllegalArgumentException("El identificador del paciente es obligatorio.");
-        }
-        return obtenerCargos().stream()
-                .filter(c -> pacienteId.equals(c.getPacienteId()))
-                .toList();
+        if (pacienteId == null) throw new IllegalArgumentException("El identificador del paciente es obligatorio.");
+        return obtenerCargos().stream().filter(c -> pacienteId.equals(c.getPacienteId())).toList();
     }
 
     public BigDecimal obtenerSaldoPaciente(Long pacienteId) {
@@ -178,16 +178,11 @@ public class FinanzasService {
     }
 
     private String construirConcepto(Cita cita) {
-        if (cita.getTratamientos() == null || cita.getTratamientos().isEmpty()) {
-            return "Servicios de consulta";
-        }
-
-        String concepto = cita.getTratamientos().stream()
-                .filter(Objects::nonNull)
+        if (cita.getTratamientos() == null || cita.getTratamientos().isEmpty()) return "Servicios de consulta";
+        String concepto = cita.getTratamientos().stream().filter(Objects::nonNull)
                 .map(TratamientoAplicado::getNombre)
                 .filter(nombre -> nombre != null && !nombre.isBlank())
                 .collect(Collectors.joining(", "));
-
         return concepto.isBlank() ? "Servicios de consulta" : concepto;
     }
 

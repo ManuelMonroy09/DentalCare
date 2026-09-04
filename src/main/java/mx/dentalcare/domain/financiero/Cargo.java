@@ -44,6 +44,6 @@ public class Cargo implements Serializable {
         if (citaId == null) throw new IllegalStateException("El cargo debe estar asociado a una cita.");
         if (fecha == null) throw new IllegalStateException("El cargo debe tener fecha.");
         if (concepto == null || concepto.isBlank()) throw new IllegalStateException("El cargo debe tener concepto.");
-        if (importe == null || importe.compareTo(BigDecimal.ZERO) < 0) throw new IllegalStateException("El importe del cargo no puede ser negativo.");
+        if (importe == null || importe.compareTo(BigDecimal.ZERO) <= 0) throw new IllegalStateException("El importe del cargo debe ser mayor a 0.");
     }
 }

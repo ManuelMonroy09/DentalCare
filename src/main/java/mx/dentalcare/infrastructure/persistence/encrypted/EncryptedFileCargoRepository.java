@@ -33,7 +33,12 @@ public class EncryptedFileCargoRepository implements CargoRepository {
         CargoData data = loadData();
         if (cargo.getId() == null) {
             long id = 1;
-            while (data.getCargos().stream().anyMatch(c -> id == c.getId())) id++;
+            boolean exists;
+            do {
+                final long candidate = id;
+                exists = data.getCargos().stream().anyMatch(c -> c.getId() != null && candidate == c.getId());
+                if (exists) id++;
+            } while (exists);
             cargo.setId(id);
         }
         data.getCargos().removeIf(c -> cargo.getId().equals(c.getId()));

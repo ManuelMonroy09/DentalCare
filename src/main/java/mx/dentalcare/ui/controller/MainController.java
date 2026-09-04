@@ -12,67 +12,28 @@ import org.springframework.stereotype.Component;
 @Component
 public class MainController {
 
-    @FXML
-    private StackPane contentArea;
-
-    @FXML
-    private Button inicioButton;
-
-    @FXML
-    private Button pacientesButton;
-
-    @FXML
-    private Button citasButton;
-
-    @FXML
-    private Button tratamientosButton;
-
-    @FXML
-    private Button historialButton;
-
-    @FXML
-    private Button configuracionButton;
+    @FXML private StackPane contentArea;
+    @FXML private Button inicioButton;
+    @FXML private Button pacientesButton;
+    @FXML private Button citasButton;
+    @FXML private Button tratamientosButton;
+    @FXML private Button historialButton;
+    @FXML private Button finanzasButton;
+    @FXML private Button configuracionButton;
 
     private final ApplicationContext context;
 
-    public MainController(ApplicationContext context) {
-        this.context = context;
-    }
+    public MainController(ApplicationContext context) { this.context = context; }
 
-    @FXML
-    public void initialize() {
-        mostrarInicio();
-    }
+    @FXML public void initialize() { mostrarInicio(); }
 
-    @FXML
-    private void mostrarInicio() {
-        cargarVista("/ui/fxml/DashboardView.fxml");
-    }
-
-    @FXML
-    private void mostrarPacientes() {
-        cargarVista("/ui/fxml/PacientesView.fxml");
-    }
-
-    @FXML
-    private void mostrarCitas() {
-        cargarVista("/ui/fxml/AgendaView.fxml");
-    }
-
-    @FXML
-    private void mostrarTratamientos() {
-        cargarVista("/ui/fxml/TratamientosView.fxml");
-    }
-
-    @FXML
-    private void mostrarHistorial() {
-        cargarVista("/ui/fxml/HistorialView.fxml");
-    }
-
-    @FXML
-    private void mostrarConfiguracion() {
-        mostrarMensaje("Configuración", "Módulo de configuración próximamente.");
-    }
+    @FXML private void mostrarInicio() { cargarVista("/ui/fxml/DashboardView.fxml"); }
+    @FXML private void mostrarPacientes() { cargarVista("/ui/fxml/PacientesView.fxml"); }
+    @FXML private void mostrarCitas() { cargarVista("/ui/fxml/AgendaView.fxml"); }
+    @FXML private void mostrarTratamientos() { cargarVista("/ui/fxml/TratamientosView.fxml"); }
+    @FXML private void mostrarHistorial() { cargarVista("/ui/fxml/HistorialView.fxml"); }
+    @FXML private void mostrarFinanzas() { cargarVista("/ui/fxml/FinanzasView.fxml"); }
+    @FXML private void mostrarConfiguracion() { mostrarMensaje("Configuración", "Módulo de configuración próximamente."); }
 
     private void cargarVista(String ruta) {
         try {

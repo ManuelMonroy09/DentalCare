@@ -28,13 +28,14 @@ public class BackupService {
             Path archivo = destino.toAbsolutePath().normalize();
             Path padre = archivo.getParent();
             if (padre != null) Files.createDirectories(padre);
+            if (archivo.startsWith(DATA_DIRECTORY.toAbsolutePath().normalize())) {
+                throw new IllegalArgumentException("El respaldo debe guardarse fuera de la carpeta data.");
+            }
 
             try (OutputStream output = Files.newOutputStream(archivo);
                  ZipOutputStream zip = new ZipOutputStream(output)) {
-                if (Files.exists(DATA_DIRECTORY)) {
-                    try (var stream = Files.walk(DATA_DIRECTORY)) {
-                        stream.filter(Files::isRegularFile).forEach(path -> agregarArchivo(zip, path));
-                    }
+                try (var stream = Files.walk(DATA_DIRECTORY)) {
+                    stream.filter(Files::isRegularFile).forEach(path -> agregarArchivo(zip, path));
                 }
             }
             return archivo;
@@ -56,7 +57,6 @@ public class BackupService {
 
         Path temporal = null;
         try {
-            crearDirectorioDatosSiNoExiste();
             temporal = Files.createTempDirectory("dentalcare-restore-");
 
             try (InputStream input = Files.newInputStream(respaldo);
@@ -68,14 +68,17 @@ public class BackupService {
                     if (!destino.startsWith(temporal)) {
                         throw new IllegalStateException("El respaldo contiene una ruta no válida.");
                     }
-                    Files.createDirectories(destino.getParent());
+                    Path padre = destino.getParent();
+                    if (padre != null) Files.createDirectories(padre);
                     Files.copy(zip, destino, StandardCopyOption.REPLACE_EXISTING);
                 }
             }
 
-            try (var stream = Files.walk(temporal)) {
+            limpiarDatosActuales();
+            Path origenTemporal = temporal;
+            try (var stream = Files.walk(origenTemporal)) {
                 stream.filter(Files::isRegularFile).forEach(origen -> {
-                    Path relativa = temporal.relativize(origen);
+                    Path relativa = origenTemporal.relativize(origen);
                     Path destino = DATA_DIRECTORY.resolve(relativa).normalize();
                     try {
                         Files.createDirectories(destino.getParent());
@@ -100,6 +103,19 @@ public class BackupService {
             zip.closeEntry();
         } catch (IOException ex) {
             throw new IllegalStateException("No fue posible incluir " + archivo + " en el respaldo.", ex);
+        }
+    }
+
+    private void limpiarDatosActuales() throws IOException {
+        if (!Files.exists(DATA_DIRECTORY)) {
+            Files.createDirectories(DATA_DIRECTORY);
+            return;
+        }
+        try (var stream = Files.walk(DATA_DIRECTORY)) {
+            stream.filter(Files::isRegularFile).forEach(path -> {
+                try { Files.deleteIfExists(path); }
+                catch (IOException ex) { throw new IllegalStateException("No fue posible limpiar " + path + ".", ex); }
+            });
         }
     }
 

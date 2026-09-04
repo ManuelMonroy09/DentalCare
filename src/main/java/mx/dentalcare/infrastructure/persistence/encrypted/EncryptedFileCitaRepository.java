@@ -46,8 +46,9 @@ public class EncryptedFileCitaRepository implements CitaRepository {
             boolean idExiste;
 
             do {
+                final Long idBuscado = nuevoId;
                 idExiste = data.getCitas().stream()
-                        .anyMatch(c -> c.getId() != null && c.getId().equals(nuevoId));
+                        .anyMatch(c -> c.getId() != null && c.getId().equals(idBuscado));
 
                 if (idExiste) {
                     nuevoId++;

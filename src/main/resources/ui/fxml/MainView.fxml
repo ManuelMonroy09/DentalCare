@@ -8,42 +8,31 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.StackPane?>
 
-<BorderPane
-        xmlns="http://javafx.com/javafx/21"
+<BorderPane xmlns="http://javafx.com/javafx/21"
         xmlns:fx="http://javafx.com/fxml/1"
         fx:controller="mx.dentalcare.ui.controller.MainController"
         styleClass="root"
         stylesheets="@../css/dentalcare.css,@../css/dentalcare-overrides.css">
-
     <top>
-        <HBox
-                alignment="CENTER_LEFT"
-                spacing="15"
-                styleClass="header">
+        <HBox alignment="CENTER_LEFT" spacing="15" styleClass="header">
             <Label text="DentalCare" styleClass="logo"/>
             <HBox HBox.hgrow="ALWAYS"/>
             <Label text="Administrador" styleClass="user-name"/>
             <Button text="⚙" styleClass="icon-button"/>
         </HBox>
     </top>
-
     <left>
         <VBox spacing="8" styleClass="sidebar">
-            <padding>
-                <Insets top="20" right="15" bottom="20" left="15"/>
-            </padding>
+            <padding><Insets top="20" right="15" bottom="20" left="15"/></padding>
             <Button fx:id="inicioButton" text="⌂   Inicio" onAction="#mostrarInicio" styleClass="menu-button"/>
             <Button fx:id="pacientesButton" text="♟   Pacientes" onAction="#mostrarPacientes" styleClass="menu-button"/>
             <Button fx:id="citasButton" text="▣   Citas" onAction="#mostrarCitas" styleClass="menu-button"/>
             <Button fx:id="tratamientosButton" text="✚   Tratamientos" onAction="#mostrarTratamientos" styleClass="menu-button"/>
             <Button fx:id="historialButton" text="☷   Historial" onAction="#mostrarHistorial" styleClass="menu-button"/>
+            <Button fx:id="finanzasButton" text="▤   Finanzas" onAction="#mostrarFinanzas" styleClass="menu-button"/>
             <VBox VBox.vgrow="ALWAYS"/>
             <Button fx:id="configuracionButton" text="⚙   Configuración" onAction="#mostrarConfiguracion" styleClass="menu-button"/>
         </VBox>
     </left>
-
-    <center>
-        <StackPane fx:id="contentArea" styleClass="content-area"/>
-    </center>
-
+    <center><StackPane fx:id="contentArea" styleClass="content-area"/></center>
 </BorderPane>

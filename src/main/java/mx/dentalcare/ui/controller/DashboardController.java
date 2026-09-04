@@ -8,9 +8,11 @@ import javafx.scene.layout.VBox;
 import mx.dentalcare.domain.cita.Cita;
 import mx.dentalcare.domain.tratamiento.TratamientoAplicado;
 import mx.dentalcare.service.CitaService;
+import mx.dentalcare.service.FinanzasService;
 import mx.dentalcare.service.PacientesService;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -20,43 +22,34 @@ import java.util.List;
 @Component
 public class DashboardController {
 
-    @FXML
-    private Label lblTotalPacientes;
-
-    @FXML
-    private Label lblCitasHoy;
-
-    @FXML
-    private Label lblProximaHora;
-
-    @FXML
-    private Label lblProximoPaciente;
-
-    @FXML
-    private Label lblProximoTratamiento;
-
-    @FXML
-    private Label lblProximoEstado;
-
-    @FXML
-    private VBox contenedorCitasHoy;
+    @FXML private Label lblTotalPacientes;
+    @FXML private Label lblCitasHoy;
+    @FXML private Label lblProximaHora;
+    @FXML private Label lblProximoPaciente;
+    @FXML private Label lblProximoTratamiento;
+    @FXML private Label lblProximoEstado;
+    @FXML private Label lblIngresosHoy;
+    @FXML private Label lblPorCobrar;
+    @FXML private Label lblCobrosHoy;
 
     private final PacientesService pacienteService;
     private final CitaService citaService;
+    private final FinanzasService finanzasService;
 
-    private static final DateTimeFormatter FORMATO_HORA =
-            DateTimeFormatter.ofPattern("HH:mm");
+    private static final DateTimeFormatter FORMATO_HORA = DateTimeFormatter.ofPattern("HH:mm");
 
-    public DashboardController(PacientesService pacienteService, CitaService citaService) {
+    public DashboardController(PacientesService pacienteService, CitaService citaService,
+                               FinanzasService finanzasService) {
         this.pacienteService = pacienteService;
         this.citaService = citaService;
+        this.finanzasService = finanzasService;
     }
 
     @FXML
     public void initialize() {
         cargarResumen();
         cargarProximaCita();
-        cargarCitasHoy();
+        cargarResumenFinanciero();
     }
 
     private void cargarResumen() {
@@ -67,6 +60,13 @@ public class DashboardController {
                 .count();
         lblTotalPacientes.setText(String.valueOf(totalPacientes));
         lblCitasHoy.setText(String.valueOf(citasHoy));
+    }
+
+    private void cargarResumenFinanciero() {
+        LocalDate hoy = LocalDate.now();
+        lblIngresosHoy.setText(moneda(finanzasService.obtenerIngresos(hoy, hoy)));
+        lblPorCobrar.setText(moneda(finanzasService.obtenerPorCobrar()));
+        lblCobrosHoy.setText(String.valueOf(finanzasService.obtenerCantidadPagos(hoy, hoy)));
     }
 
     private void cargarProximaCita() {
@@ -86,19 +86,14 @@ public class DashboardController {
         }
 
         lblProximaHora.setText(proximaCita.getInicio().format(FORMATO_HORA));
-
         if (proximaCita.getPaciente() != null) {
-            String nombre = proximaCita.getPaciente().getNombre() + " "
-                    + proximaCita.getPaciente().getApellidoPaterno();
-            lblProximoPaciente.setText(nombre);
+            lblProximoPaciente.setText(proximaCita.getPaciente().getNombre() + " "
+                    + proximaCita.getPaciente().getApellidoPaterno());
         } else {
             lblProximoPaciente.setText("Paciente no disponible");
         }
-
         lblProximoTratamiento.setText(obtenerResumenTratamientos(proximaCita));
-        lblProximoEstado.setText(proximaCita.getEstado() != null
-                ? proximaCita.getEstado().name()
-                : "SIN ESTADO");
+        lblProximoEstado.setText(proximaCita.getEstado() != null ? proximaCita.getEstado().name() : "SIN ESTADO");
     }
 
     private void mostrarSinProximaCita() {
@@ -108,105 +103,19 @@ public class DashboardController {
         lblProximoEstado.setText("");
     }
 
-    private void cargarCitasHoy() {
-        contenedorCitasHoy.getChildren().clear();
-        LocalDate hoy = LocalDate.now();
-
-        List<Cita> citasHoy = citaService.obtenerTodas().stream()
-                .filter(cita -> cita.getInicio() != null)
-                .filter(cita -> cita.getInicio().toLocalDate().equals(hoy))
-                .sorted(Comparator.comparing(Cita::getInicio))
-                .toList();
-
-        if (citasHoy.isEmpty()) {
-            Label mensaje = new Label("No hay citas programadas para hoy.");
-            mensaje.getStyleClass().add("page-subtitle");
-            contenedorCitasHoy.getChildren().add(mensaje);
-            return;
-        }
-
-        for (Cita cita : citasHoy) {
-            contenedorCitasHoy.getChildren().add(crearFilaCita(cita));
-        }
-    }
-
-    private HBox crearFilaCita(Cita cita) {
-        HBox fila = new HBox(15);
-        fila.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-        fila.getStyleClass().add("dashboard-appointment");
-
-        Label hora = new Label(cita.getInicio().format(FORMATO_HORA));
-        hora.getStyleClass().add("dashboard-appointment-time");
-
-        VBox informacion = new VBox(3);
-        String nombrePaciente;
-        if (cita.getPaciente() != null) {
-            nombrePaciente = cita.getPaciente().getNombre() + " "
-                    + cita.getPaciente().getApellidoPaterno();
-        } else {
-            nombrePaciente = "Paciente no disponible";
-        }
-
-        Label paciente = new Label(nombrePaciente);
-        paciente.getStyleClass().add("dashboard-appointment-patient");
-
-        Label tratamiento = new Label(obtenerResumenTratamientos(cita));
-        tratamiento.getStyleClass().add("dashboard-appointment-treatment");
-        tratamiento.setWrapText(true);
-
-        informacion.getChildren().addAll(paciente, tratamiento);
-        HBox.setHgrow(informacion, Priority.ALWAYS);
-
-        Label estado = new Label(cita.getEstado() != null
-                ? cita.getEstado().name()
-                : "SIN ESTADO");
-        estado.getStyleClass().add("dashboard-appointment-status");
-        aplicarEstiloEstado(estado, cita);
-
-        fila.getChildren().addAll(hora, informacion, estado);
-        return fila;
-    }
-
     private String obtenerResumenTratamientos(Cita cita) {
-        if (cita.getTratamientos() == null || cita.getTratamientos().isEmpty()) {
-            return "Sin tratamiento registrado";
-        }
-
+        if (cita.getTratamientos() == null || cita.getTratamientos().isEmpty()) return "Sin tratamiento registrado";
         List<String> nombres = cita.getTratamientos().stream()
                 .filter(tratamiento -> tratamiento != null)
                 .map(TratamientoAplicado::getNombre)
                 .filter(nombre -> nombre != null && !nombre.isBlank())
                 .toList();
-
-        if (nombres.isEmpty()) {
-            return "Sin tratamiento registrado";
-        }
-
-        if (nombres.size() == 1) {
-            return nombres.get(0);
-        }
-
+        if (nombres.isEmpty()) return "Sin tratamiento registrado";
+        if (nombres.size() == 1) return nombres.get(0);
         return nombres.get(0) + " +" + (nombres.size() - 1);
     }
 
-    private void aplicarEstiloEstado(Label estado, Cita cita) {
-        if (cita.getEstado() == null) {
-            estado.getStyleClass().add("status-default");
-            return;
-        }
-        switch (cita.getEstado()) {
-            case PROGRAMADA ->
-                    estado.getStyleClass().add("status-programada");
-            case CONFIRMADA ->
-                    estado.getStyleClass().add("status-confirmada");
-            case ATENDIDA ->
-                    estado.getStyleClass().add("status-atendida");
-            case CANCELADA ->
-                    estado.getStyleClass().add("status-cancelada");
-            case NO_ASISTIO ->
-                    estado.getStyleClass().add("status-no-asistio");
-            default ->
-                    estado.getStyleClass().add("status-default");
-        }
+    private String moneda(BigDecimal valor) {
+        return "$" + (valor == null ? "0.00" : valor.setScale(2).toPlainString());
     }
 }

@@ -48,11 +48,11 @@
         <HBox spacing="15">
             <VBox spacing="4" styleClass="dashboard-summary-item" HBox.hgrow="ALWAYS">
                 <Label text="Ingresos" styleClass="dashboard-summary-label"/>
-                <Label fx:id="lblIngresosHoy" text="$0.00" styleClass="dashboard-summary-value"/>
+                <Label fx:id="lblIngresosHoy" text="0.00" styleClass="dashboard-summary-value"/>
             </VBox>
             <VBox spacing="4" styleClass="dashboard-summary-item" HBox.hgrow="ALWAYS">
                 <Label text="Por cobrar" styleClass="dashboard-summary-label"/>
-                <Label fx:id="lblPorCobrar" text="$0.00" styleClass="dashboard-summary-value"/>
+                <Label fx:id="lblPorCobrar" text="0.00" styleClass="dashboard-summary-value"/>
             </VBox>
             <VBox spacing="4" styleClass="dashboard-summary-item" HBox.hgrow="ALWAYS">
                 <Label text="Cobros realizados" styleClass="dashboard-summary-label"/>

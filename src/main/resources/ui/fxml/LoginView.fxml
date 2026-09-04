@@ -13,9 +13,11 @@
         xmlns:fx="http://javafx.com/fxml/1"
         fx:controller="mx.dentalcare.ui.controller.LoginController"
         styleClass="auth-root"
-        stylesheets="@../css/dentalcare.css,@../css/dentalcare-overrides.css">
+        stylesheets="@../css/dentalcare.css">
 
     <HBox maxWidth="900" maxHeight="540" styleClass="auth-shell">
+
+        <Button text="×" styleClass="auth-close-button" onAction="#cerrarVentana" StackPane.alignment="TOP_RIGHT"/>
 
         <VBox prefWidth="430" spacing="18" styleClass="auth-brand-panel">
             <VBox spacing="10">

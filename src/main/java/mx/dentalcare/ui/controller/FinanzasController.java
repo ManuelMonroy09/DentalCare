@@ -4,12 +4,10 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import mx.dentalcare.domain.cita.Cita;
 import mx.dentalcare.domain.financiero.Cargo;
 import mx.dentalcare.domain.financiero.EstadoCargo;
 import mx.dentalcare.domain.financiero.MetodoPago;
 import mx.dentalcare.domain.paciente.Paciente;
-import mx.dentalcare.service.CitaService;
 import mx.dentalcare.service.FinanzasService;
 import mx.dentalcare.service.PacientesService;
 import org.springframework.stereotype.Component;
@@ -36,14 +34,12 @@ public class FinanzasController {
     @FXML private Label mensajeLabel;
 
     private final FinanzasService finanzasService;
-    private final CitaService citaService;
     private final PacientesService pacientesService;
     private final Map<Long, Paciente> pacientes = new HashMap<>();
     private static final DateTimeFormatter FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    public FinanzasController(FinanzasService finanzasService, CitaService citaService, PacientesService pacientesService) {
+    public FinanzasController(FinanzasService finanzasService, PacientesService pacientesService) {
         this.finanzasService = finanzasService;
-        this.citaService = citaService;
         this.pacientesService = pacientesService;
     }
 
@@ -68,25 +64,15 @@ public class FinanzasController {
 
     @FXML
     private void sincronizarCargos() {
-        int creados = 0;
-        for (Cita cita : citaService.obtenerHistorial()) {
-            if (cita.getId() == null || cita.obtenerTotalTratamientos().compareTo(BigDecimal.ZERO) <= 0) {
-                continue;
-            }
-
-            boolean existia = finanzasService.obtenerCargos().stream()
-                    .anyMatch(c -> cita.getId().equals(c.getCitaId()));
-
-            if (!existia) {
-                finanzasService.obtenerOCrearCargo(cita);
-                creados++;
-            }
+        try {
+            int creados = finanzasService.generarCargosPendientes();
+            cargarDatos();
+            mensajeLabel.setText(creados == 0
+                    ? "No hay nuevos cargos por generar."
+                    : creados + " cargo(s) generado(s).");
+        } catch (IllegalStateException | IllegalArgumentException ex) {
+            mensajeLabel.setText(ex.getMessage());
         }
-
-        cargarDatos();
-        mensajeLabel.setText(creados == 0
-                ? "No hay nuevos cargos por generar."
-                : creados + " cargo(s) generado(s).");
     }
 
     @FXML
@@ -112,7 +98,7 @@ public class FinanzasController {
 
         BigDecimal monto;
         try {
-            monto = new BigDecimal(montoResultado.get().trim());
+            monto = new BigDecimal(montoResultado.get().trim().replace(",", "."));
         } catch (NumberFormatException ex) {
             mensajeLabel.setText("El monto no tiene un formato válido.");
             return;
@@ -128,7 +114,6 @@ public class FinanzasController {
         try {
             finanzasService.registrarPago(cargo.getId(), monto, metodoResultado.get(), null);
             cargarDatos();
-            cargosTable.getSelectionModel().select(cargo);
             mensajeLabel.setText("Pago registrado correctamente.");
         } catch (IllegalArgumentException | IllegalStateException ex) {
             mensajeLabel.setText(ex.getMessage());
@@ -136,6 +121,8 @@ public class FinanzasController {
     }
 
     private void cargarDatos() {
+        // Al entrar al módulo se sincronizan automáticamente las citas atendidas.
+        finanzasService.generarCargosPendientes();
         List<Cargo> cargos = finanzasService.obtenerCargos();
         cargosTable.setItems(FXCollections.observableArrayList(cargos));
         LocalDate hoy = LocalDate.now();

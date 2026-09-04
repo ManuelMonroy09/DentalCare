@@ -15,7 +15,12 @@
         styleClass="auth-root"
         stylesheets="@../css/dentalcare.css">
 
-    <HBox maxWidth="900" maxHeight="540" styleClass="auth-shell">
+    <HBox fx:id="authShell"
+          maxWidth="900"
+          maxHeight="540"
+          styleClass="auth-shell"
+          onMousePressed="#iniciarMovimientoVentana"
+          onMouseDragged="#moverVentana">
 
         <VBox prefWidth="430" spacing="18" styleClass="auth-brand-panel">
             <VBox spacing="10">

@@ -31,12 +31,9 @@ public class BackupService {
             if (archivo.startsWith(DATA_DIRECTORY.toAbsolutePath().normalize())) {
                 throw new IllegalArgumentException("El respaldo debe guardarse fuera de la carpeta data.");
             }
-
-            try (OutputStream output = Files.newOutputStream(archivo);
-                 ZipOutputStream zip = new ZipOutputStream(output)) {
-                try (var stream = Files.walk(DATA_DIRECTORY)) {
-                    stream.filter(Files::isRegularFile).forEach(path -> agregarArchivo(zip, path));
-                }
+            try (OutputStream output = Files.newOutputStream(archivo); ZipOutputStream zip = new ZipOutputStream(output);
+                 var stream = Files.walk(DATA_DIRECTORY)) {
+                stream.filter(Files::isRegularFile).forEach(path -> agregarArchivo(zip, path));
             }
             return archivo;
         } catch (IOException ex) {
@@ -51,27 +48,25 @@ public class BackupService {
     }
 
     public void restaurarRespaldo(Path respaldo) {
-        if (respaldo == null || !Files.isRegularFile(respaldo)) {
-            throw new IllegalArgumentException("El archivo de respaldo no existe.");
-        }
-
+        if (respaldo == null || !Files.isRegularFile(respaldo)) throw new IllegalArgumentException("El archivo de respaldo no existe.");
         Path temporal = null;
         try {
             temporal = Files.createTempDirectory("dentalcare-restore-");
-
-            try (InputStream input = Files.newInputStream(respaldo);
-                 ZipInputStream zip = new ZipInputStream(input)) {
+            try (InputStream input = Files.newInputStream(respaldo); ZipInputStream zip = new ZipInputStream(input)) {
                 ZipEntry entry;
                 while ((entry = zip.getNextEntry()) != null) {
                     if (entry.isDirectory()) continue;
                     Path destino = temporal.resolve(entry.getName()).normalize();
-                    if (!destino.startsWith(temporal)) {
-                        throw new IllegalStateException("El respaldo contiene una ruta no válida.");
-                    }
+                    if (!destino.startsWith(temporal)) throw new IllegalStateException("El respaldo contiene una ruta no válida.");
                     Path padre = destino.getParent();
                     if (padre != null) Files.createDirectories(padre);
                     Files.copy(zip, destino, StandardCopyOption.REPLACE_EXISTING);
                 }
+            }
+
+            Path archivoSeguridad = temporal.resolve("security.dat").normalize();
+            if (!Files.isRegularFile(archivoSeguridad)) {
+                throw new IllegalArgumentException("El archivo seleccionado no es un respaldo válido de DentalCare.");
             }
 
             limpiarDatosActuales();
@@ -119,15 +114,12 @@ public class BackupService {
         }
     }
 
-    private void crearDirectorioDatosSiNoExiste() throws IOException {
-        Files.createDirectories(DATA_DIRECTORY);
-    }
+    private void crearDirectorioDatosSiNoExiste() throws IOException { Files.createDirectories(DATA_DIRECTORY); }
 
     private void eliminarDirectorioTemporal(Path directorio) {
         try (var stream = Files.walk(directorio)) {
             stream.sorted(Comparator.reverseOrder()).forEach(path -> {
-                try { Files.deleteIfExists(path); }
-                catch (IOException ignored) { }
+                try { Files.deleteIfExists(path); } catch (IOException ignored) { }
             });
         } catch (IOException ignored) { }
     }

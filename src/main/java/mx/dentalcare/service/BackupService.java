@@ -1,0 +1,118 @@
+package mx.dentalcare.service;
+
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
+
+@Service
+public class BackupService {
+
+    private static final Path DATA_DIRECTORY = Path.of("data");
+    private static final DateTimeFormatter TIMESTAMP = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
+
+    public Path crearRespaldo(Path destino) {
+        if (destino == null) throw new IllegalArgumentException("Debes seleccionar un archivo de respaldo.");
+        try {
+            crearDirectorioDatosSiNoExiste();
+            Path archivo = destino.toAbsolutePath().normalize();
+            Path padre = archivo.getParent();
+            if (padre != null) Files.createDirectories(padre);
+
+            try (OutputStream output = Files.newOutputStream(archivo);
+                 ZipOutputStream zip = new ZipOutputStream(output)) {
+                if (Files.exists(DATA_DIRECTORY)) {
+                    try (var stream = Files.walk(DATA_DIRECTORY)) {
+                        stream.filter(Files::isRegularFile).forEach(path -> agregarArchivo(zip, path));
+                    }
+                }
+            }
+            return archivo;
+        } catch (IOException ex) {
+            throw new IllegalStateException("No fue posible crear el respaldo: " + ex.getMessage(), ex);
+        }
+    }
+
+    public Path crearRespaldoAutomatico(Path directorio) {
+        if (directorio == null) throw new IllegalArgumentException("El directorio de respaldo es obligatorio.");
+        String nombre = "DentalCare_backup_" + LocalDateTime.now().format(TIMESTAMP) + ".zip";
+        return crearRespaldo(directorio.resolve(nombre));
+    }
+
+    public void restaurarRespaldo(Path respaldo) {
+        if (respaldo == null || !Files.isRegularFile(respaldo)) {
+            throw new IllegalArgumentException("El archivo de respaldo no existe.");
+        }
+
+        Path temporal = null;
+        try {
+            crearDirectorioDatosSiNoExiste();
+            temporal = Files.createTempDirectory("dentalcare-restore-");
+
+            try (InputStream input = Files.newInputStream(respaldo);
+                 ZipInputStream zip = new ZipInputStream(input)) {
+                ZipEntry entry;
+                while ((entry = zip.getNextEntry()) != null) {
+                    if (entry.isDirectory()) continue;
+                    Path destino = temporal.resolve(entry.getName()).normalize();
+                    if (!destino.startsWith(temporal)) {
+                        throw new IllegalStateException("El respaldo contiene una ruta no válida.");
+                    }
+                    Files.createDirectories(destino.getParent());
+                    Files.copy(zip, destino, StandardCopyOption.REPLACE_EXISTING);
+                }
+            }
+
+            try (var stream = Files.walk(temporal)) {
+                stream.filter(Files::isRegularFile).forEach(origen -> {
+                    Path relativa = temporal.relativize(origen);
+                    Path destino = DATA_DIRECTORY.resolve(relativa).normalize();
+                    try {
+                        Files.createDirectories(destino.getParent());
+                        Files.copy(origen, destino, StandardCopyOption.REPLACE_EXISTING);
+                    } catch (IOException ex) {
+                        throw new IllegalStateException("No fue posible restaurar " + relativa + ".", ex);
+                    }
+                });
+            }
+        } catch (IOException ex) {
+            throw new IllegalStateException("No fue posible restaurar el respaldo: " + ex.getMessage(), ex);
+        } finally {
+            if (temporal != null) eliminarDirectorioTemporal(temporal);
+        }
+    }
+
+    private void agregarArchivo(ZipOutputStream zip, Path archivo) {
+        try {
+            ZipEntry entry = new ZipEntry(DATA_DIRECTORY.relativize(archivo).toString().replace('\\', '/'));
+            zip.putNextEntry(entry);
+            Files.copy(archivo, zip);
+            zip.closeEntry();
+        } catch (IOException ex) {
+            throw new IllegalStateException("No fue posible incluir " + archivo + " en el respaldo.", ex);
+        }
+    }
+
+    private void crearDirectorioDatosSiNoExiste() throws IOException {
+        Files.createDirectories(DATA_DIRECTORY);
+    }
+
+    private void eliminarDirectorioTemporal(Path directorio) {
+        try (var stream = Files.walk(directorio)) {
+            stream.sorted(Comparator.reverseOrder()).forEach(path -> {
+                try { Files.deleteIfExists(path); }
+                catch (IOException ignored) { }
+            });
+        } catch (IOException ignored) { }
+    }
+}

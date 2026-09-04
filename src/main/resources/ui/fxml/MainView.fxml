@@ -12,7 +12,7 @@
         xmlns:fx="http://javafx.com/fxml/1"
         fx:controller="mx.dentalcare.ui.controller.MainController"
         styleClass="root"
-        stylesheets="@../css/dentalcare.css,@../css/dentalcare-overrides.css">
+        stylesheets="@../css/dentalcare.css">
     <top>
         <HBox alignment="CENTER_LEFT" spacing="15" styleClass="header">
             <Label text="DentalCare" styleClass="logo"/>

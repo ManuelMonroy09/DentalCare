@@ -7,10 +7,11 @@
    ========================================================= */
 
 .agenda-event {
-    -fx-padding: 5px 7px;
+    -fx-padding: 4px 6px;
     -fx-background-radius: 7px;
     -fx-border-radius: 7px;
     -fx-border-width: 0 0 0 4px;
+    -fx-spacing: 1px;
 }
 
 .agenda-event:hover {
@@ -18,29 +19,35 @@
 }
 
 .agenda-event-patient {
-    -fx-font-size: 12px;
+    -fx-font-size: 11px;
     -fx-font-weight: bold;
+    -fx-text-overrun: ellipsis;
 }
 
 .agenda-event-time,
 .agenda-event-treatment {
-    -fx-font-size: 10px;
+    -fx-font-size: 9px;
 }
 
 .agenda-event-treatment {
     -fx-font-weight: bold;
+    -fx-text-overrun: ellipsis;
 }
 
-.agenda-event-notes {
-    -fx-font-size: 9px;
-    -fx-text-fill: #6b7280;
-    -fx-padding: 1px 0 0 0;
-}
-
-/* Mantiene la información secundaria visualmente discreta. */
+/*
+ * La tarjeta de agenda muestra únicamente información esencial.
+ * Motivo y notas se conservan en la cita y se consultan desde el
+ * detalle de la cita, evitando que el contenido invada la siguiente
+ * franja horaria cuando la cita es corta.
+ */
+.agenda-event-notes,
 .agenda-event-reason {
-    -fx-font-size: 9px;
-    -fx-text-fill: #6b7280;
+    -fx-font-size: 0px;
+    -fx-padding: 0;
+    -fx-min-height: 0;
+    -fx-pref-height: 0;
+    -fx-max-height: 0;
+    -fx-opacity: 0;
 }
 
 /* =========================================================

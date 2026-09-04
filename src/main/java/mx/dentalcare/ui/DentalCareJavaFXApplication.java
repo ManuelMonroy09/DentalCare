@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import mx.dentalcare.DentalCareApplication;
 import mx.dentalcare.security.SecuritySession;
 import mx.dentalcare.security.AuthenticationService;
@@ -26,6 +27,7 @@ public class DentalCareJavaFXApplication extends Application {
         AuthenticationService authenticationService = context.getBean(AuthenticationService.class);
 
         if (authenticationService.isConfigured()) {
+            stage.initStyle(StageStyle.UNDECORATED);
             mostrarVista(stage, "/ui/fxml/LoginView.fxml", "DentalCare | Iniciar sesión", 960, 620);
         } else {
             mostrarVista(stage, "/ui/fxml/SetupView.fxml", "DentalCare | Configuración inicial", 1200, 750);
@@ -52,6 +54,7 @@ public class DentalCareJavaFXApplication extends Application {
         }
 
         stage.show();
+        stage.centerOnScreen();
     }
 
     @Override

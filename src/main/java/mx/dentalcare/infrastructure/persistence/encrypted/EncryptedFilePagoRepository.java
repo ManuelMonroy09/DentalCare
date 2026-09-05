@@ -1,6 +1,7 @@
 package mx.dentalcare.infrastructure.persistence.encrypted;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import mx.dentalcare.config.DataDirectoryService;
 import mx.dentalcare.domain.financiero.Pago;
 import mx.dentalcare.infrastructure.persistence.file.PagoData;
 import mx.dentalcare.repository.PagoRepository;
@@ -22,15 +23,14 @@ import java.util.Optional;
 public class EncryptedFilePagoRepository implements PagoRepository {
     private final EncryptedFileStorage storage;
     private final SecuritySession securitySession;
-    private final Path filePath = Path.of("data", "pagos.dat");
+    private final Path filePath = DataDirectoryService.resolve("pagos.dat");
 
     public EncryptedFilePagoRepository(ObjectMapper objectMapper, SecuritySession securitySession) {
         this.securitySession = securitySession;
         this.storage = new EncryptedFileStorage(objectMapper, new KeyDerivationService(), new AesEncryptionService());
     }
 
-    @Override
-    public Pago save(Pago pago) {
+    @Override public Pago save(Pago pago) {
         PagoData data = loadData();
         if (pago.getId() == null) {
             long id = 1;
@@ -48,17 +48,10 @@ public class EncryptedFilePagoRepository implements PagoRepository {
         return pago;
     }
 
-    @Override
-    public List<Pago> findAll() {
-        return new ArrayList<>(loadData().getPagos());
-    }
-
-    @Override
-    public Optional<Pago> findById(Long id) {
+    @Override public List<Pago> findAll() { return new ArrayList<>(loadData().getPagos()); }
+    @Override public Optional<Pago> findById(Long id) {
         if (id == null) return Optional.empty();
-        return loadData().getPagos().stream()
-                .filter(p -> id.equals(p.getId()))
-                .findFirst();
+        return loadData().getPagos().stream().filter(p -> id.equals(p.getId())).findFirst();
     }
 
     private PagoData loadData() {
@@ -68,8 +61,5 @@ public class EncryptedFilePagoRepository implements PagoRepository {
         if (data.getPagos() == null) data.setPagos(new ArrayList<>());
         return data;
     }
-
-    private void saveData(PagoData data) {
-        storage.save(filePath, data, securitySession.requireMasterKey());
-    }
+    private void saveData(PagoData data) { storage.save(filePath, data, securitySession.requireMasterKey()); }
 }

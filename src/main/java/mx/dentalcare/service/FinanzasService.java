@@ -144,7 +144,9 @@ public class FinanzasService {
         if (citaId == null) throw new IllegalArgumentException("El identificador de la cita es obligatorio.");
         if (metodoPago == null) throw new IllegalArgumentException("El método de pago es obligatorio.");
         Cita cita = citaService.obtenerPorId(citaId).orElseThrow(() -> new IllegalArgumentException("No existe la cita seleccionada."));
-        if (cita.getEstado() != EstadoCita.CONFIRMADA) throw new IllegalStateException("Solo se puede registrar un anticipo para una cita confirmada.");
+        if (cita.getEstado() != EstadoCita.PROGRAMADA && cita.getEstado() != EstadoCita.CONFIRMADA) {
+            throw new IllegalStateException("Solo se puede registrar un anticipo para una cita programada o confirmada.");
+        }
         if (cita.getPaciente() == null || cita.getPaciente().getId() == null) throw new IllegalStateException("La cita no tiene un paciente válido.");
 
         BigDecimal importe = dinero(monto);

@@ -110,8 +110,9 @@
     -fx-text-fill: #374151;
     -fx-font-size: 13px;
     -fx-wrap-text: false;
-    -fx-min-width: 70px;
-    -fx-pref-width: 78px;
+    -fx-min-width: 140px;
+    -fx-pref-width: 150px;
+    -fx-max-width: 150px;
     -fx-alignment: CENTER_LEFT;
 }
 .dialog-pane .button-bar {

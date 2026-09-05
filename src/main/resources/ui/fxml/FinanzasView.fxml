@@ -18,7 +18,7 @@
 
     <VBox spacing="5">
         <Label text="Finanzas" styleClass="page-title"/>
-        <Label text="Control de cargos, pagos y saldos pendientes del consultorio." styleClass="page-subtitle"/>
+        <Label text="Control de cargos, pagos, anticipos y saldos pendientes del consultorio." styleClass="page-subtitle"/>
     </VBox>
 
     <HBox spacing="15">
@@ -38,6 +38,7 @@
 
     <HBox alignment="CENTER_LEFT" spacing="10">
         <Button text="Registrar pago" onAction="#registrarPago" styleClass="primary-button"/>
+        <Button text="Registrar anticipo" onAction="#registrarAnticipo" styleClass="secondary-button"/>
         <Button text="Imprimir recibo" onAction="#imprimirRecibo" styleClass="secondary-button"/>
         <Button text="Ver detalle" onAction="#verDetalle" styleClass="secondary-button"/>
         <Button text="Sincronizar cargos" onAction="#sincronizarCargos" styleClass="secondary-button"/>

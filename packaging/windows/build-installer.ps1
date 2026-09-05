@@ -10,6 +10,11 @@ if (-not (Get-Command jpackage -ErrorAction SilentlyContinue)) {
     throw "jpackage no está disponible. Instala un JDK 17 o superior y verifica PATH."
 }
 
+$icon = Join-Path (Get-Location) "packaging\windows\dentalcare.ico"
+if (-not (Test-Path $icon)) {
+    throw "No se encontró el icono de Windows: $icon"
+}
+
 Write-Host "[1/3] Compilando..."
 mvn clean package -DskipTests
 
@@ -35,6 +40,7 @@ jpackage `
     --main-jar $jar.Name `
     --main-class mx.dentalcare.ui.DentalCareJavaFXApplication `
     --dest $output `
+    --icon $icon `
     --win-dir-chooser `
     --win-menu `
     --win-shortcut

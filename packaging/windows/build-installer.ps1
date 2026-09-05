@@ -59,6 +59,7 @@ jpackage `
     --app-version 1.0.0 `
     --vendor "DentalCare" `
     --description "Sistema de gestión para consultorio dental" `
+    --win-per-user-install `
     --win-dir-chooser `
     --win-menu `
     --win-shortcut `

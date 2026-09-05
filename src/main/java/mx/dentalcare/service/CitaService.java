@@ -8,6 +8,7 @@ import mx.dentalcare.domain.tratamiento.TratamientoAplicado;
 import mx.dentalcare.event.CitaEstadoCambiadoEvent;
 import mx.dentalcare.repository.CargoRepository;
 import mx.dentalcare.repository.CitaRepository;
+import mx.dentalcare.repository.PagoRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
@@ -28,13 +29,16 @@ public class CitaService {
     private final CitaRepository citaRepository;
     private final TratamientoService tratamientoService;
     private final CargoRepository cargoRepository;
+    private final PagoRepository pagoRepository;
     private final ApplicationEventPublisher eventPublisher;
 
     public CitaService(CitaRepository citaRepository, TratamientoService tratamientoService,
-                       CargoRepository cargoRepository, ApplicationEventPublisher eventPublisher) {
+                       CargoRepository cargoRepository, PagoRepository pagoRepository,
+                       ApplicationEventPublisher eventPublisher) {
         this.citaRepository = citaRepository;
         this.tratamientoService = tratamientoService;
         this.cargoRepository = cargoRepository;
+        this.pagoRepository = pagoRepository;
         this.eventPublisher = eventPublisher;
     }
 
@@ -86,8 +90,7 @@ public class CitaService {
         if (cita.getTratamientos() == null) cita.setTratamientos(new ArrayList<>());
         Set<Long> seleccionados = tratamientoIds == null ? new HashSet<>() : new HashSet<>(tratamientoIds);
         cita.getTratamientos().removeIf(tratamientoAplicado ->
-                tratamientoAplicado == null
-                        || tratamientoAplicado.getTratamientoId() == null
+                tratamientoAplicado == null || tratamientoAplicado.getTratamientoId() == null
                         || !seleccionados.contains(tratamientoAplicado.getTratamientoId()));
         Set<Long> existentes = new HashSet<>();
         for (TratamientoAplicado tratamientoAplicado : cita.getTratamientos()) {
@@ -196,9 +199,15 @@ public class CitaService {
 
     public void eliminar(Long id) {
         if (id == null) throw new IllegalArgumentException("El identificador de la cita no puede ser nulo.");
-        obtenerExistente(id);
-        if (cargoRepository.findByCitaId(id).isPresent()) throw new IllegalStateException("No se puede eliminar una cita que ya tiene un cargo financiero asociado. Puedes cancelarla para conservar su historial.");
-        citaRepository.deleteById(id);
+        Cita cita = obtenerExistente(id);
+        if (cargoRepository.findByCitaId(id).isPresent()) {
+            throw new IllegalStateException("No se puede eliminar una cita que ya tiene un cargo financiero asociado. Puedes cancelarla para conservar su historial.");
+        }
+        boolean tieneMovimientos = pagoRepository.findAll().stream().anyMatch(p -> id.equals(p.getCitaId()));
+        if (tieneMovimientos) {
+            throw new IllegalStateException("No se puede eliminar una cita que tiene movimientos financieros. Cancélala para conservar el historial del anticipo.");
+        }
+        citaRepository.deleteById(cita.getId());
     }
 
     private void validarTratamientosModificables(Long citaId) {

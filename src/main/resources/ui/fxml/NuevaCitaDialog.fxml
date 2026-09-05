@@ -23,11 +23,6 @@
       minWidth="640"
       minHeight="700">
 
-    <stylesheets>
-        <String fx:value="@../css/dentalcare.css"/>
-        <String fx:value="@../css/dentalcare-overrides.css"/>
-    </stylesheets>
-
     <padding>
         <Insets top="18" right="26" bottom="18" left="26"/>
     </padding>

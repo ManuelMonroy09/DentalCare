@@ -55,6 +55,12 @@ Write-Host "Dependencias: $((Get-ChildItem $dependencies -Filter '*.jar').Count)
 Write-Host "Entrada jpackage: $stagedJar"
 
 Write-Host "[3/4] Generando instalador MSI..."
+# DentalCare extiende javafx.application.Application. Java necesita que los
+# módulos JavaFX estén disponibles en el module-path para detectar y arrancar
+# correctamente el runtime de JavaFX. $APPDIR se deja literal para que lo
+# resuelva el launcher generado por jpackage en tiempo de ejecución.
+$javafxModulePath = '--module-path $APPDIR/lib --add-modules javafx.controls,javafx.fxml'
+
 jpackage `
     --type msi `
     --input $input `
@@ -66,6 +72,7 @@ jpackage `
     --app-version 1.0.0 `
     --vendor "DentalCare" `
     --description "Sistema de gestión para consultorio dental" `
+    --java-options $javafxModulePath `
     --win-per-user-install `
     --win-dir-chooser `
     --win-menu `

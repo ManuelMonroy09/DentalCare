@@ -10,9 +10,6 @@ public class PersistenceConfig {
 
     @Bean
     public Path pacienteFilePath() {
-        return Path.of(
-                "data",
-                "pacientes.json"
-        );
+        return DataDirectoryService.resolve("pacientes.json");
     }
 }

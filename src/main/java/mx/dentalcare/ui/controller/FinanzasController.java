@@ -92,23 +92,24 @@ public class FinanzasController {
     @FXML
     private void registrarAnticipo() {
         List<Cita> citas = citaService.obtenerTodas().stream()
-                .filter(c -> c.getEstado() == EstadoCita.CONFIRMADA)
+                .filter(c -> c.getEstado() == EstadoCita.PROGRAMADA || c.getEstado() == EstadoCita.CONFIRMADA)
                 .filter(c -> c.getId() != null && c.getPaciente() != null && c.getPaciente().getId() != null)
                 .sorted(Comparator.comparing(Cita::getInicio, Comparator.nullsLast(Comparator.naturalOrder())))
                 .toList();
         if (citas.isEmpty()) {
-            mensajeLabel.setText("No hay citas confirmadas disponibles para registrar un anticipo.");
+            mensajeLabel.setText("No hay citas programadas o confirmadas disponibles para registrar un anticipo.");
             return;
         }
 
-        ChoiceDialog<Cita> citaDialog = new ChoiceDialog<>(citas.get(0), citas);
+        List<CitaAnticipoOption> opciones = citas.stream().map(CitaAnticipoOption::new).toList();
+        ChoiceDialog<CitaAnticipoOption> citaDialog = new ChoiceDialog<>(opciones.get(0), opciones);
         citaDialog.setTitle("Registrar anticipo");
-        citaDialog.setHeaderText("Selecciona la cita confirmada");
+        citaDialog.setHeaderText("Selecciona la cita a la que corresponde el anticipo");
         citaDialog.setContentText("Cita:");
-        citaDialog.getDialogPane().setMinWidth(560);
+        citaDialog.getDialogPane().setMinWidth(600);
         var citaResultado = citaDialog.showAndWait();
         if (citaResultado.isEmpty()) return;
-        Cita cita = citaResultado.get();
+        Cita cita = citaResultado.get().cita();
 
         BigDecimal anticipos = finanzasService.obtenerTotalAnticipos(cita.getId());
         TextInputDialog montoDialog = new TextInputDialog("0.00");
@@ -135,6 +136,18 @@ public class FinanzasController {
             mensajeLabel.setText("Anticipo registrado correctamente para " + nombrePaciente(cita.getPaciente().getId()) + ".");
         } catch (IllegalArgumentException | IllegalStateException ex) {
             mensajeLabel.setText(ex.getMessage());
+        }
+    }
+
+    private record CitaAnticipoOption(Cita cita) {
+        @Override
+        public String toString() {
+            String paciente = cita.getPaciente() == null ? "Paciente" :
+                    (cita.getPaciente().getNombre() + " " + cita.getPaciente().getApellidoPaterno() + " " + cita.getPaciente().getApellidoMaterno())
+                            .trim().replaceAll("\\s+", " ");
+            String fecha = cita.getInicio() == null ? "Fecha no disponible" : cita.getInicio().format(FECHA_HORA);
+            String estado = cita.getEstado() == EstadoCita.CONFIRMADA ? "Confirmada" : "Programada";
+            return paciente + " · " + fecha + " · " + estado;
         }
     }
 

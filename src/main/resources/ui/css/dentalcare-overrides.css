@@ -157,3 +157,10 @@
     -fx-border-radius: 8px;
     -fx-border-color: #d1d5db;
 }
+
+/* ChoiceDialog: las etiquetas de campo cortas deben permanecer en una sola línea. */
+.choice-dialog.dialog-pane > .content.label {
+    -fx-wrap-text: false;
+    -fx-min-width: 52px;
+    -fx-pref-width: 52px;
+}

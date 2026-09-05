@@ -34,7 +34,8 @@ public class DentalCareJavaFXApplication extends Application {
             stage.initStyle(StageStyle.UNDECORATED);
             mostrarVista(stage, "/ui/fxml/LoginView.fxml", "DentalCare | Iniciar sesión", 900, 540);
         } else {
-            mostrarVista(stage, "/ui/fxml/SetupView.fxml", "DentalCare | Configuración inicial", 1200, 750);
+            stage.initStyle(StageStyle.UNDECORATED);
+            mostrarVista(stage, "/ui/fxml/SetupView.fxml", "DentalCare | Configuración inicial", 900, 540);
         }
     }
 
@@ -44,25 +45,18 @@ public class DentalCareJavaFXApplication extends Application {
 
         Parent root = loader.load();
         Scene scene = new Scene(root, ancho, alto);
+        scene.setFill(Color.TRANSPARENT);
 
-        if (ruta.endsWith("LoginView.fxml")) {
-            scene.setFill(Color.TRANSPARENT);
-            String overrides = getClass().getResource("/ui/css/dentalcare-overrides.css").toExternalForm();
-            scene.getStylesheets().add(overrides);
-        }
+        String overrides = getClass().getResource("/ui/css/dentalcare-overrides.css").toExternalForm();
+        if (!scene.getStylesheets().contains(overrides)) scene.getStylesheets().add(overrides);
 
         stage.setTitle(titulo);
         stage.setScene(scene);
-
-        if (ruta.endsWith("LoginView.fxml")) {
-            stage.setMinWidth(900);
-            stage.setMinHeight(540);
-            stage.setResizable(false);
-        } else {
-            stage.setMinWidth(1000);
-            stage.setMinHeight(650);
-        }
-
+        stage.setMinWidth(ancho);
+        stage.setMinHeight(alto);
+        stage.setMaxWidth(ancho);
+        stage.setMaxHeight(alto);
+        stage.setResizable(false);
         stage.show();
         stage.centerOnScreen();
     }
@@ -73,7 +67,6 @@ public class DentalCareJavaFXApplication extends Application {
             context.getBean(SecuritySession.class).clear();
             context.close();
         }
-
         Platform.exit();
     }
 

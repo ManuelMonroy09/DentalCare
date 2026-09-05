@@ -104,9 +104,13 @@ public class FinanzasController {
         List<CitaAnticipoOption> opciones = citas.stream().map(CitaAnticipoOption::new).toList();
         ChoiceDialog<CitaAnticipoOption> citaDialog = new ChoiceDialog<>(opciones.get(0), opciones);
         citaDialog.setTitle("Registrar anticipo");
-        citaDialog.setHeaderText("Selecciona la cita a la que corresponde el anticipo");
-        citaDialog.setContentText("Cita:");
+        citaDialog.setHeaderText("Seleccionar cita para registrar el anticipo");
+        citaDialog.setContentText(null);
         citaDialog.getDialogPane().setMinWidth(600);
+        citaDialog.getDialogPane().setPrefWidth(600);
+        citaDialog.getDialogPane().setMinHeight(190);
+        citaDialog.getDialogPane().setPrefHeight(210);
+        citaDialog.setResizable(false);
         var citaResultado = citaDialog.showAndWait();
         if (citaResultado.isEmpty()) return;
         Cita cita = citaResultado.get().cita();

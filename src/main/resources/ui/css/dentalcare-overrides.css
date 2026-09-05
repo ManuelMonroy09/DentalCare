@@ -91,7 +91,6 @@
     -fx-background-radius: 12px;
     -fx-border-radius: 12px;
     -fx-padding: 0;
-    -fx-min-width: 460px;
 }
 .dialog-pane .header-panel {
     -fx-background-color: white;
@@ -109,28 +108,16 @@
 .dialog-pane .content .label {
     -fx-text-fill: #374151;
     -fx-font-size: 13px;
-    -fx-wrap-text: false;
-    -fx-min-width: 175px;
-    -fx-pref-width: 175px;
-    -fx-max-width: 175px;
+    -fx-wrap-text: true;
     -fx-alignment: CENTER_LEFT;
 }
 .dialog-pane .button-bar {
     -fx-padding: 12px 24px 18px 24px;
-    -fx-min-height: 70px;
-    -fx-pref-height: 70px;
     -fx-alignment: CENTER_RIGHT;
 }
 .dialog-pane .button-bar .container {
     -fx-alignment: CENTER_RIGHT;
     -fx-spacing: 8px;
-    /*
-     * Reserva espacio suficiente para dos botones.
-     * Evita que el segundo botón de las confirmaciones
-     * quede fuera del área visible del DialogPane.
-     */
-    -fx-min-width: 240px;
-    -fx-pref-width: 240px;
 }
 .dialog-pane .button-bar .button,
 .dialog-pane .button {
@@ -139,9 +126,6 @@
     -fx-background-radius: 8px;
     -fx-border-radius: 8px;
     -fx-padding: 8px 18px;
-    -fx-min-width: 110px;
-    -fx-pref-width: 110px;
-    -fx-max-width: 140px;
     -fx-font-size: 13px;
     -fx-font-weight: bold;
     -fx-text-overrun: clip;
@@ -180,7 +164,8 @@
 
 /* =========================================================
    FINANZAS - BOTONES DE LA VISTA PRINCIPAL
-   ========================================================= */
+   =========================================================
+ */
 .button.primary-button,
 .button.secondary-button {
     -fx-opacity: 1;

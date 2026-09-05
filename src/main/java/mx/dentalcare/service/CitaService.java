@@ -1,5 +1,8 @@
 package mx.dentalcare.service;
 
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import mx.dentalcare.domain.cita.Cita;
 import mx.dentalcare.domain.cita.EstadoCita;
 import mx.dentalcare.domain.paciente.Paciente;
@@ -200,14 +203,36 @@ public class CitaService {
     public void eliminar(Long id) {
         if (id == null) throw new IllegalArgumentException("El identificador de la cita no puede ser nulo.");
         Cita cita = obtenerExistente(id);
+
         if (cargoRepository.findByCitaId(id).isPresent()) {
-            throw new IllegalStateException("No se puede eliminar una cita que ya tiene un cargo financiero asociado. Puedes cancelarla para conservar su historial.");
+            mostrarAvisoEliminacion("No se puede eliminar esta cita porque ya tiene un cargo financiero asociado.\n\nPuedes cancelarla para conservar su historial.");
+            return;
         }
+
         boolean tieneMovimientos = pagoRepository.findAll().stream().anyMatch(p -> id.equals(p.getCitaId()));
         if (tieneMovimientos) {
-            throw new IllegalStateException("No se puede eliminar una cita que tiene movimientos financieros. Cancélala para conservar el historial del anticipo.");
+            mostrarAvisoEliminacion("No se puede eliminar esta cita porque tiene movimientos financieros.\n\nCancélala para conservar el historial del anticipo.");
+            return;
         }
+
         citaRepository.deleteById(cita.getId());
+    }
+
+    private void mostrarAvisoEliminacion(String mensaje) {
+        Runnable mostrar = () -> {
+            Alert alerta = new Alert(Alert.AlertType.WARNING);
+            alerta.setTitle("DentalCare | Eliminación");
+            alerta.setHeaderText("La cita no puede eliminarse");
+            alerta.setContentText(mensaje);
+            alerta.getDialogPane().setMinWidth(480);
+            alerta.showAndWait();
+        };
+
+        if (Platform.isFxApplicationThread()) {
+            mostrar.run();
+        } else {
+            Platform.runLater(mostrar);
+        }
     }
 
     private void validarTratamientosModificables(Long citaId) {

@@ -11,39 +11,40 @@
 <VBox xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="mx.dentalcare.ui.controller.FinanzasController"
-      spacing="20"
+      spacing="18"
       styleClass="content"
-      stylesheets="@../css/dentalcare.css">
+      stylesheets="@../css/dentalcare.css,@../css/dentalcare-overrides.css">
     <padding><Insets top="5" right="0" bottom="5" left="0"/></padding>
 
-    <VBox spacing="5">
+    <VBox spacing="4">
         <Label text="Finanzas" styleClass="page-title"/>
         <Label text="Control de cargos, pagos, anticipos y saldos pendientes del consultorio." styleClass="page-subtitle"/>
     </VBox>
 
-    <HBox spacing="15">
-        <VBox spacing="4" styleClass="stat-card" HBox.hgrow="ALWAYS">
+    <HBox spacing="12">
+        <VBox spacing="3" styleClass="stat-card" HBox.hgrow="ALWAYS">
             <Label text="Ingresos de hoy" styleClass="page-subtitle"/>
-            <Label fx:id="ingresosLabel" text="0.00" styleClass="stat-value"/>
+            <Label fx:id="ingresosLabel" text="$0.00" styleClass="stat-value"/>
         </VBox>
-        <VBox spacing="4" styleClass="stat-card" HBox.hgrow="ALWAYS">
+        <VBox spacing="3" styleClass="stat-card" HBox.hgrow="ALWAYS">
             <Label text="Por cobrar" styleClass="page-subtitle"/>
-            <Label fx:id="pendienteLabel" text="0.00" styleClass="stat-value"/>
+            <Label fx:id="pendienteLabel" text="$0.00" styleClass="stat-value"/>
         </VBox>
-        <VBox spacing="4" styleClass="stat-card" HBox.hgrow="ALWAYS">
+        <VBox spacing="3" styleClass="stat-card" HBox.hgrow="ALWAYS">
             <Label text="Cobros de hoy" styleClass="page-subtitle"/>
             <Label fx:id="cobrosHoyLabel" text="0" styleClass="stat-value"/>
         </VBox>
     </HBox>
 
-    <HBox alignment="CENTER_LEFT" spacing="10">
+    <HBox alignment="CENTER_LEFT" spacing="8">
         <Button text="Registrar pago" onAction="#registrarPago" styleClass="primary-button"/>
         <Button text="Registrar anticipo" onAction="#registrarAnticipo" styleClass="secondary-button"/>
         <Button text="Imprimir recibo" onAction="#imprimirRecibo" styleClass="secondary-button"/>
         <Button text="Ver detalle" onAction="#verDetalle" styleClass="secondary-button"/>
         <Button text="Sincronizar cargos" onAction="#sincronizarCargos" styleClass="secondary-button"/>
-        <Label fx:id="mensajeLabel" text="" styleClass="page-subtitle" HBox.hgrow="ALWAYS"/>
     </HBox>
+
+    <Label fx:id="mensajeLabel" text="" wrapText="true" maxWidth="900" styleClass="page-subtitle"/>
 
     <TableView fx:id="cargosTable" VBox.vgrow="ALWAYS" styleClass="patients-table">
         <columns>

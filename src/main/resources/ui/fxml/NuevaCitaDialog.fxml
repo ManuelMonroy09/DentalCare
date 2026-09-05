@@ -16,75 +16,79 @@
 <VBox xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="mx.dentalcare.ui.controller.NuevaCitaController"
-      stylesheets="@../css/dentalcare.css,@../css/dentalcare-overrides.css"
       styleClass="root"
-      spacing="10"
+      spacing="9"
       prefWidth="640"
       prefHeight="700"
       minWidth="640"
       minHeight="700">
 
+    <stylesheets>
+        <String fx:value="@../css/dentalcare.css"/>
+        <String fx:value="@../css/dentalcare-overrides.css"/>
+    </stylesheets>
+
     <padding>
-        <Insets top="20" right="28" bottom="20" left="28"/>
+        <Insets top="18" right="26" bottom="18" left="26"/>
     </padding>
 
     <Label text="Nueva cita" styleClass="page-title"/>
     <Label text="Programa una nueva cita para un paciente." styleClass="page-subtitle"/>
 
-    <VBox spacing="4">
+    <VBox spacing="3">
         <Label text="Paciente" styleClass="form-label"/>
-        <ComboBox fx:id="cmbPaciente" promptText="Selecciona un paciente" prefWidth="584" minWidth="584" prefHeight="36" styleClass="form-control"/>
+        <ComboBox fx:id="cmbPaciente" promptText="Selecciona un paciente" prefWidth="588" minWidth="588" prefHeight="36" styleClass="form-control"/>
     </VBox>
 
     <GridPane hgap="12">
         <columnConstraints>
-            <ColumnConstraints prefWidth="286" minWidth="286" hgrow="ALWAYS"/>
-            <ColumnConstraints prefWidth="286" minWidth="286" hgrow="ALWAYS"/>
+            <ColumnConstraints prefWidth="288" minWidth="288" hgrow="ALWAYS"/>
+            <ColumnConstraints prefWidth="288" minWidth="288" hgrow="ALWAYS"/>
         </columnConstraints>
-        <VBox spacing="4" GridPane.columnIndex="0">
+        <VBox spacing="3" GridPane.columnIndex="0">
             <Label text="Fecha" styleClass="form-label"/>
-            <DatePicker fx:id="dateFecha" prefWidth="286" minWidth="286" prefHeight="36" styleClass="form-control"/>
+            <DatePicker fx:id="dateFecha" prefWidth="288" minWidth="288" prefHeight="36" styleClass="form-control"/>
         </VBox>
-        <VBox spacing="4" GridPane.columnIndex="1">
+        <VBox spacing="3" GridPane.columnIndex="1">
             <Label text="Hora de inicio" styleClass="form-label"/>
-            <ComboBox fx:id="cmbHora" promptText="Selecciona una hora" prefWidth="286" minWidth="286" prefHeight="36" styleClass="form-control"/>
+            <ComboBox fx:id="cmbHora" promptText="Selecciona una hora" prefWidth="288" minWidth="288" prefHeight="36" styleClass="form-control"/>
         </VBox>
     </GridPane>
 
     <GridPane hgap="12">
         <columnConstraints>
-            <ColumnConstraints prefWidth="155" minWidth="155" maxWidth="155"/>
-            <ColumnConstraints prefWidth="417" minWidth="417" hgrow="ALWAYS"/>
+            <ColumnConstraints prefWidth="158" minWidth="158" maxWidth="158"/>
+            <ColumnConstraints prefWidth="418" minWidth="418" hgrow="ALWAYS"/>
         </columnConstraints>
-        <VBox spacing="4" GridPane.columnIndex="0">
+        <VBox spacing="3" GridPane.columnIndex="0">
             <Label text="Duración" styleClass="form-label"/>
-            <ComboBox fx:id="cmbDuracion" prefWidth="155" minWidth="155" maxWidth="155" prefHeight="36" styleClass="form-control"/>
+            <ComboBox fx:id="cmbDuracion" prefWidth="158" minWidth="158" maxWidth="158" prefHeight="36" styleClass="form-control"/>
         </VBox>
-        <VBox spacing="4" GridPane.columnIndex="1">
+        <VBox spacing="3" GridPane.columnIndex="1">
             <Label text="Motivo de consulta" styleClass="form-label"/>
-            <TextField fx:id="txtMotivo" promptText="Ej. Dolor intenso en la muela inferior derecha" prefWidth="417" minWidth="417" prefHeight="36" styleClass="form-control"/>
+            <TextField fx:id="txtMotivo" promptText="Ej. Dolor intenso en la muela inferior derecha" prefWidth="418" minWidth="418" prefHeight="36" styleClass="form-control"/>
         </VBox>
     </GridPane>
 
-    <VBox spacing="5">
+    <VBox spacing="4">
         <Label text="Tratamientos" styleClass="form-label"/>
         <HBox spacing="8" alignment="CENTER_LEFT">
-            <ComboBox fx:id="cmbTratamiento" promptText="Selecciona un tratamiento" prefWidth="470" minWidth="470" prefHeight="36" HBox.hgrow="ALWAYS" styleClass="form-control"/>
+            <ComboBox fx:id="cmbTratamiento" promptText="Selecciona un tratamiento" prefWidth="475" minWidth="475" prefHeight="36" HBox.hgrow="ALWAYS" styleClass="form-control"/>
             <Button fx:id="btnAgregarTratamiento" text="+ Agregar" mnemonicParsing="false" prefHeight="36" styleClass="secondary-button"/>
         </HBox>
-        <ListView fx:id="lstTratamientos" prefHeight="85" minHeight="70" maxHeight="95"/>
+        <ListView fx:id="lstTratamientos" prefHeight="78" minHeight="65" maxHeight="88"/>
         <HBox alignment="CENTER_RIGHT" spacing="8">
             <Label text="Total:" styleClass="form-label"/>
             <Label fx:id="lblTotalTratamientos" text="$0.00" styleClass="page-title"/>
         </HBox>
     </VBox>
 
-    <VBox spacing="4">
+    <VBox spacing="3">
         <Label text="Notas" styleClass="form-label"/>
-        <TextArea fx:id="txtNotas" promptText="Notas adicionales de la cita..." wrapText="true" prefRowCount="2" prefHeight="58" minHeight="50" maxHeight="70" styleClass="form-textarea"/>
+        <TextArea fx:id="txtNotas" promptText="Notas adicionales de la cita..." wrapText="true" prefRowCount="2" prefHeight="54" minHeight="48" maxHeight="64" styleClass="form-textarea"/>
     </VBox>
 
-    <Label fx:id="lblError" managed="false" visible="false" wrapText="true" maxWidth="584" styleClass="form-error"/>
+    <Label fx:id="lblError" managed="false" visible="false" wrapText="true" maxWidth="588" minHeight="30" styleClass="form-error"/>
 
     <HBox spacing="10" alignment="CENTER_RIGHT">
         <Button fx:id="btnCancelar" text="Cancelar" mnemonicParsing="false" styleClass="secondary-button"/>

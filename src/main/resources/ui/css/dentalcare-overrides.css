@@ -124,6 +124,13 @@
 .dialog-pane .button-bar .container {
     -fx-alignment: CENTER_RIGHT;
     -fx-spacing: 8px;
+    /*
+     * Reserva espacio suficiente para dos botones.
+     * Evita que el segundo botón de las confirmaciones
+     * quede fuera del área visible del DialogPane.
+     */
+    -fx-min-width: 240px;
+    -fx-pref-width: 240px;
 }
 .dialog-pane .button-bar .button,
 .dialog-pane .button {

@@ -2,12 +2,14 @@ package mx.dentalcare.ui;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.Window;
 import mx.dentalcare.DentalCareApplication;
 import mx.dentalcare.security.SecuritySession;
 import mx.dentalcare.security.AuthenticationService;
@@ -18,6 +20,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class DentalCareJavaFXApplication extends Application {
 
     private ConfigurableApplicationContext context;
+    private String hojaEstilosDentalCare;
 
     @Override
     public void init() {
@@ -27,6 +30,7 @@ public class DentalCareJavaFXApplication extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         WindowIconUtil.inicializar();
+        instalarEstiloGlobalDeDialogos();
 
         AuthenticationService authenticationService = context.getBean(AuthenticationService.class);
 
@@ -36,6 +40,34 @@ public class DentalCareJavaFXApplication extends Application {
         } else {
             stage.initStyle(StageStyle.UNDECORATED);
             mostrarVista(stage, "/ui/fxml/SetupView.fxml", "DentalCare | Configuración inicial", 900, 540);
+        }
+    }
+
+    private void instalarEstiloGlobalDeDialogos() {
+        hojaEstilosDentalCare = getClass()
+                .getResource("/ui/css/dentalcare-overrides.css")
+                .toExternalForm();
+
+        Window.getWindows().addListener((ListChangeListener<Window>) cambio -> {
+            while (cambio.next()) {
+                if (!cambio.wasAdded()) {
+                    continue;
+                }
+
+                for (Window window : cambio.getAddedSubList()) {
+                    Platform.runLater(() -> aplicarEstiloDentalCare(window));
+                }
+            }
+        });
+    }
+
+    private void aplicarEstiloDentalCare(Window window) {
+        if (window == null || window.getScene() == null) {
+            return;
+        }
+
+        if (!window.getScene().getStylesheets().contains(hojaEstilosDentalCare)) {
+            window.getScene().getStylesheets().add(hojaEstilosDentalCare);
         }
     }
 

@@ -2,7 +2,6 @@ package mx.dentalcare.service;
 
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import mx.dentalcare.domain.cita.Cita;
 import mx.dentalcare.domain.cita.EstadoCita;
 import mx.dentalcare.domain.paciente.Paciente;
@@ -224,7 +223,21 @@ public class CitaService {
             alerta.setTitle("DentalCare | Eliminación");
             alerta.setHeaderText("La cita no puede eliminarse");
             alerta.setContentText(mensaje);
-            alerta.getDialogPane().setMinWidth(480);
+
+            DialogPane pane = alerta.getDialogPane();
+            pane.getStyleClass().add("wide-alert");
+            pane.setMinWidth(560);
+            pane.setPrefWidth(560);
+            pane.setMaxWidth(560);
+
+            Label contenido = (Label) pane.lookup(".content.label");
+            if (contenido != null) {
+                contenido.setWrapText(true);
+                contenido.setMinWidth(0);
+                contenido.setPrefWidth(500);
+                contenido.setMaxWidth(500);
+            }
+
             alerta.showAndWait();
         };
 

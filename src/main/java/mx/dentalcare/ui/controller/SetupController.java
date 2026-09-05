@@ -15,28 +15,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class SetupController {
 
-    @FXML
-    private VBox legacySection;
-
-    @FXML
-    private PasswordField txtLegacyPassword;
-
-    @FXML
-    private PasswordField txtPassword;
-
-    @FXML
-    private PasswordField txtConfirmPassword;
-
-    @FXML
-    private Label lblError;
+    @FXML private VBox legacySection;
+    @FXML private PasswordField txtLegacyPassword;
+    @FXML private PasswordField txtPassword;
+    @FXML private PasswordField txtConfirmPassword;
+    @FXML private Label lblError;
 
     private final AuthenticationService authenticationService;
     private final ApplicationContext context;
 
-    public SetupController(
-            AuthenticationService authenticationService,
-            ApplicationContext context
-    ) {
+    public SetupController(AuthenticationService authenticationService, ApplicationContext context) {
         this.authenticationService = authenticationService;
         this.context = context;
     }
@@ -61,7 +49,6 @@ public class SetupController {
             txtPassword.requestFocus();
             return;
         }
-
         if (!password.equals(confirmPassword)) {
             mostrarError("Las contraseñas no coinciden.");
             txtConfirmPassword.clear();
@@ -74,30 +61,29 @@ public class SetupController {
             abrirAplicacion();
         } catch (RuntimeException e) {
             mostrarError(mensajeDeError(e));
-            if (authenticationService.requiresLegacyMigration()) {
-                txtLegacyPassword.requestFocus();
-            }
+            if (authenticationService.requiresLegacyMigration()) txtLegacyPassword.requestFocus();
         } catch (Exception e) {
             mostrarError("La configuración se completó, pero no fue posible abrir DentalCare.");
         }
     }
 
+    @FXML
+    private void cerrarVentana() {
+        Stage stage = (Stage) txtPassword.getScene().getWindow();
+        stage.close();
+    }
+
     private String mensajeDeError(RuntimeException e) {
         String message = e.getMessage();
-        if (message == null || message.isBlank()) {
-            return "No fue posible configurar la seguridad de DentalCare.";
-        }
-        return message;
+        return message == null || message.isBlank()
+                ? "No fue posible configurar la seguridad de DentalCare."
+                : message;
     }
 
     private void abrirAplicacion() throws Exception {
         Stage stage = (Stage) txtPassword.getScene().getWindow();
-
-        FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/ui/fxml/MainView.fxml")
-        );
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/ui/fxml/MainView.fxml"));
         loader.setControllerFactory(context::getBean);
-
         Parent root = loader.load();
         Scene scene = new Scene(root, 1200, 750);
 
@@ -105,6 +91,8 @@ public class SetupController {
         stage.setScene(scene);
         stage.setMinWidth(1000);
         stage.setMinHeight(650);
+        stage.setResizable(true);
+        stage.centerOnScreen();
         stage.show();
     }
 

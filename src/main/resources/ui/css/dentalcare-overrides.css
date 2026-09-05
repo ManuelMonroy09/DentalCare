@@ -108,6 +108,7 @@
     -fx-text-fill: #374151;
     -fx-font-size: 13px;
     -fx-wrap-text: true;
+    -fx-min-width: 48px;
 }
 .dialog-pane .button-bar {
     -fx-padding: 8px 20px 16px 20px;

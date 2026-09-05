@@ -102,38 +102,21 @@ public class FinanzasController {
         }
 
         List<CitaAnticipoOption> opciones = citas.stream().map(CitaAnticipoOption::new).toList();
-        Dialog<CitaAnticipoOption> citaDialog = new Dialog<>();
+        ChoiceDialog<CitaAnticipoOption> citaDialog = new ChoiceDialog<>(opciones.get(0), opciones);
         citaDialog.setTitle("Registrar anticipo");
         citaDialog.setHeaderText("Seleccionar cita para registrar el anticipo");
-        ComboBox<CitaAnticipoOption> comboCita = new ComboBox<>(FXCollections.observableArrayList(opciones));
-        comboCita.getSelectionModel().selectFirst();
-        comboCita.setMaxWidth(Double.MAX_VALUE);
-        comboCita.setPrefHeight(40);
-        VBox contenidoCita = new VBox(8, comboCita);
-        contenidoCita.setPrefWidth(520);
-        citaDialog.getDialogPane().setContent(contenidoCita);
-        ButtonType aceptar = new ButtonType("Continuar", ButtonBar.ButtonData.OK_DONE);
-        ButtonType cancelar = new ButtonType("Cancelar", ButtonBar.ButtonData.CANCEL_CLOSE);
-        citaDialog.getDialogPane().getButtonTypes().setAll(aceptar, cancelar);
-        citaDialog.getDialogPane().setMinWidth(600);
-        citaDialog.getDialogPane().setPrefWidth(600);
-        citaDialog.getDialogPane().setMinHeight(230);
-        citaDialog.getDialogPane().setPrefHeight(230);
-        citaDialog.setResizable(false);
+        citaDialog.setContentText("Cita:");
+        configurarDialogo(citaDialog, 600, 250);
         var citaResultado = citaDialog.showAndWait();
         if (citaResultado.isEmpty()) return;
-        Cita cita = comboCita.getValue().cita();
+        Cita cita = citaResultado.get().cita();
 
         BigDecimal anticipos = finanzasService.obtenerTotalAnticipos(cita.getId());
         TextInputDialog montoDialog = new TextInputDialog("0.00");
         montoDialog.setTitle("Registrar anticipo");
         montoDialog.setHeaderText("Anticipos registrados: " + moneda(anticipos));
         montoDialog.setContentText("Monto del anticipo:");
-        montoDialog.getDialogPane().setMinWidth(460);
-        montoDialog.getDialogPane().setPrefWidth(460);
-        montoDialog.getDialogPane().setMinHeight(210);
-        montoDialog.getDialogPane().setPrefHeight(210);
-        montoDialog.setResizable(false);
+        configurarDialogo(montoDialog, 460, 220);
         var montoResultado = montoDialog.showAndWait();
         if (montoResultado.isEmpty()) return;
 
@@ -145,11 +128,7 @@ public class FinanzasController {
         metodoDialog.setTitle("Método de pago");
         metodoDialog.setHeaderText("Selecciona el método utilizado para el anticipo");
         metodoDialog.setContentText("Método:");
-        metodoDialog.getDialogPane().setMinWidth(460);
-        metodoDialog.getDialogPane().setPrefWidth(460);
-        metodoDialog.getDialogPane().setMinHeight(210);
-        metodoDialog.getDialogPane().setPrefHeight(210);
-        metodoDialog.setResizable(false);
+        configurarDialogo(metodoDialog, 460, 220);
         var metodoResultado = metodoDialog.showAndWait();
         if (metodoResultado.isEmpty()) return;
 
@@ -185,11 +164,7 @@ public class FinanzasController {
         montoDialog.setTitle("Registrar pago");
         montoDialog.setHeaderText("Saldo pendiente: " + moneda(pendiente));
         montoDialog.setContentText("Monto del pago:");
-        montoDialog.getDialogPane().setMinWidth(460);
-        montoDialog.getDialogPane().setPrefWidth(460);
-        montoDialog.getDialogPane().setMinHeight(210);
-        montoDialog.getDialogPane().setPrefHeight(210);
-        montoDialog.setResizable(false);
+        configurarDialogo(montoDialog, 460, 220);
         var montoResultado = montoDialog.showAndWait();
         if (montoResultado.isEmpty()) return;
 
@@ -201,11 +176,7 @@ public class FinanzasController {
         metodoDialog.setTitle("Método de pago");
         metodoDialog.setHeaderText("Selecciona el método utilizado");
         metodoDialog.setContentText("Método:");
-        metodoDialog.getDialogPane().setMinWidth(460);
-        metodoDialog.getDialogPane().setPrefWidth(460);
-        metodoDialog.getDialogPane().setMinHeight(210);
-        metodoDialog.getDialogPane().setPrefHeight(210);
-        metodoDialog.setResizable(false);
+        configurarDialogo(metodoDialog, 460, 220);
         var metodoResultado = metodoDialog.showAndWait();
         if (metodoResultado.isEmpty()) return;
 
@@ -219,6 +190,15 @@ public class FinanzasController {
         }
     }
 
+    private void configurarDialogo(Dialog<?> dialogo, double ancho, double alto) {
+        DialogPane pane = dialogo.getDialogPane();
+        pane.setMinWidth(ancho);
+        pane.setPrefWidth(ancho);
+        pane.setMinHeight(alto);
+        pane.setPrefHeight(alto);
+        dialogo.setResizable(false);
+    }
+
     private void ofrecerImpresion(Pago pago, Cargo cargo) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Pago registrado");
@@ -227,6 +207,7 @@ public class FinanzasController {
         ButtonType imprimir = new ButtonType("Ver recibo");
         ButtonType despues = new ButtonType("Ahora no", ButtonBar.ButtonData.CANCEL_CLOSE);
         alert.getButtonTypes().setAll(imprimir, despues);
+        configurarDialogo(alert, 460, 200);
         if (alert.showAndWait().orElse(despues) == imprimir) mostrarVistaPrevia(pago, cargo);
     }
 
@@ -319,10 +300,7 @@ public class FinanzasController {
                 "Pagado: " + moneda(pagado) + "\n" +
                 "Pendiente: " + moneda(pendiente) + "\n" +
                 "Estado: " + finanzasService.obtenerEstadoCargo(cargo.getId()).getDescripcion());
-        alert.getDialogPane().setMinWidth(480);
-        alert.getDialogPane().setPrefWidth(480);
-        alert.getDialogPane().setMinHeight(300);
-        alert.getDialogPane().setPrefHeight(300);
+        configurarDialogo(alert, 480, 300);
         alert.showAndWait();
     }
 
@@ -334,9 +312,7 @@ public class FinanzasController {
     }
 
     private void cargarDatos() {
-        List<Cargo> cargos = finanzasService.obtenerTodos().stream()
-                .sorted(Comparator.comparing(Cargo::getFecha, Comparator.nullsLast(Comparator.reverseOrder())))
-                .toList();
+        List<Cargo> cargos = finanzasService.obtenerCargos();
         cargosTable.setItems(FXCollections.observableArrayList(cargos));
         BigDecimal ingresosHoy = cargos.stream()
                 .filter(c -> LocalDate.now().equals(c.getFecha()))
@@ -373,7 +349,7 @@ public class FinanzasController {
         alert.setTitle(titulo);
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
-        alert.getDialogPane().setMinWidth(420);
+        configurarDialogo(alert, 420, 190);
         alert.showAndWait();
     }
 }

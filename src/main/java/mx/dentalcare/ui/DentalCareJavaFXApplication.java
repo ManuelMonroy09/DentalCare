@@ -11,6 +11,7 @@ import javafx.stage.StageStyle;
 import mx.dentalcare.DentalCareApplication;
 import mx.dentalcare.security.SecuritySession;
 import mx.dentalcare.security.AuthenticationService;
+import mx.dentalcare.ui.util.WindowIconUtil;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 
@@ -25,6 +26,8 @@ public class DentalCareJavaFXApplication extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
+        WindowIconUtil.inicializar();
+
         AuthenticationService authenticationService = context.getBean(AuthenticationService.class);
 
         if (authenticationService.isConfigured()) {

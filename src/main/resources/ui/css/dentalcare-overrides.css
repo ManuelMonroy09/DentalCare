@@ -80,3 +80,75 @@
     -fx-font-weight: bold;
     -fx-text-fill: #111827;
 }
+
+/* =========================================================
+   DIÁLOGOS DEL SISTEMA
+   ========================================================= */
+.dialog-pane {
+    -fx-background-color: white;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1px;
+    -fx-background-radius: 12px;
+    -fx-border-radius: 12px;
+}
+.dialog-pane .header-panel {
+    -fx-background-color: white;
+    -fx-padding: 18px 20px 10px 20px;
+}
+.dialog-pane .header-panel .label {
+    -fx-text-fill: #111827;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+.dialog-pane .content {
+    -fx-padding: 6px 20px 12px 20px;
+}
+.dialog-pane .content .label {
+    -fx-text-fill: #374151;
+    -fx-font-size: 13px;
+    -fx-wrap-text: true;
+}
+.dialog-pane .button-bar {
+    -fx-padding: 8px 20px 16px 20px;
+}
+.dialog-pane .button {
+    -fx-background-color: #f3f4f6;
+    -fx-text-fill: #374151;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-padding: 8px 16px;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+.dialog-pane .button:hover {
+    -fx-background-color: #e5e7eb;
+}
+.dialog-pane .button:default {
+    -fx-background-color: #2563eb;
+    -fx-text-fill: white;
+}
+.dialog-pane .button:default:hover {
+    -fx-background-color: #1d4ed8;
+}
+.dialog-pane .text-field,
+.dialog-pane .combo-box {
+    -fx-pref-height: 38px;
+    -fx-background-color: #f9fafb;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-font-size: 13px;
+}
+.dialog-pane .text-field:focused,
+.dialog-pane .combo-box:focused {
+    -fx-background-color: white;
+    -fx-border-color: #2563eb;
+    -fx-border-width: 2px;
+}
+.dialog-pane .choice-box,
+.dialog-pane .list-view {
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-color: #d1d5db;
+}

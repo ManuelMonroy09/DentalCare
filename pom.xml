@@ -1,5 +1,4 @@
 <project
-
         xmlns="http://maven.apache.org/POM/4.0.0"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
@@ -69,6 +68,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
@@ -77,8 +77,26 @@
                     <mainClass>mx.dentalcare.ui.DentalCareJavaFXApplication</mainClass>
                 </configuration>
             </plugin>
+
+            <!--
+                Manifest usado por el empaquetado de Windows.
+                El instalador toma el JAR original generado por Spring Boot
+                y coloca sus dependencias en la carpeta lib/.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>mx.dentalcare.ui.DentalCareJavaFXApplication</mainClass>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
-</project
-        >
+</project>

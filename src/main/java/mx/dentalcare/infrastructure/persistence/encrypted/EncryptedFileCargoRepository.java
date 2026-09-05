@@ -1,6 +1,7 @@
 package mx.dentalcare.infrastructure.persistence.encrypted;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import mx.dentalcare.config.DataDirectoryService;
 import mx.dentalcare.domain.financiero.Cargo;
 import mx.dentalcare.infrastructure.persistence.file.CargoData;
 import mx.dentalcare.repository.CargoRepository;
@@ -22,7 +23,7 @@ import java.util.Optional;
 public class EncryptedFileCargoRepository implements CargoRepository {
     private final EncryptedFileStorage storage;
     private final SecuritySession securitySession;
-    private final Path filePath = Path.of("data", "cargos.dat");
+    private final Path filePath = DataDirectoryService.resolve("cargos.dat");
 
     public EncryptedFileCargoRepository(ObjectMapper objectMapper, SecuritySession securitySession) {
         this.securitySession = securitySession;
@@ -48,12 +49,10 @@ public class EncryptedFileCargoRepository implements CargoRepository {
     }
 
     @Override public List<Cargo> findAll() { return new ArrayList<>(loadData().getCargos()); }
-
     @Override public Optional<Cargo> findById(Long id) {
         if (id == null) return Optional.empty();
         return loadData().getCargos().stream().filter(c -> id.equals(c.getId())).findFirst();
     }
-
     @Override public Optional<Cargo> findByCitaId(Long citaId) {
         if (citaId == null) return Optional.empty();
         return loadData().getCargos().stream().filter(c -> citaId.equals(c.getCitaId())).findFirst();
@@ -66,6 +65,5 @@ public class EncryptedFileCargoRepository implements CargoRepository {
         if (data.getCargos() == null) data.setCargos(new ArrayList<>());
         return data;
     }
-
     private void saveData(CargoData data) { storage.save(filePath, data, securitySession.requireMasterKey()); }
 }

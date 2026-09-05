@@ -3,8 +3,14 @@ name: DentalCare Windows Installer
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
     tags:
       - 'v*'
+    paths:
+      - 'pom.xml'
+      - 'packaging/**'
+      - 'src/**'
 
 jobs:
   build-windows-installer:

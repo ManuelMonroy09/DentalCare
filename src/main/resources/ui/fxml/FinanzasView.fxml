@@ -12,8 +12,7 @@
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="mx.dentalcare.ui.controller.FinanzasController"
       spacing="18"
-      styleClass="content"
-      stylesheets="@../css/dentalcare.css,@../css/dentalcare-overrides.css">
+      styleClass="content">
     <padding><Insets top="5" right="0" bottom="5" left="0"/></padding>
 
     <VBox spacing="4">

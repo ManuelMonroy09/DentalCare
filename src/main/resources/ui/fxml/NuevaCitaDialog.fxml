@@ -74,7 +74,7 @@
         <ListView fx:id="lstTratamientos" prefHeight="78" minHeight="65" maxHeight="88"/>
         <HBox alignment="CENTER_RIGHT" spacing="8">
             <Label text="Total:" styleClass="form-label"/>
-            <Label fx:id="lblTotalTratamientos" text="$0.00" styleClass="page-title"/>
+            <Label fx:id="lblTotalTratamientos" text="\$0.00" styleClass="page-title"/>
         </HBox>
     </VBox>
 

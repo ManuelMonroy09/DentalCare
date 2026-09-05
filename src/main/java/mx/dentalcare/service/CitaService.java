@@ -2,6 +2,8 @@ package mx.dentalcare.service;
 
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
+import javafx.scene.control.DialogPane;
+import javafx.scene.control.Label;
 import mx.dentalcare.domain.cita.Cita;
 import mx.dentalcare.domain.cita.EstadoCita;
 import mx.dentalcare.domain.paciente.Paciente;

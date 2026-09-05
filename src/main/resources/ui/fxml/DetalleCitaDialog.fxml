@@ -3,75 +3,71 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox
-        xmlns="http://javafx.com/javafx/21"
-        xmlns:fx="http://javafx.com/fxml/1"
-        fx:controller="mx.dentalcare.ui.controller.DetalleCitaController"
-        stylesheets="@../css/dentalcare.css"
-        styleClass="dialog-root"
-        spacing="16">
-
-    <padding>
-        <Insets top="25" right="30" bottom="25" left="30"/>
-    </padding>
-
-    <VBox spacing="4">
-        <Label text="Detalle de cita" styleClass="dialog-title"/>
-        <Label text="Información de la cita seleccionada." styleClass="page-subtitle"/>
-    </VBox>
-
-    <VBox spacing="5">
-        <Label text="Paciente" styleClass="form-label"/>
-        <Label fx:id="lblPaciente" text="-" styleClass="detail-value"/>
-    </VBox>
-
-    <HBox spacing="35">
-        <VBox spacing="5" HBox.hgrow="ALWAYS">
-            <Label text="Fecha" styleClass="form-label"/>
-            <Label fx:id="lblFecha" text="-" styleClass="detail-value"/>
+<ScrollPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="mx.dentalcare.ui.controller.DetalleCitaController"
+            stylesheets="@../css/dentalcare.css"
+            styleClass="dialog-root"
+            fitToWidth="true"
+            hbarPolicy="NEVER"
+            vbarPolicy="AS_NEEDED">
+    <content>
+        <VBox spacing="16" fillWidth="true">
+            <padding>
+                <Insets top="25" right="30" bottom="25" left="30"/>
+            </padding>
+            <VBox spacing="4">
+                <Label text="Detalle de cita" styleClass="dialog-title"/>
+                <Label text="Información de la cita seleccionada." styleClass="page-subtitle"/>
+            </VBox>
+            <VBox spacing="5">
+                <Label text="Paciente" styleClass="form-label"/>
+                <Label fx:id="lblPaciente" text="-" wrapText="true" styleClass="detail-value"/>
+            </VBox>
+            <HBox spacing="35">
+                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                    <Label text="Fecha" styleClass="form-label"/>
+                    <Label fx:id="lblFecha" text="-" wrapText="true" styleClass="detail-value"/>
+                </VBox>
+                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                    <Label text="Horario" styleClass="form-label"/>
+                    <Label fx:id="lblHorario" text="-" wrapText="true" styleClass="detail-value"/>
+                </VBox>
+            </HBox>
+            <HBox spacing="35">
+                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                    <Label text="Duración" styleClass="form-label"/>
+                    <Label fx:id="lblDuracion" text="-" wrapText="true" styleClass="detail-value"/>
+                </VBox>
+                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                    <Label text="Estado" styleClass="form-label"/>
+                    <Label fx:id="lblEstado" text="-" wrapText="true" styleClass="detail-status"/>
+                </VBox>
+            </HBox>
+            <VBox spacing="5">
+                <Label text="Motivo de consulta" styleClass="form-label"/>
+                <Label fx:id="lblMotivo" text="-" wrapText="true" maxWidth="Infinity" styleClass="detail-value"/>
+            </VBox>
+            <VBox spacing="5">
+                <Label text="Tratamientos" styleClass="form-label"/>
+                <Label fx:id="lblTratamientos" text="-" wrapText="true" maxWidth="Infinity" styleClass="detail-value"/>
+                <HBox alignment="CENTER_RIGHT" spacing="8">
+                    <Label text="Total:" styleClass="form-label"/>
+                    <Label fx:id="lblTotalTratamientos" text="0.00" styleClass="detail-value"/>
+                </HBox>
+            </VBox>
+            <VBox spacing="5">
+                <Label text="Notas" styleClass="form-label"/>
+                <Label fx:id="lblNotas" text="-" wrapText="true" maxWidth="Infinity" styleClass="detail-notes"/>
+            </VBox>
+            <HBox spacing="10" alignment="CENTER_RIGHT">
+                <Button fx:id="btnEditar" text="Editar cita" mnemonicParsing="false" styleClass="primary-button"/>
+                <Button fx:id="btnCerrar" text="Cerrar" mnemonicParsing="false" styleClass="secondary-button"/>
+            </HBox>
         </VBox>
-        <VBox spacing="5" HBox.hgrow="ALWAYS">
-            <Label text="Horario" styleClass="form-label"/>
-            <Label fx:id="lblHorario" text="-" styleClass="detail-value"/>
-        </VBox>
-    </HBox>
-
-    <HBox spacing="35">
-        <VBox spacing="5" HBox.hgrow="ALWAYS">
-            <Label text="Duración" styleClass="form-label"/>
-            <Label fx:id="lblDuracion" text="-" styleClass="detail-value"/>
-        </VBox>
-        <VBox spacing="5" HBox.hgrow="ALWAYS">
-            <Label text="Estado" styleClass="form-label"/>
-            <Label fx:id="lblEstado" text="-" styleClass="detail-status"/>
-        </VBox>
-    </HBox>
-
-    <VBox spacing="5">
-        <Label text="Motivo de consulta" styleClass="form-label"/>
-        <Label fx:id="lblMotivo" text="-" wrapText="true" maxWidth="Infinity" styleClass="detail-value"/>
-    </VBox>
-
-    <VBox spacing="5">
-        <Label text="Tratamientos" styleClass="form-label"/>
-        <Label fx:id="lblTratamientos" text="-" wrapText="true" maxWidth="Infinity" styleClass="detail-value"/>
-        <HBox alignment="CENTER_RIGHT" spacing="8">
-            <Label text="Total:" styleClass="form-label"/>
-            <Label fx:id="lblTotalTratamientos" text="0.00" styleClass="detail-value"/>
-        </HBox>
-    </VBox>
-
-    <VBox spacing="5" VBox.vgrow="ALWAYS">
-        <Label text="Notas" styleClass="form-label"/>
-        <Label fx:id="lblNotas" text="-" wrapText="true" maxWidth="Infinity" VBox.vgrow="ALWAYS" styleClass="detail-notes"/>
-    </VBox>
-
-    <HBox spacing="10" alignment="CENTER_RIGHT">
-        <Button fx:id="btnEditar" text="Editar cita" mnemonicParsing="false" styleClass="primary-button"/>
-        <Button fx:id="btnCerrar" text="Cerrar" mnemonicParsing="false" styleClass="secondary-button"/>
-    </HBox>
-
-</VBox>
+    </content>
+</ScrollPane>

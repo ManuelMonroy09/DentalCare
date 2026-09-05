@@ -7,6 +7,7 @@ import mx.dentalcare.domain.financiero.EstadoCargo;
 import mx.dentalcare.domain.financiero.EstadoPago;
 import mx.dentalcare.domain.financiero.MetodoPago;
 import mx.dentalcare.domain.financiero.Pago;
+import mx.dentalcare.domain.financiero.TipoPago;
 import mx.dentalcare.domain.tratamiento.TratamientoAplicado;
 import mx.dentalcare.event.CitaEstadoCambiadoEvent;
 import mx.dentalcare.repository.CargoRepository;
@@ -48,6 +49,19 @@ public class FinanzasService {
                 .toList();
     }
 
+    public List<Pago> obtenerAnticiposPorCita(Long citaId) {
+        if (citaId == null) throw new IllegalArgumentException("El identificador de la cita es obligatorio.");
+        return obtenerPagos().stream()
+                .filter(p -> citaId.equals(p.getCitaId()) && p.getTipo() == TipoPago.ANTICIPO)
+                .toList();
+    }
+
+    public BigDecimal obtenerTotalAnticipos(Long citaId) {
+        return dinero(obtenerAnticiposPorCita(citaId).stream()
+                .map(Pago::getMonto).filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add));
+    }
+
     public List<Pago> obtenerPagosPorCargo(Long cargoId) {
         if (cargoId == null) throw new IllegalArgumentException("El identificador del cargo es obligatorio.");
         return obtenerPagos().stream().filter(p -> cargoId.equals(p.getCargoId()))
@@ -59,10 +73,11 @@ public class FinanzasService {
         return pagoRepository.findById(pagoId).orElseThrow(() -> new IllegalArgumentException("No existe el pago seleccionado."));
     }
 
+    /** Genera cargos únicamente cuando la atención ya ocurrió. */
     public int generarCargosPendientes() {
         int creados = 0;
         for (Cita cita : citaService.obtenerTodas()) {
-            if (cita.getEstado() != EstadoCita.CONFIRMADA && cita.getEstado() != EstadoCita.ATENDIDA) continue;
+            if (cita.getEstado() != EstadoCita.ATENDIDA) continue;
             BigDecimal total = cita.obtenerTotalTratamientos();
             if (cita.getId() == null || total == null || total.compareTo(BigDecimal.ZERO) <= 0) continue;
             if (cargoRepository.findByCitaId(cita.getId()).isEmpty()) {
@@ -76,24 +91,36 @@ public class FinanzasService {
     public Cargo obtenerOCrearCargo(Cita cita) {
         if (cita == null || cita.getId() == null) throw new IllegalArgumentException("La cita debe estar guardada.");
         if (cita.getPaciente() == null || cita.getPaciente().getId() == null) throw new IllegalArgumentException("La cita debe tener un paciente válido.");
-        if (cita.getEstado() != EstadoCita.CONFIRMADA && cita.getEstado() != EstadoCita.ATENDIDA) throw new IllegalStateException("Solo una cita confirmada o atendida puede generar un cargo.");
+        if (cita.getEstado() != EstadoCita.ATENDIDA) throw new IllegalStateException("Solo una cita atendida puede generar un cargo por servicios realizados.");
 
-        return cargoRepository.findByCitaId(cita.getId()).orElseGet(() -> {
+        Cargo cargo = cargoRepository.findByCitaId(cita.getId()).orElseGet(() -> {
             BigDecimal total = dinero(cita.obtenerTotalTratamientos());
             if (total.compareTo(BigDecimal.ZERO) <= 0) throw new IllegalStateException("La cita no tiene tratamientos con importe para generar un cargo.");
-            Cargo cargo = new Cargo(cita.getPaciente().getId(), cita.getId(),
+            Cargo nuevo = new Cargo(cita.getPaciente().getId(), cita.getId(),
                     cita.getInicio() != null ? cita.getInicio() : LocalDateTime.now(), construirConcepto(cita), total);
-            cargo.validar();
-            return cargoRepository.save(cargo);
+            nuevo.validar();
+            return cargoRepository.save(nuevo);
         });
+
+        vincularAnticiposAlCargo(cita.getId(), cargo.getId());
+        return cargo;
+    }
+
+    private void vincularAnticiposAlCargo(Long citaId, Long cargoId) {
+        for (Pago pago : pagoRepository.findAll()) {
+            if (!citaId.equals(pago.getCitaId()) || pago.getTipo() != TipoPago.ANTICIPO) continue;
+            if (pago.getCargoId() != null && pago.getCargoId().equals(cargoId)) continue;
+            pago.setCargoId(cargoId);
+            pago.setTipo(TipoPago.PAGO);
+            pagoRepository.save(pago);
+        }
     }
 
     @EventListener
     public void alCambiarEstadoCita(CitaEstadoCambiadoEvent event) {
         if (event == null || event.getCita() == null) return;
         Cita cita = event.getCita();
-        if (cita.getEstado() != EstadoCita.CONFIRMADA && cita.getEstado() != EstadoCita.ATENDIDA) return;
-        if (cita.getId() == null) return;
+        if (cita.getEstado() != EstadoCita.ATENDIDA || cita.getId() == null) return;
         BigDecimal total = cita.obtenerTotalTratamientos();
         if (total == null || total.compareTo(BigDecimal.ZERO) <= 0) return;
         obtenerOCrearCargo(cita);
@@ -109,6 +136,26 @@ public class FinanzasService {
         if (pendiente.compareTo(BigDecimal.ZERO) <= 0) throw new IllegalStateException("El cargo seleccionado ya está pagado.");
         if (importe.compareTo(pendiente) > 0) throw new IllegalArgumentException("El pago no puede superar el saldo pendiente de $" + pendiente.toPlainString());
         Pago pago = new Pago(cargo.getPacienteId(), cargoId, LocalDateTime.now(), importe, metodoPago, notas == null ? null : notas.trim());
+        pago.validar();
+        return pagoRepository.save(pago);
+    }
+
+    public Pago registrarAnticipo(Long citaId, BigDecimal monto, MetodoPago metodoPago, String notas) {
+        if (citaId == null) throw new IllegalArgumentException("El identificador de la cita es obligatorio.");
+        if (metodoPago == null) throw new IllegalArgumentException("El método de pago es obligatorio.");
+        Cita cita = citaService.obtenerPorId(citaId).orElseThrow(() -> new IllegalArgumentException("No existe la cita seleccionada."));
+        if (cita.getEstado() != EstadoCita.CONFIRMADA) throw new IllegalStateException("Solo se puede registrar un anticipo para una cita confirmada.");
+        if (cita.getPaciente() == null || cita.getPaciente().getId() == null) throw new IllegalStateException("La cita no tiene un paciente válido.");
+
+        BigDecimal importe = dinero(monto);
+        if (importe.compareTo(BigDecimal.ZERO) <= 0) throw new IllegalArgumentException("El monto debe ser mayor a 0.");
+        BigDecimal totalTratamientos = dinero(cita.obtenerTotalTratamientos());
+        BigDecimal anticiposActuales = obtenerTotalAnticipos(citaId);
+        if (totalTratamientos.compareTo(BigDecimal.ZERO) > 0 && anticiposActuales.add(importe).compareTo(totalTratamientos) > 0) {
+            throw new IllegalArgumentException("El anticipo no puede superar el importe actual de los tratamientos: $" + totalTratamientos.toPlainString());
+        }
+
+        Pago pago = Pago.anticipo(cita.getPaciente().getId(), citaId, LocalDateTime.now(), importe, metodoPago, notas == null ? null : notas.trim());
         pago.validar();
         return pagoRepository.save(pago);
     }

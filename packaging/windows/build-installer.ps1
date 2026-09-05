@@ -1,50 +1,75 @@
 $ErrorActionPreference = "Stop"
 
-Write-Host "=== DentalCare - Empaquetado Windows ===" -ForegroundColor Cyan
+Write-Host "=== DentalCare - Instalador Windows ===" -ForegroundColor Cyan
 
-if (-not (Get-Command mvn -ErrorAction SilentlyContinue)) {
-    throw "Maven no está disponible en PATH."
+function Require-Command($name, $message) {
+    if (-not (Get-Command $name -ErrorAction SilentlyContinue)) {
+        throw $message
+    }
 }
 
-if (-not (Get-Command jpackage -ErrorAction SilentlyContinue)) {
-    throw "jpackage no está disponible. Instala un JDK 17 o superior y verifica PATH."
-}
+Require-Command "mvn" "Maven no está disponible en PATH. Instala Maven y vuelve a intentarlo."
+Require-Command "jpackage" "jpackage no está disponible. Instala un JDK 17 o superior y verifica PATH."
 
 $icon = Join-Path (Get-Location) "packaging\windows\dentalcare.ico"
 if (-not (Test-Path $icon)) {
     throw "No se encontró el icono de Windows: $icon"
 }
 
-Write-Host "[1/3] Compilando..."
+Write-Host "[1/4] Compilando DentalCare..."
 mvn clean package -DskipTests
 
-$jar = Get-ChildItem "target\dentalcare-*.jar" |
-    Where-Object { $_.Name -notmatch "original" } |
+$target = Join-Path (Get-Location) "target"
+$input = Join-Path $target "installer-input"
+$output = Join-Path $target "installer"
+
+if (Test-Path $input) { Remove-Item $input -Recurse -Force }
+if (Test-Path $output) { Remove-Item $output -Recurse -Force }
+New-Item -ItemType Directory -Path (Join-Path $input "lib") -Force | Out-Null
+New-Item -ItemType Directory -Path $output -Force | Out-Null
+
+$thinJar = Get-ChildItem $target -Filter "dentalcare-*.jar" |
+    Where-Object { $_.Name -notmatch "-boot\.jar$|original" } |
     Select-Object -First 1
 
-if (-not $jar) {
-    throw "No se encontró el JAR ejecutable en target."
+if (-not $thinJar) {
+    throw "No se encontró el JAR de aplicación para el instalador."
 }
 
-$output = Join-Path (Get-Location) "target\installer"
-if (Test-Path $output) {
-    Remove-Item $output -Recurse -Force
-}
-New-Item -ItemType Directory -Path $output | Out-Null
+Copy-Item $thinJar.FullName $input
 
-Write-Host "[2/3] Generando aplicación Windows..."
+$dependencies = Join-Path $input "lib"
+if (-not (Test-Path $dependencies) -or -not (Get-ChildItem $dependencies -Filter "*.jar")) {
+    throw "No se copiaron las dependencias runtime."
+}
+
+Write-Host "[2/4] Preparando aplicación autónoma..."
+Write-Host "JAR principal: $($thinJar.Name)"
+Write-Host "Dependencias: $((Get-ChildItem $dependencies -Filter '*.jar').Count) JAR(s)"
+
+Write-Host "[3/4] Generando instalador MSI..."
 jpackage `
-    --type app-image `
-    --input $jar.DirectoryName `
+    --type msi `
+    --input $input `
     --name DentalCare `
-    --main-jar $jar.Name `
+    --main-jar $thinJar.Name `
     --main-class mx.dentalcare.ui.DentalCareJavaFXApplication `
     --dest $output `
     --icon $icon `
+    --app-version 1.0.0 `
+    --vendor "DentalCare" `
+    --description "Sistema de gestión para consultorio dental" `
     --win-dir-chooser `
     --win-menu `
-    --win-shortcut
+    --win-shortcut `
+    --win-menu-group "DentalCare"
 
-Write-Host "[3/3] Empaquetado terminado." -ForegroundColor Green
-Write-Host "Aplicación: $output\DentalCare"
-Write-Host "Para generar un instalador MSI, cambia --type app-image por --type msi."
+$msi = Get-ChildItem $output -Filter "DentalCare-*.msi" | Select-Object -First 1
+if (-not $msi) {
+    throw "jpackage terminó sin generar el instalador MSI."
+}
+
+Write-Host "[4/4] Instalador generado correctamente." -ForegroundColor Green
+Write-Host "Archivo: $($msi.FullName)"
+Write-Host ""
+Write-Host "DentalCare está listo para instalarse en Windows." -ForegroundColor Green

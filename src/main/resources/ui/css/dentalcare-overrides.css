@@ -126,6 +126,8 @@
     -fx-background-radius: 8px;
     -fx-border-radius: 8px;
     -fx-padding: 8px 18px;
+    -fx-min-width: 90px;
+    -fx-pref-width: 90px;
     -fx-font-size: 13px;
     -fx-font-weight: bold;
     -fx-text-overrun: clip;

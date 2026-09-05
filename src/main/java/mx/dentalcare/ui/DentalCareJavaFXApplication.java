@@ -20,7 +20,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class DentalCareJavaFXApplication extends Application {
 
     private ConfigurableApplicationContext context;
-    private String hojaEstilosDentalCare;
+    private String hojaEstilosBase;
+    private String hojaEstilosOverrides;
 
     @Override
     public void init() {
@@ -44,7 +45,11 @@ public class DentalCareJavaFXApplication extends Application {
     }
 
     private void instalarEstiloGlobalDeDialogos() {
-        hojaEstilosDentalCare = getClass()
+        hojaEstilosBase = getClass()
+                .getResource("/ui/css/dentalcare.css")
+                .toExternalForm();
+
+        hojaEstilosOverrides = getClass()
                 .getResource("/ui/css/dentalcare-overrides.css")
                 .toExternalForm();
 
@@ -66,8 +71,12 @@ public class DentalCareJavaFXApplication extends Application {
             return;
         }
 
-        if (!window.getScene().getStylesheets().contains(hojaEstilosDentalCare)) {
-            window.getScene().getStylesheets().add(hojaEstilosDentalCare);
+        if (!window.getScene().getStylesheets().contains(hojaEstilosBase)) {
+            window.getScene().getStylesheets().add(hojaEstilosBase);
+        }
+
+        if (!window.getScene().getStylesheets().contains(hojaEstilosOverrides)) {
+            window.getScene().getStylesheets().add(hojaEstilosOverrides);
         }
     }
 
@@ -79,8 +88,8 @@ public class DentalCareJavaFXApplication extends Application {
         Scene scene = new Scene(root, ancho, alto);
         scene.setFill(Color.TRANSPARENT);
 
-        String overrides = getClass().getResource("/ui/css/dentalcare-overrides.css").toExternalForm();
-        if (!scene.getStylesheets().contains(overrides)) scene.getStylesheets().add(overrides);
+        if (!scene.getStylesheets().contains(hojaEstilosBase)) scene.getStylesheets().add(hojaEstilosBase);
+        if (!scene.getStylesheets().contains(hojaEstilosOverrides)) scene.getStylesheets().add(hojaEstilosOverrides);
 
         stage.setTitle(titulo);
         stage.setScene(scene);

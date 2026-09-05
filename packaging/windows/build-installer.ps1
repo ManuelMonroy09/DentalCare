@@ -16,16 +16,18 @@ if (-not (Test-Path $icon)) {
     throw "No se encontró el icono de Windows: $icon"
 }
 
-Write-Host "[1/4] Compilando DentalCare..."
+Write-Host "[1/4] Compilando DentalCare y preparando dependencias..."
 mvn clean package -DskipTests
 
 $target = Join-Path (Get-Location) "target"
 $input = Join-Path $target "installer-input"
 $output = Join-Path $target "installer"
+$dependencies = Join-Path $input "lib"
 
-if (Test-Path $input) { Remove-Item $input -Recurse -Force }
+# Maven Dependency Plugin crea installer-input/lib durante la fase package.
+# No debemos borrar esa carpeta después del build porque contiene las dependencias
+# que jpackage necesita para ejecutar la aplicación.
 if (Test-Path $output) { Remove-Item $output -Recurse -Force }
-New-Item -ItemType Directory -Path (Join-Path $input "lib") -Force | Out-Null
 New-Item -ItemType Directory -Path $output -Force | Out-Null
 
 $thinJar = Get-ChildItem $target -Filter "dentalcare-*.jar" |
@@ -36,11 +38,8 @@ if (-not $thinJar) {
     throw "No se encontró el JAR de aplicación para el instalador."
 }
 
-Copy-Item $thinJar.FullName $input
-
-$dependencies = Join-Path $input "lib"
 if (-not (Test-Path $dependencies) -or -not (Get-ChildItem $dependencies -Filter "*.jar")) {
-    throw "No se copiaron las dependencias runtime."
+    throw "No se copiaron las dependencias runtime en $dependencies."
 }
 
 Write-Host "[2/4] Preparando aplicación autónoma..."

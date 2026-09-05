@@ -6,12 +6,15 @@ import javafx.fxml.FXML;
 import javafx.print.PrinterJob;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import mx.dentalcare.domain.cita.Cita;
+import mx.dentalcare.domain.cita.EstadoCita;
 import mx.dentalcare.domain.configuracion.ConfiguracionConsultorio;
 import mx.dentalcare.domain.financiero.Cargo;
 import mx.dentalcare.domain.financiero.EstadoCargo;
 import mx.dentalcare.domain.financiero.MetodoPago;
 import mx.dentalcare.domain.financiero.Pago;
 import mx.dentalcare.domain.paciente.Paciente;
+import mx.dentalcare.service.CitaService;
 import mx.dentalcare.service.ConfiguracionService;
 import mx.dentalcare.service.FinanzasService;
 import mx.dentalcare.service.PacientesService;
@@ -44,14 +47,17 @@ public class FinanzasController {
     private final FinanzasService finanzasService;
     private final PacientesService pacientesService;
     private final ConfiguracionService configuracionService;
+    private final CitaService citaService;
     private final Map<Long, Paciente> pacientes = new HashMap<>();
     private static final DateTimeFormatter FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter FECHA_HORA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-    public FinanzasController(FinanzasService finanzasService, PacientesService pacientesService, ConfiguracionService configuracionService) {
+    public FinanzasController(FinanzasService finanzasService, PacientesService pacientesService,
+                              ConfiguracionService configuracionService, CitaService citaService) {
         this.finanzasService = finanzasService;
         this.pacientesService = pacientesService;
         this.configuracionService = configuracionService;
+        this.citaService = citaService;
     }
 
     @FXML
@@ -79,6 +85,55 @@ public class FinanzasController {
             cargarDatos();
             mensajeLabel.setText(creados == 0 ? "No hay nuevos cargos por generar." : creados + " cargo(s) sincronizado(s).");
         } catch (IllegalStateException | IllegalArgumentException ex) {
+            mensajeLabel.setText(ex.getMessage());
+        }
+    }
+
+    @FXML
+    private void registrarAnticipo() {
+        List<Cita> citas = citaService.obtenerTodas().stream()
+                .filter(c -> c.getEstado() == EstadoCita.CONFIRMADA)
+                .filter(c -> c.getId() != null && c.getPaciente() != null && c.getPaciente().getId() != null)
+                .sorted(Comparator.comparing(Cita::getInicio, Comparator.nullsLast(Comparator.naturalOrder())))
+                .toList();
+        if (citas.isEmpty()) {
+            mensajeLabel.setText("No hay citas confirmadas disponibles para registrar un anticipo.");
+            return;
+        }
+
+        ChoiceDialog<Cita> citaDialog = new ChoiceDialog<>(citas.get(0), citas);
+        citaDialog.setTitle("Registrar anticipo");
+        citaDialog.setHeaderText("Selecciona la cita confirmada");
+        citaDialog.setContentText("Cita:");
+        citaDialog.getDialogPane().setMinWidth(560);
+        var citaResultado = citaDialog.showAndWait();
+        if (citaResultado.isEmpty()) return;
+        Cita cita = citaResultado.get();
+
+        BigDecimal anticipos = finanzasService.obtenerTotalAnticipos(cita.getId());
+        TextInputDialog montoDialog = new TextInputDialog("0.00");
+        montoDialog.setTitle("Registrar anticipo");
+        montoDialog.setHeaderText("Anticipos registrados: " + moneda(anticipos));
+        montoDialog.setContentText("Monto del anticipo:");
+        var montoResultado = montoDialog.showAndWait();
+        if (montoResultado.isEmpty()) return;
+
+        BigDecimal monto;
+        try { monto = new BigDecimal(montoResultado.get().trim().replace(",", ".")); }
+        catch (NumberFormatException ex) { mensajeLabel.setText("El monto no tiene un formato válido."); return; }
+
+        ChoiceDialog<MetodoPago> metodoDialog = new ChoiceDialog<>(MetodoPago.EFECTIVO, MetodoPago.values());
+        metodoDialog.setTitle("Método de pago");
+        metodoDialog.setHeaderText("Selecciona el método utilizado para el anticipo");
+        metodoDialog.setContentText("Método:");
+        var metodoResultado = metodoDialog.showAndWait();
+        if (metodoResultado.isEmpty()) return;
+
+        try {
+            finanzasService.registrarAnticipo(cita.getId(), monto, metodoResultado.get(), null);
+            cargarDatos();
+            mensajeLabel.setText("Anticipo registrado correctamente para " + nombrePaciente(cita.getPaciente().getId()) + ".");
+        } catch (IllegalArgumentException | IllegalStateException ex) {
             mensajeLabel.setText(ex.getMessage());
         }
     }
@@ -149,7 +204,6 @@ public class FinanzasController {
         scroll.setFitToHeight(true);
         scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scroll.setStyle("-fx-background-color: white;");
-
         Dialog<ButtonType> dialogo = new Dialog<>();
         dialogo.setTitle("Vista previa del recibo");
         dialogo.setHeaderText("Vista previa del recibo de pago");
@@ -159,9 +213,7 @@ public class FinanzasController {
         ButtonType imprimir = new ButtonType("Imprimir", ButtonBar.ButtonData.OK_DONE);
         ButtonType cancelar = new ButtonType("Cerrar", ButtonBar.ButtonData.CANCEL_CLOSE);
         dialogo.getDialogPane().getButtonTypes().setAll(imprimir, cancelar);
-        dialogo.showAndWait().ifPresent(resultado -> {
-            if (resultado == imprimir) imprimirTicket(ticket);
-        });
+        dialogo.showAndWait().ifPresent(resultado -> { if (resultado == imprimir) imprimirTicket(ticket); });
     }
 
     private VBox construirTicket(Pago pago, Cargo cargo) {
@@ -169,11 +221,8 @@ public class FinanzasController {
         Paciente paciente = pacientes.get(cargo.getPacienteId());
         String nombre = paciente == null ? "Paciente #" + cargo.getPacienteId() : nombrePaciente(cargo.getPacienteId());
         BigDecimal pendiente = finanzasService.obtenerSaldoPendiente(cargo.getId());
-
         VBox ticket = new VBox(6);
-        ticket.setPrefWidth(280);
-        ticket.setMinWidth(280);
-        ticket.setMaxWidth(280);
+        ticket.setPrefWidth(280); ticket.setMinWidth(280); ticket.setMaxWidth(280);
         ticket.setStyle("-fx-background-color: white; -fx-padding: 16px; -fx-font-family: 'Segoe UI';");
         agregarTexto(ticket, valor(configuracion.getNombreConsultorio()), "-fx-font-size: 18px; -fx-font-weight: bold; -fx-alignment: center;");
         if (!vacio(configuracion.getNombreOdontologo())) agregarTexto(ticket, configuracion.getNombreOdontologo(), "-fx-font-size: 12px; -fx-alignment: center;");
@@ -195,9 +244,7 @@ public class FinanzasController {
     }
 
     private void imprimirTicket(VBox ticket) {
-        ticket.applyCss();
-        ticket.autosize();
-        ticket.layout();
+        ticket.applyCss(); ticket.autosize(); ticket.layout();
         PrinterJob job = PrinterJob.createPrinterJob();
         if (job == null) { mostrarError("Impresión", "No hay una impresora disponible en el sistema."); return; }
         if (!job.showPrintDialog(cargosTable.getScene().getWindow())) return;
@@ -206,11 +253,7 @@ public class FinanzasController {
     }
 
     private void agregarTexto(VBox contenedor, String texto, String estilo) {
-        Label label = new Label(texto);
-        label.setWrapText(true);
-        label.setMaxWidth(Double.MAX_VALUE);
-        label.setStyle(estilo);
-        contenedor.getChildren().add(label);
+        Label label = new Label(texto); label.setWrapText(true); label.setMaxWidth(Double.MAX_VALUE); label.setStyle(estilo); contenedor.getChildren().add(label);
     }
 
     @FXML
@@ -244,8 +287,7 @@ public class FinanzasController {
 
     private void cargarDatos() {
         finanzasService.generarCargosPendientes();
-        List<Cargo> cargos = finanzasService.obtenerCargos();
-        cargosTable.setItems(FXCollections.observableArrayList(cargos));
+        cargosTable.setItems(FXCollections.observableArrayList(finanzasService.obtenerCargos()));
         LocalDate hoy = LocalDate.now();
         ingresosLabel.setText(moneda(finanzasService.obtenerIngresos(hoy, hoy)));
         pendienteLabel.setText(moneda(finanzasService.obtenerPorCobrar()));
@@ -269,6 +311,6 @@ public class FinanzasController {
 
     private void mostrarError(String titulo, String mensaje) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(titulo); alert.setHeaderText(null); alert.setContentText(mensaje); alert.showAndWait();
+        alert.setTitle(titulo); alert.setHeaderText(titulo); alert.setContentText(mensaje); alert.showAndWait();
     }
 }

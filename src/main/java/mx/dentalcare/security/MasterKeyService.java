@@ -1,6 +1,7 @@
 package mx.dentalcare.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import mx.dentalcare.config.DataDirectoryService;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -14,7 +15,7 @@ import java.util.Base64;
 @Service
 public class MasterKeyService {
 
-    private static final Path SECURITY_FILE = Path.of("data", "security.dat");
+    private static final Path SECURITY_FILE = DataDirectoryService.resolve("security.dat");
 
     private final ObjectMapper objectMapper;
     private final KeyDerivationService keyDerivationService;
@@ -22,27 +23,18 @@ public class MasterKeyService {
     private final SecuritySession securitySession;
     private final SecureRandom secureRandom = new SecureRandom();
 
-    public MasterKeyService(
-            ObjectMapper objectMapper,
-            KeyDerivationService keyDerivationService,
-            AesEncryptionService aesEncryptionService,
-            SecuritySession securitySession
-    ) {
+    public MasterKeyService(ObjectMapper objectMapper, KeyDerivationService keyDerivationService,
+                             AesEncryptionService aesEncryptionService, SecuritySession securitySession) {
         this.objectMapper = objectMapper;
         this.keyDerivationService = keyDerivationService;
         this.aesEncryptionService = aesEncryptionService;
         this.securitySession = securitySession;
     }
 
-    public boolean isConfigured() {
-        return Files.exists(SECURITY_FILE);
-    }
+    public boolean isConfigured() { return Files.exists(SECURITY_FILE); }
 
     public synchronized void initialize(String password) {
-        if (isConfigured()) {
-            throw new IllegalStateException("La seguridad de DentalCare ya está configurada.");
-        }
-
+        if (isConfigured()) throw new IllegalStateException("La seguridad de DentalCare ya está configurada.");
         SecretKey masterKey = generateMasterKey();
         AuthenticationData metadata = wrapMasterKey(masterKey, password);
         writeMetadata(metadata);
@@ -50,33 +42,18 @@ public class MasterKeyService {
     }
 
     public synchronized void unlock(String password) {
-        if (!isConfigured()) {
-            throw new IllegalStateException("La seguridad de DentalCare no está configurada.");
-        }
-
+        if (!isConfigured()) throw new IllegalStateException("La seguridad de DentalCare no está configurada.");
         try {
-            AuthenticationData metadata = objectMapper.readValue(
-                    Files.readString(SECURITY_FILE),
-                    AuthenticationData.class
-            );
-
+            AuthenticationData metadata = objectMapper.readValue(Files.readString(SECURITY_FILE), AuthenticationData.class);
             validateMetadata(metadata);
-
             byte[] salt = Base64.getDecoder().decode(metadata.getSalt());
             byte[] iv = Base64.getDecoder().decode(metadata.getIv());
             byte[] wrappedMasterKey = Base64.getDecoder().decode(metadata.getWrappedMasterKey());
-
             SecretKey protectionKey = keyDerivationService.deriveKey(password, salt);
-            byte[] masterKeyBytes = aesEncryptionService.decrypt(
-                    wrappedMasterKey,
-                    protectionKey,
-                    iv
-            );
-
+            byte[] masterKeyBytes = aesEncryptionService.decrypt(wrappedMasterKey, protectionKey, iv);
             if (masterKeyBytes.length != EncryptionConstants.MASTER_KEY_LENGTH_BYTES) {
                 throw new SecurityException("La clave maestra tiene un tamaño inválido.");
             }
-
             securitySession.authenticate(new SecretKeySpec(masterKeyBytes, "AES"));
         } catch (Exception e) {
             securitySession.clear();
@@ -86,19 +63,14 @@ public class MasterKeyService {
 
     public synchronized void changePassword(String currentPassword, String newPassword) {
         unlock(currentPassword);
-
         SecretKey masterKey = securitySession.requireMasterKey();
-        AuthenticationData metadata = wrapMasterKey(masterKey, newPassword);
-        writeMetadata(metadata);
+        writeMetadata(wrapMasterKey(masterKey, newPassword));
     }
 
     public synchronized void clearConfiguration() {
         securitySession.clear();
-        try {
-            Files.deleteIfExists(SECURITY_FILE);
-        } catch (Exception e) {
-            throw new RuntimeException("No fue posible eliminar la configuración de seguridad.", e);
-        }
+        try { Files.deleteIfExists(SECURITY_FILE); }
+        catch (Exception e) { throw new RuntimeException("No fue posible eliminar la configuración de seguridad.", e); }
     }
 
     private SecretKey generateMasterKey() {
@@ -109,61 +81,37 @@ public class MasterKeyService {
 
     private AuthenticationData wrapMasterKey(SecretKey masterKey, String password) {
         validatePassword(password);
-
         byte[] salt = CryptoUtils.randomBytes(EncryptionConstants.SALT_LENGTH);
         byte[] iv = CryptoUtils.randomBytes(EncryptionConstants.IV_LENGTH);
         SecretKey protectionKey = keyDerivationService.deriveKey(password, salt);
         byte[] wrapped = aesEncryptionService.encrypt(masterKey.getEncoded(), protectionKey, iv);
-
-        return new AuthenticationData(
-                EncryptionConstants.SECURITY_VERSION,
-                EncryptionConstants.KDF_ITERATIONS,
-                Base64.getEncoder().encodeToString(salt),
-                Base64.getEncoder().encodeToString(iv),
-                Base64.getEncoder().encodeToString(wrapped)
-        );
+        return new AuthenticationData(EncryptionConstants.SECURITY_VERSION, EncryptionConstants.KDF_ITERATIONS,
+                Base64.getEncoder().encodeToString(salt), Base64.getEncoder().encodeToString(iv),
+                Base64.getEncoder().encodeToString(wrapped));
     }
 
     private void writeMetadata(AuthenticationData metadata) {
         try {
             Files.createDirectories(SECURITY_FILE.getParent());
-
             Path temporaryFile = SECURITY_FILE.resolveSibling("security.dat.tmp");
             objectMapper.writerWithDefaultPrettyPrinter().writeValue(temporaryFile.toFile(), metadata);
-
             try {
-                Files.move(
-                        temporaryFile,
-                        SECURITY_FILE,
-                        StandardCopyOption.REPLACE_EXISTING,
-                        StandardCopyOption.ATOMIC_MOVE
-                );
+                Files.move(temporaryFile, SECURITY_FILE, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
             } catch (java.nio.file.AtomicMoveNotSupportedException e) {
-                Files.move(
-                        temporaryFile,
-                        SECURITY_FILE,
-                        StandardCopyOption.REPLACE_EXISTING
-                );
+                Files.move(temporaryFile, SECURITY_FILE, StandardCopyOption.REPLACE_EXISTING);
             }
-        } catch (Exception e) {
-            throw new RuntimeException("No fue posible guardar la configuración de seguridad.", e);
-        }
+        } catch (Exception e) { throw new RuntimeException("No fue posible guardar la configuración de seguridad.", e); }
     }
 
     private void validateMetadata(AuthenticationData metadata) {
-        if (metadata == null
-                || metadata.getVersion() != EncryptionConstants.SECURITY_VERSION
+        if (metadata == null || metadata.getVersion() != EncryptionConstants.SECURITY_VERSION
                 || metadata.getKdfIterations() != EncryptionConstants.KDF_ITERATIONS
-                || metadata.getSalt() == null
-                || metadata.getIv() == null
-                || metadata.getWrappedMasterKey() == null) {
+                || metadata.getSalt() == null || metadata.getIv() == null || metadata.getWrappedMasterKey() == null) {
             throw new SecurityException("La configuración de seguridad no es válida.");
         }
     }
 
     private void validatePassword(String password) {
-        if (password == null || password.length() < 8) {
-            throw new IllegalArgumentException("La contraseña debe tener al menos 8 caracteres.");
-        }
+        if (password == null || password.length() < 8) throw new IllegalArgumentException("La contraseña debe tener al menos 8 caracteres.");
     }
 }

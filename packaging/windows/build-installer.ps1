@@ -24,10 +24,8 @@ $input = Join-Path $target "installer-input"
 $output = Join-Path $target "installer"
 $dependencies = Join-Path $input "lib"
 
-# Maven Dependency Plugin crea installer-input/lib durante la fase package.
-# No debemos borrar esa carpeta después del build porque contiene las dependencias
-# que jpackage necesita para ejecutar la aplicación.
 if (Test-Path $output) { Remove-Item $output -Recurse -Force }
+New-Item -ItemType Directory -Path $input -Force | Out-Null
 New-Item -ItemType Directory -Path $output -Force | Out-Null
 
 $thinJar = Get-ChildItem $target -Filter "dentalcare-*.jar" |
@@ -38,6 +36,15 @@ if (-not $thinJar) {
     throw "No se encontró el JAR de aplicación para el instalador."
 }
 
+# jpackage exige que --main-jar exista físicamente dentro de --input.
+# Maven deja el JAR en target/, por lo que lo copiamos al staging junto con lib/.
+Copy-Item $thinJar.FullName -Destination (Join-Path $input $thinJar.Name) -Force
+
+$stagedJar = Join-Path $input $thinJar.Name
+if (-not (Test-Path $stagedJar)) {
+    throw "No fue posible colocar el JAR principal en $input."
+}
+
 if (-not (Test-Path $dependencies) -or -not (Get-ChildItem $dependencies -Filter "*.jar")) {
     throw "No se copiaron las dependencias runtime en $dependencies."
 }
@@ -45,6 +52,7 @@ if (-not (Test-Path $dependencies) -or -not (Get-ChildItem $dependencies -Filter
 Write-Host "[2/4] Preparando aplicación autónoma..."
 Write-Host "JAR principal: $($thinJar.Name)"
 Write-Host "Dependencias: $((Get-ChildItem $dependencies -Filter '*.jar').Count) JAR(s)"
+Write-Host "Entrada jpackage: $stagedJar"
 
 Write-Host "[3/4] Generando instalador MSI..."
 jpackage `

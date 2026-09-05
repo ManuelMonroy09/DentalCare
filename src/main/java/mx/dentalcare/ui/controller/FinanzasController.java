@@ -102,24 +102,38 @@ public class FinanzasController {
         }
 
         List<CitaAnticipoOption> opciones = citas.stream().map(CitaAnticipoOption::new).toList();
-        ChoiceDialog<CitaAnticipoOption> citaDialog = new ChoiceDialog<>(opciones.get(0), opciones);
+        Dialog<CitaAnticipoOption> citaDialog = new Dialog<>();
         citaDialog.setTitle("Registrar anticipo");
         citaDialog.setHeaderText("Seleccionar cita para registrar el anticipo");
-        citaDialog.setContentText(null);
+        ComboBox<CitaAnticipoOption> comboCita = new ComboBox<>(FXCollections.observableArrayList(opciones));
+        comboCita.getSelectionModel().selectFirst();
+        comboCita.setMaxWidth(Double.MAX_VALUE);
+        comboCita.setPrefHeight(40);
+        VBox contenidoCita = new VBox(8, comboCita);
+        contenidoCita.setPrefWidth(520);
+        citaDialog.getDialogPane().setContent(contenidoCita);
+        ButtonType aceptar = new ButtonType("Continuar", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancelar = new ButtonType("Cancelar", ButtonBar.ButtonData.CANCEL_CLOSE);
+        citaDialog.getDialogPane().getButtonTypes().setAll(aceptar, cancelar);
         citaDialog.getDialogPane().setMinWidth(600);
         citaDialog.getDialogPane().setPrefWidth(600);
-        citaDialog.getDialogPane().setMinHeight(190);
-        citaDialog.getDialogPane().setPrefHeight(210);
+        citaDialog.getDialogPane().setMinHeight(230);
+        citaDialog.getDialogPane().setPrefHeight(230);
         citaDialog.setResizable(false);
         var citaResultado = citaDialog.showAndWait();
         if (citaResultado.isEmpty()) return;
-        Cita cita = citaResultado.get().cita();
+        Cita cita = comboCita.getValue().cita();
 
         BigDecimal anticipos = finanzasService.obtenerTotalAnticipos(cita.getId());
         TextInputDialog montoDialog = new TextInputDialog("0.00");
         montoDialog.setTitle("Registrar anticipo");
         montoDialog.setHeaderText("Anticipos registrados: " + moneda(anticipos));
         montoDialog.setContentText("Monto del anticipo:");
+        montoDialog.getDialogPane().setMinWidth(460);
+        montoDialog.getDialogPane().setPrefWidth(460);
+        montoDialog.getDialogPane().setMinHeight(210);
+        montoDialog.getDialogPane().setPrefHeight(210);
+        montoDialog.setResizable(false);
         var montoResultado = montoDialog.showAndWait();
         if (montoResultado.isEmpty()) return;
 
@@ -131,6 +145,11 @@ public class FinanzasController {
         metodoDialog.setTitle("Método de pago");
         metodoDialog.setHeaderText("Selecciona el método utilizado para el anticipo");
         metodoDialog.setContentText("Método:");
+        metodoDialog.getDialogPane().setMinWidth(460);
+        metodoDialog.getDialogPane().setPrefWidth(460);
+        metodoDialog.getDialogPane().setMinHeight(210);
+        metodoDialog.getDialogPane().setPrefHeight(210);
+        metodoDialog.setResizable(false);
         var metodoResultado = metodoDialog.showAndWait();
         if (metodoResultado.isEmpty()) return;
 
@@ -166,6 +185,11 @@ public class FinanzasController {
         montoDialog.setTitle("Registrar pago");
         montoDialog.setHeaderText("Saldo pendiente: " + moneda(pendiente));
         montoDialog.setContentText("Monto del pago:");
+        montoDialog.getDialogPane().setMinWidth(460);
+        montoDialog.getDialogPane().setPrefWidth(460);
+        montoDialog.getDialogPane().setMinHeight(210);
+        montoDialog.getDialogPane().setPrefHeight(210);
+        montoDialog.setResizable(false);
         var montoResultado = montoDialog.showAndWait();
         if (montoResultado.isEmpty()) return;
 
@@ -177,6 +201,11 @@ public class FinanzasController {
         metodoDialog.setTitle("Método de pago");
         metodoDialog.setHeaderText("Selecciona el método utilizado");
         metodoDialog.setContentText("Método:");
+        metodoDialog.getDialogPane().setMinWidth(460);
+        metodoDialog.getDialogPane().setPrefWidth(460);
+        metodoDialog.getDialogPane().setMinHeight(210);
+        metodoDialog.getDialogPane().setPrefHeight(210);
+        metodoDialog.setResizable(false);
         var metodoResultado = metodoDialog.showAndWait();
         if (metodoResultado.isEmpty()) return;
 
@@ -279,55 +308,72 @@ public class FinanzasController {
         if (cargo == null) { mensajeLabel.setText("Selecciona un cargo para ver su detalle."); return; }
         BigDecimal pagado = finanzasService.obtenerTotalPagado(cargo.getId());
         BigDecimal pendiente = finanzasService.obtenerSaldoPendiente(cargo.getId());
-        EstadoCargo estado = finanzasService.obtenerEstadoCargo(cargo.getId());
-        List<Pago> pagos = finanzasService.obtenerPagosPorCargo(cargo.getId());
-        StringBuilder detalle = new StringBuilder();
-        detalle.append("Paciente: ").append(nombrePaciente(cargo.getPacienteId())).append("\n")
-                .append("Fecha: ").append(cargo.getFecha() == null ? "" : cargo.getFecha().format(FECHA_HORA)).append("\n")
-                .append("Concepto: ").append(cargo.getConcepto()).append("\n")
-                .append("Importe total: ").append(moneda(cargo.getImporte())).append("\n")
-                .append("Total pagado: ").append(moneda(pagado)).append("\n")
-                .append("Saldo pendiente: ").append(moneda(pendiente)).append("\n")
-                .append("Estado: ").append(estado.getDescripcion()).append("\n\n")
-                .append("Historial de pagos\n");
-        if (pagos.isEmpty()) detalle.append("Sin pagos registrados.");
-        else for (Pago pago : pagos) {
-            detalle.append("• ").append(pago.getFecha() == null ? "" : pago.getFecha().format(FECHA_HORA)).append(" | ")
-                    .append(moneda(pago.getMonto())).append(" | ")
-                    .append(pago.getMetodoPago() == null ? "Sin método" : pago.getMetodoPago().getDescripcion()).append("\n");
-            if (pago.getNotas() != null && !pago.getNotas().isBlank()) detalle.append("  Nota: ").append(pago.getNotas()).append("\n");
-        }
-        Alert dialogo = new Alert(Alert.AlertType.INFORMATION);
-        dialogo.setTitle("Detalle del cargo"); dialogo.setHeaderText("Cargo #" + cargo.getId()); dialogo.setContentText(detalle.toString());
-        dialogo.getDialogPane().setMinWidth(520); dialogo.showAndWait();
-    }
-
-    private void cargarDatos() {
-        finanzasService.generarCargosPendientes();
-        cargosTable.setItems(FXCollections.observableArrayList(finanzasService.obtenerCargos()));
-        LocalDate hoy = LocalDate.now();
-        ingresosLabel.setText(moneda(finanzasService.obtenerIngresos(hoy, hoy)));
-        pendienteLabel.setText(moneda(finanzasService.obtenerPorCobrar()));
-        cobrosHoyLabel.setText(String.valueOf(finanzasService.obtenerCantidadPagos(hoy, hoy)));
+        BigDecimal anticipos = finanzasService.obtenerTotalAnticipos(cargo.getId());
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Detalle financiero");
+        alert.setHeaderText("Detalle del cargo");
+        alert.setContentText("Paciente: " + nombrePaciente(cargo.getPacienteId()) + "\n" +
+                "Concepto: " + valor(cargo.getConcepto()) + "\n" +
+                "Cargo: " + moneda(cargo.getImporte()) + "\n" +
+                "Anticipos: " + moneda(anticipos) + "\n" +
+                "Pagado: " + moneda(pagado) + "\n" +
+                "Pendiente: " + moneda(pendiente) + "\n" +
+                "Estado: " + finanzasService.obtenerEstadoCargo(cargo.getId()).getDescripcion());
+        alert.getDialogPane().setMinWidth(480);
+        alert.getDialogPane().setPrefWidth(480);
+        alert.getDialogPane().setMinHeight(300);
+        alert.getDialogPane().setPrefHeight(300);
+        alert.showAndWait();
     }
 
     private void cargarPacientes() {
         pacientes.clear();
-        pacientesService.obtenerTodos().forEach(p -> { if (p.getId() != null) pacientes.put(p.getId(), p); });
+        for (Paciente paciente : pacientesService.obtenerTodos()) {
+            if (paciente.getId() != null) pacientes.put(paciente.getId(), paciente);
+        }
+    }
+
+    private void cargarDatos() {
+        List<Cargo> cargos = finanzasService.obtenerTodos().stream()
+                .sorted(Comparator.comparing(Cargo::getFecha, Comparator.nullsLast(Comparator.reverseOrder())))
+                .toList();
+        cargosTable.setItems(FXCollections.observableArrayList(cargos));
+        BigDecimal ingresosHoy = cargos.stream()
+                .filter(c -> LocalDate.now().equals(c.getFecha()))
+                .map(c -> finanzasService.obtenerTotalPagado(c.getId()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal pendiente = cargos.stream()
+                .map(c -> finanzasService.obtenerSaldoPendiente(c.getId()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        long cobrosHoy = cargos.stream()
+                .filter(c -> LocalDate.now().equals(c.getFecha()))
+                .mapToLong(c -> finanzasService.obtenerPagosPorCargo(c.getId()).size())
+                .sum();
+        ingresosLabel.setText(moneda(ingresosHoy));
+        pendienteLabel.setText(moneda(pendiente));
+        cobrosHoyLabel.setText(String.valueOf(cobrosHoy));
     }
 
     private String nombrePaciente(Long id) {
         Paciente p = pacientes.get(id);
-        if (p == null) return "Paciente #" + (id == null ? "?" : id);
+        if (p == null) return "Paciente #" + id;
         return (p.getNombre() + " " + p.getApellidoPaterno() + " " + p.getApellidoMaterno()).trim().replaceAll("\\s+", " ");
     }
 
-    private String moneda(BigDecimal valor) { return "$" + (valor == null ? "0.00" : valor.setScale(2, RoundingMode.HALF_UP).toPlainString()); }
-    private String valor(Object valor) { return valor == null ? "" : String.valueOf(valor); }
+    private String moneda(BigDecimal valor) {
+        if (valor == null) valor = BigDecimal.ZERO;
+        return "$" + valor.setScale(2, RoundingMode.HALF_UP).toPlainString();
+    }
+
+    private String valor(Object valor) { return valor == null ? "" : valor.toString(); }
     private boolean vacio(String valor) { return valor == null || valor.isBlank(); }
 
     private void mostrarError(String titulo, String mensaje) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(titulo); alert.setHeaderText(titulo); alert.setContentText(mensaje); alert.showAndWait();
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.getDialogPane().setMinWidth(420);
+        alert.showAndWait();
     }
 }

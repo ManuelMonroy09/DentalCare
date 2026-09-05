@@ -101,6 +101,7 @@
     -fx-text-fill: #111827;
     -fx-font-size: 16px;
     -fx-font-weight: bold;
+    -fx-wrap-text: true;
 }
 .dialog-pane .content {
     -fx-padding: 10px 24px 16px 24px;
@@ -108,17 +109,20 @@
 .dialog-pane .content .label {
     -fx-text-fill: #374151;
     -fx-font-size: 13px;
-    -fx-wrap-text: true;
-    -fx-min-width: 0;
+    -fx-wrap-text: false;
+    -fx-min-width: 70px;
+    -fx-pref-width: 78px;
+    -fx-alignment: CENTER_LEFT;
 }
 .dialog-pane .button-bar {
-    -fx-padding: 12px 24px 16px 24px;
-    -fx-min-height: 58px;
-    -fx-pref-height: 58px;
+    -fx-padding: 12px 24px 18px 24px;
+    -fx-min-height: 70px;
+    -fx-pref-height: 70px;
     -fx-alignment: CENTER_RIGHT;
 }
 .dialog-pane .button-bar .container {
     -fx-alignment: CENTER_RIGHT;
+    -fx-spacing: 8px;
 }
 .dialog-pane .button-bar .button,
 .dialog-pane .button {
@@ -127,8 +131,9 @@
     -fx-background-radius: 8px;
     -fx-border-radius: 8px;
     -fx-padding: 8px 18px;
-    -fx-min-width: 96px;
-    -fx-pref-width: 96px;
+    -fx-min-width: 110px;
+    -fx-pref-width: 110px;
+    -fx-max-width: 140px;
     -fx-font-size: 13px;
     -fx-font-weight: bold;
     -fx-text-overrun: clip;

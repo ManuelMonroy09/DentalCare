@@ -9,115 +9,57 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox
-        xmlns="http://javafx.com/javafx/21"
+<ScrollPane xmlns="http://javafx.com/javafx/21"
         xmlns:fx="http://javafx.com/fxml/1"
         fx:controller="mx.dentalcare.ui.controller.TratamientoDialogController"
-        stylesheets="@../css/dentalcare.css"
-        styleClass="root"
-        spacing="18"
-        prefWidth="650"
-        prefHeight="500"
-        minWidth="550"
-        minHeight="450">
+        stylesheets="@../css/dentalcare.css,@../css/ui-standard.css"
+        fitToWidth="true"
+        hbarPolicy="NEVER"
+        vbarPolicy="AS_NEEDED"
+        styleClass="standard-page">
+    <content>
+        <VBox spacing="16" fillWidth="true" styleClass="dialog-standard">
+            <padding><Insets top="26" right="30" bottom="24" left="30"/></padding>
 
-    <padding>
-        <Insets top="25" right="30" bottom="25" left="30"/>
-    </padding>
-
-    <Label
-            fx:id="tituloLabel"
-            text="Nuevo Tratamiento"
-            styleClass="page-title"/>
-
-    <Label
-            text="Configura el tratamiento y sus características."
-            styleClass="page-subtitle"/>
-
-    <VBox spacing="15"
-          VBox.vgrow="ALWAYS">
-
-        <VBox spacing="6">
-            <Label
-                    text="Nombre"
-                    styleClass="form-label"/>
-
-            <TextField
-                    fx:id="nombreField"
-                    promptText="Ej. Limpieza dental"
-                    maxWidth="Infinity"/>
-        </VBox>
-
-        <VBox spacing="6">
-            <Label
-                    text="Descripción"
-                    styleClass="form-label"/>
-
-            <TextArea
-                    fx:id="descripcionArea"
-                    promptText="Describe brevemente el tratamiento..."
-                    prefRowCount="3"
-                    wrapText="true"
-                    maxWidth="Infinity"
-                    styleClass="form-textarea"/>
-        </VBox>
-
-        <HBox spacing="15">
-
-            <VBox
-                    spacing="6"
-                    HBox.hgrow="ALWAYS">
-
-                <Label
-                        text="Precio"
-                        styleClass="form-label"/>
-
-                <TextField
-                        fx:id="precioField"
-                        promptText="0.00"
-                        maxWidth="Infinity"/>
+            <VBox spacing="4">
+                <Label fx:id="tituloLabel" text="Nuevo tratamiento" styleClass="page-title"/>
+                <Label text="Configura el tratamiento, su precio y duración." styleClass="page-subtitle" wrapText="true"/>
             </VBox>
 
-            <VBox
-                    spacing="6"
-                    HBox.hgrow="ALWAYS">
+            <VBox spacing="14" styleClass="standard-section">
+                <VBox spacing="2">
+                    <Label text="Información del tratamiento" styleClass="standard-section-title"/>
+                    <Label text="Define los datos que se utilizarán al registrar tratamientos en una cita." styleClass="standard-section-subtitle" wrapText="true"/>
+                </VBox>
 
-                <Label
-                        text="Duración (minutos)"
-                        styleClass="form-label"/>
+                <VBox spacing="6">
+                    <Label text="Nombre" styleClass="standard-form-label"/>
+                    <TextField fx:id="nombreField" promptText="Ej. Limpieza dental" maxWidth="Infinity"/>
+                </VBox>
 
-                <Spinner
-                        fx:id="duracionSpinner"
-                        editable="true"
-                        maxWidth="Infinity"/>
+                <VBox spacing="6">
+                    <Label text="Descripción" styleClass="standard-form-label"/>
+                    <TextArea fx:id="descripcionArea" promptText="Describe brevemente el tratamiento..." prefRowCount="3" wrapText="true" maxWidth="Infinity"/>
+                </VBox>
+
+                <HBox spacing="12">
+                    <VBox spacing="6" HBox.hgrow="ALWAYS">
+                        <Label text="Precio" styleClass="standard-form-label"/>
+                        <TextField fx:id="precioField" promptText="0.00" maxWidth="Infinity"/>
+                    </VBox>
+                    <VBox spacing="6" HBox.hgrow="ALWAYS">
+                        <Label text="Duración (minutos)" styleClass="standard-form-label"/>
+                        <Spinner fx:id="duracionSpinner" editable="true" maxWidth="Infinity"/>
+                    </VBox>
+                </HBox>
             </VBox>
 
-        </HBox>
+            <Label fx:id="lblError" text="" wrapText="true" maxWidth="Infinity" styleClass="standard-error"/>
 
-    </VBox>
-
-    <Label
-            fx:id="lblError"
-            text=""
-            wrapText="true"
-            maxWidth="Infinity"
-            minHeight="35"
-            styleClass="error-label"/>
-
-    <HBox
-            spacing="10"
-            alignment="CENTER_RIGHT">
-
-        <Button
-                fx:id="guardarButton"
-                text="Guardar"
-                styleClass="primary-button"/>
-
-        <Button
-                fx:id="cancelarButton"
-                text="Cancelar"
-                styleClass="secondary-button"/>
-
-    </HBox>
-
-</VBox>
+            <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="standard-actions">
+                <Button fx:id="cancelarButton" text="Cancelar" mnemonicParsing="false" styleClass="secondary-button"/>
+                <Button fx:id="guardarButton" text="Guardar" mnemonicParsing="false" styleClass="primary-button"/>
+            </HBox>
+        </VBox>
+    </content>
+</ScrollPane>

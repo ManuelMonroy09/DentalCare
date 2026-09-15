@@ -1,0 +1,176 @@
+/* =========================================================
+   DIALOGOS ESTANDAR DENTALCARE
+   Un solo punto de estilo para todas las ventanas modales.
+   ========================================================= */
+
+.dialog-pane.standard-dialog {
+    -fx-background-color: #f6f7f9;
+    -fx-padding: 0;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+}
+
+/* ---------------------------------------------------------
+   ENCABEZADO
+   --------------------------------------------------------- */
+
+.standard-dialog-header {
+    -fx-background-color: white;
+    -fx-padding: 20px 24px 16px 24px;
+    -fx-spacing: 5px;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.standard-dialog-title {
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #111827;
+}
+
+.standard-dialog-subtitle {
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 14px;
+    -fx-text-fill: #6b7280;
+    -fx-wrap-text: true;
+}
+
+/* ---------------------------------------------------------
+   CONTENIDO
+   --------------------------------------------------------- */
+
+.standard-dialog-content {
+    -fx-background-color: #f6f7f9;
+    -fx-padding: 20px 24px;
+    -fx-spacing: 10px;
+}
+
+.standard-dialog-panel {
+    -fx-background-color: white;
+    -fx-padding: 18px;
+    -fx-spacing: 10px;
+    -fx-background-radius: 8px;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+}
+
+.standard-dialog-text {
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 14px;
+    -fx-text-fill: #374151;
+    -fx-wrap-text: true;
+}
+
+.standard-dialog-label {
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #4b5563;
+}
+
+/* ---------------------------------------------------------
+   CAMPOS
+   --------------------------------------------------------- */
+
+.standard-dialog-content .text-field,
+.standard-dialog-content .password-field,
+.standard-dialog-content .combo-box,
+.standard-dialog-panel .text-field,
+.standard-dialog-panel .password-field,
+.standard-dialog-panel .combo-box {
+    -fx-pref-height: 44px;
+    -fx-min-height: 44px;
+    -fx-background-color: white;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 8px 10px;
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 14px;
+}
+
+.standard-dialog-content .text-field:focused,
+.standard-dialog-content .password-field:focused,
+.standard-dialog-content .combo-box:focused,
+.standard-dialog-panel .text-field:focused,
+.standard-dialog-panel .password-field:focused,
+.standard-dialog-panel .combo-box:focused {
+    -fx-border-color: #2563eb;
+    -fx-border-width: 2px;
+}
+
+.standard-dialog-content .combo-box,
+.standard-dialog-panel .combo-box {
+    -fx-cursor: hand;
+}
+
+/* ---------------------------------------------------------
+   PIE Y BOTONES NATIVOS DE DIALOGPANE
+   --------------------------------------------------------- */
+
+.dialog-pane.standard-dialog .button-bar {
+    -fx-background-color: white;
+    -fx-padding: 14px 24px 18px 24px;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1px 0 0 0;
+}
+
+.dialog-pane.standard-dialog .button-bar .container {
+    -fx-background-color: transparent;
+}
+
+.dialog-pane.standard-dialog .button-bar .button {
+    -fx-min-height: 40px;
+    -fx-pref-height: 40px;
+    -fx-max-height: 44px;
+    -fx-padding: 9px 18px;
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-cursor: hand;
+    -fx-wrap-text: false;
+}
+
+.dialog-pane.standard-dialog .button-bar .dialog-primary-button {
+    -fx-background-color: #2563eb;
+    -fx-text-fill: white;
+}
+
+.dialog-pane.standard-dialog .button-bar .dialog-primary-button:hover {
+    -fx-background-color: #1d4ed8;
+}
+
+.dialog-pane.standard-dialog .button-bar .dialog-primary-button:pressed {
+    -fx-background-color: #1e40af;
+}
+
+.dialog-pane.standard-dialog .button-bar .dialog-secondary-button {
+    -fx-background-color: white;
+    -fx-text-fill: #374151;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1px;
+}
+
+.dialog-pane.standard-dialog .button-bar .dialog-secondary-button:hover {
+    -fx-background-color: #f3f4f6;
+    -fx-border-color: #9ca3af;
+}
+
+.dialog-pane.standard-dialog .button-bar .dialog-secondary-button:pressed {
+    -fx-background-color: #e5e7eb;
+}
+
+/* ---------------------------------------------------------
+   MENSAJES LARGOS
+   --------------------------------------------------------- */
+
+.dialog-pane.standard-dialog .label {
+    -fx-wrap-text: true;
+}

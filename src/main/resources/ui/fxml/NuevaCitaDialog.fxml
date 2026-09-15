@@ -8,7 +8,6 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
@@ -17,20 +16,21 @@
 <ScrollPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="mx.dentalcare.ui.controller.NuevaCitaController"
-            stylesheets="@../css/dentalcare.css,@../css/ui-standard.css"
             fitToWidth="true"
             hbarPolicy="NEVER"
             vbarPolicy="AS_NEEDED"
             styleClass="standard-page">
+    <stylesheets>
+        <String fx:value="@../css/dentalcare.css"/>
+        <String fx:value="@../css/ui-standard.css"/>
+    </stylesheets>
     <content>
         <VBox spacing="16" fillWidth="true" styleClass="dialog-standard">
             <padding><Insets top="26" right="30" bottom="24" left="30"/></padding>
-
             <VBox spacing="4">
                 <Label text="Nueva cita" styleClass="page-title"/>
                 <Label text="Programa la atención del paciente y define los detalles de la cita." styleClass="page-subtitle" wrapText="true"/>
             </VBox>
-
             <VBox spacing="14" styleClass="standard-section">
                 <VBox spacing="2">
                     <Label text="Información de la cita" styleClass="standard-section-title"/>
@@ -60,7 +60,6 @@
                     </VBox>
                 </GridPane>
             </VBox>
-
             <VBox spacing="14" styleClass="standard-section">
                 <VBox spacing="2">
                     <Label text="Detalles de la atención" styleClass="standard-section-title"/>
@@ -68,14 +67,13 @@
                 </VBox>
                 <VBox spacing="6">
                     <Label text="Motivo de consulta" styleClass="standard-form-label"/>
-                    <TextField fx:id="txtMotivo" promptText="Ej. Dolor intenso en la muela inferior derecha" maxWidth="Infinity" styleClass="form-control"/>
+                    <TextArea fx:id="txtMotivo" promptText="Ej. Dolor intenso en la muela inferior derecha" wrapText="true" maxWidth="Infinity" styleClass="form-textarea"/>
                 </VBox>
                 <VBox spacing="6">
                     <Label text="Notas" styleClass="standard-form-label"/>
                     <TextArea fx:id="txtNotas" promptText="Notas adicionales de la cita..." wrapText="true" prefRowCount="3" maxWidth="Infinity" styleClass="form-textarea"/>
                 </VBox>
             </VBox>
-
             <VBox spacing="14" styleClass="standard-section">
                 <VBox spacing="2">
                     <Label text="Tratamientos" styleClass="standard-section-title"/>
@@ -91,12 +89,10 @@
                     <Label fx:id="lblTotalTratamientos" text="$0.00" styleClass="standard-total"/>
                 </HBox>
             </VBox>
-
             <Label fx:id="lblError" managed="false" visible="false" wrapText="true" maxWidth="Infinity" styleClass="standard-error"/>
-
             <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="standard-actions">
-                <Button fx:id="btnCancelar" text="Cancelar" mnemonicParsing="false" styleClass="secondary-button"/>
-                <Button fx:id="btnGuardar" text="Guardar cita" mnemonicParsing="false" styleClass="primary-button"/>
+                <Button fx:id="btnCancelar" text="Cancelar" mnemonicParsing="false"/>
+                <Button fx:id="btnGuardar" text="Guardar cita" mnemonicParsing="false"/>
             </HBox>
         </VBox>
     </content>

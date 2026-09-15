@@ -70,8 +70,12 @@ public class MainController {
     private void cambiarPassword() {
         Dialog<ButtonType> dialog = crearDialogoEstandar("Cambiar contraseña", "Actualiza la contraseña de tu usuario");
         PasswordField actual = new PasswordField(); actual.setPromptText("Contraseña actual"); PasswordField nueva = new PasswordField(); nueva.setPromptText("Nueva contraseña"); PasswordField confirmar = new PasswordField(); confirmar.setPromptText("Confirmar nueva contraseña");
-        GridPane grid = new GridPane(); grid.setHgap(14); grid.setVgap(14); grid.setPadding(new Insets(4)); grid.add(new Label("Actual:"), 0, 0); grid.add(actual, 1, 0); grid.add(new Label("Nueva:"), 0, 1); grid.add(nueva, 1, 1); grid.add(new Label("Confirmar:"), 0, 2); grid.add(confirmar, 1, 2); GridPane.setHgrow(actual, Priority.ALWAYS); GridPane.setHgrow(nueva, Priority.ALWAYS); GridPane.setHgrow(confirmar, Priority.ALWAYS);
-        mostrarContenidoDialogo(dialog, grid, ButtonType.OK, ButtonType.CANCEL); Button guardar = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK); if (guardar != null) guardar.setText("Guardar"); Button cancelar = (Button) dialog.getDialogPane().lookupButton(ButtonType.CANCEL); if (cancelar != null) cancelar.setText("Cancelar"); estilizarBotonesDialogo(dialog.getDialogPane());
+        actual.setMaxWidth(Double.MAX_VALUE); nueva.setMaxWidth(Double.MAX_VALUE); confirmar.setMaxWidth(Double.MAX_VALUE);
+        GridPane grid = new GridPane(); grid.setHgap(14); grid.setVgap(14); grid.setPadding(new Insets(4)); grid.setMaxWidth(Double.MAX_VALUE);
+        grid.add(new Label("Actual:"), 0, 0); grid.add(actual, 1, 0); grid.add(new Label("Nueva:"), 0, 1); grid.add(nueva, 1, 1); grid.add(new Label("Confirmar:"), 0, 2); grid.add(confirmar, 1, 2);
+        GridPane.setHgrow(actual, Priority.ALWAYS); GridPane.setHgrow(nueva, Priority.ALWAYS); GridPane.setHgrow(confirmar, Priority.ALWAYS); GridPane.setHgrow(grid, Priority.ALWAYS);
+        VBox content = crearPanel(10); content.getChildren().add(grid); VBox.setVgrow(grid, Priority.ALWAYS);
+        mostrarContenidoDialogo(dialog, content, ButtonType.OK, ButtonType.CANCEL); Button guardar = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK); if (guardar != null) guardar.setText("Guardar"); Button cancelar = (Button) dialog.getDialogPane().lookupButton(ButtonType.CANCEL); if (cancelar != null) cancelar.setText("Cancelar"); estilizarBotonesDialogo(dialog.getDialogPane());
         Optional<ButtonType> result = dialog.showAndWait(); if (result.isEmpty() || result.get() != ButtonType.OK) return; if (!nueva.getText().equals(confirmar.getText())) { mostrarError("Las nuevas contraseñas no coinciden."); return; }
         try { authenticationService.changePassword(actual.getText(), nueva.getText()); mostrarInformacion("Contraseña actualizada", "Tu contraseña fue cambiada correctamente."); } catch (Exception e) { mostrarError(e.getMessage() == null ? "No fue posible cambiar la contraseña." : e.getMessage()); }
     }
@@ -114,9 +118,7 @@ public class MainController {
     }
 
     private void mostrarContenidoDialogo(Dialog<ButtonType> dialog, javafx.scene.Node contenido, ButtonType... botones) {
-        DialogPane pane = dialog.getDialogPane();
-        pane.setContent(contenido);
-        pane.getButtonTypes().setAll(botones);
+        DialogPane pane = dialog.getDialogPane(); pane.setContent(contenido); pane.getButtonTypes().setAll(botones);
     }
 
     private VBox crearPanel(double spacing) { VBox panel = new VBox(spacing); panel.setPadding(new Insets(16)); panel.setFillWidth(true); panel.setMaxWidth(Double.MAX_VALUE); panel.getStyleClass().add("standard-dialog-panel"); return panel; }

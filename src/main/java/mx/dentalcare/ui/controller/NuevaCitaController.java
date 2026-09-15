@@ -35,7 +35,6 @@ import java.util.Set;
 
 @Component
 public class NuevaCitaController {
-
     @FXML private ComboBox<Paciente> cmbPaciente;
     @FXML private DatePicker dateFecha;
     @FXML private ComboBox<String> cmbHora;
@@ -219,27 +218,18 @@ public class NuevaCitaController {
             LocalDateTime inicio = LocalDateTime.of(dateFecha.getValue(), hora);
             int duracion = cmbDuracion.getValue();
             LocalDateTime fin = inicio.plusMinutes(duracion);
-
-            Set<Long> idsTratamientos = new HashSet<>();
-            for (TratamientoAplicado aplicado : tratamientosSeleccionados) {
-                if (aplicado.getTratamientoId() != null) idsTratamientos.add(aplicado.getTratamientoId());
-            }
-
             Cita cita;
             if (modoEdicion && citaEditar != null) {
                 cita = citaEditar;
                 cita.setPaciente(cmbPaciente.getValue());
                 cita.setInicio(inicio);
                 cita.setFin(fin);
-                cita.setMotivo(txtMotivo.getText());
-                cita.setNotas(txtNotas.getText());
-                cita.setTratamientos(new ArrayList<>(tratamientosSeleccionados));
             } else {
                 cita = new Cita(cmbPaciente.getValue(), inicio, fin);
-                cita.setMotivo(txtMotivo.getText());
-                cita.setNotas(txtNotas.getText());
-                cita.setTratamientos(new ArrayList<>(tratamientosSeleccionados));
             }
+            cita.setMotivo(txtMotivo.getText());
+            cita.setNotas(txtNotas.getText());
+            cita.setTratamientos(new ArrayList<>(tratamientosSeleccionados));
             citaService.guardar(cita);
             cerrarVentana();
         } catch (Exception e) {
@@ -272,6 +262,10 @@ public class NuevaCitaController {
         lblError.setManaged(false);
     }
 
+    public void prepararNuevaCita(LocalDate fecha, LocalTime hora) {
+        prepararNuevaCita(fecha, hora != null ? hora.format(FORMATO_HORA) : null);
+    }
+
     public void prepararEdicion(Cita cita) {
         modoEdicion = true;
         citaEditar = cita;
@@ -292,5 +286,13 @@ public class NuevaCitaController {
         actualizarTotalTratamientos();
         lblError.setVisible(false);
         lblError.setManaged(false);
+    }
+
+    public void prepararParaEdicion(Cita cita) {
+        prepararEdicion(cita);
+    }
+
+    public void setCitaEditar(Cita cita) {
+        prepararEdicion(cita);
     }
 }

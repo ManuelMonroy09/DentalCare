@@ -120,6 +120,27 @@ public class UserService {
         saveStore(store);
     }
 
+    public synchronized void updateDisplayName(String username, String displayName) {
+        requireAdmin();
+        if (displayName == null || displayName.isBlank()) {
+            throw new IllegalArgumentException("El nombre visible es obligatorio.");
+        }
+
+        UserStore store = loadStore();
+        StoredUser record = findRecord(store, username);
+        if (record == null) {
+            throw new IllegalArgumentException("No se encontró el usuario.");
+        }
+
+        record.displayName = displayName.trim();
+        saveStore(store);
+
+        AuthenticatedUser current = securitySession.requireCurrentUser();
+        if (current.getUsername().equalsIgnoreCase(record.username)) {
+            securitySession.setCurrentUser(new AuthenticatedUser(record.username, record.displayName, record.role));
+        }
+    }
+
     public synchronized void setUserActive(String username, boolean active) {
         requireAdmin();
         UserStore store = loadStore();

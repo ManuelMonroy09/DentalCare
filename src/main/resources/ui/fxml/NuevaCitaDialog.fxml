@@ -24,8 +24,8 @@
     <content>
         <VBox spacing="16" fillWidth="true" styleClass="dialog-standard">
             <padding><Insets top="26" right="30" bottom="24" left="30"/></padding>
-            <VBox spacing="4">
-                <Label text="Nueva cita" styleClass="page-title"/>
+            <VBox spacing="4" styleClass="standard-section">
+                <Label fx:id="lblTitulo" text="Nueva cita" styleClass="page-title"/>
                 <Label text="Programa la atención del paciente y define los detalles de la cita." styleClass="page-subtitle" wrapText="true"/>
             </VBox>
             <VBox spacing="14" styleClass="standard-section">
@@ -87,7 +87,7 @@
                 </HBox>
             </VBox>
             <Label fx:id="lblError" managed="false" visible="false" wrapText="true" maxWidth="Infinity" styleClass="standard-error"/>
-            <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="standard-actions">
+            <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="dialog-actions">
                 <Button fx:id="btnCancelar" text="Cancelar" mnemonicParsing="false" styleClass="secondary-button"/>
                 <Button fx:id="btnGuardar" text="Guardar cita" mnemonicParsing="false" styleClass="primary-button"/>
             </HBox>

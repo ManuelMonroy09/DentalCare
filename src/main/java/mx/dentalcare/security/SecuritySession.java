@@ -8,6 +8,7 @@ import javax.crypto.SecretKey;
 public class SecuritySession {
 
     private SecretKey masterKey;
+    private AuthenticatedUser currentUser;
     private boolean authenticated;
 
     public synchronized void authenticate(SecretKey masterKey) {
@@ -19,6 +20,13 @@ public class SecuritySession {
         this.authenticated = true;
     }
 
+    public synchronized void setCurrentUser(AuthenticatedUser user) {
+        if (!authenticated || masterKey == null) {
+            throw new IllegalStateException("DentalCare no está autenticado.");
+        }
+        this.currentUser = user;
+    }
+
     public synchronized SecretKey requireMasterKey() {
         if (!authenticated || masterKey == null) {
             throw new IllegalStateException("DentalCare no está autenticado.");
@@ -27,12 +35,24 @@ public class SecuritySession {
         return masterKey;
     }
 
+    public synchronized AuthenticatedUser requireCurrentUser() {
+        if (!authenticated || masterKey == null || currentUser == null) {
+            throw new IllegalStateException("No hay un usuario autenticado.");
+        }
+        return currentUser;
+    }
+
+    public synchronized AuthenticatedUser getCurrentUser() {
+        return currentUser;
+    }
+
     public synchronized boolean isAuthenticated() {
-        return authenticated && masterKey != null;
+        return authenticated && masterKey != null && currentUser != null;
     }
 
     public synchronized void clear() {
         masterKey = null;
+        currentUser = null;
         authenticated = false;
     }
 }

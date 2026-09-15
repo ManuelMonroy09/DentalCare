@@ -7,13 +7,16 @@ public class AuthenticationService {
 
     private final MasterKeyService masterKeyService;
     private final LegacyDataMigrationService migrationService;
+    private final UserService userService;
 
     public AuthenticationService(
             MasterKeyService masterKeyService,
-            LegacyDataMigrationService migrationService
+            LegacyDataMigrationService migrationService,
+            UserService userService
     ) {
         this.masterKeyService = masterKeyService;
         this.migrationService = migrationService;
+        this.userService = userService;
     }
 
     public boolean isConfigured() {
@@ -31,21 +34,25 @@ public class AuthenticationService {
 
         try {
             migrationService.migrateIfNecessary(legacyPassword);
+            userService.initializeAdmin(password);
         } catch (RuntimeException e) {
             masterKeyService.clearConfiguration();
             throw e;
         }
     }
 
-    public void login(String password) {
+    public AuthenticatedUser login(String username, String password) {
         validatePassword(password);
-        masterKeyService.unlock(password);
+        return userService.authenticate(username, password);
     }
 
     public void logout() {
-        // La sesión se limpia desde MasterKeyService mediante unlock failure o
-        // desde el controlador al cerrar la aplicación. Se mantiene aquí como
-        // punto único para la API de autenticación.
+        masterKeyService.clearConfigurationSessionOnly();
+    }
+
+    public void changePassword(String currentPassword, String newPassword) {
+        validatePassword(newPassword);
+        userService.changeCurrentUserPassword(currentPassword, newPassword);
     }
 
     private void validatePassword(String password) {

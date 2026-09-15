@@ -7,7 +7,6 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Priority?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox xmlns="http://javafx.com/javafx/21"
@@ -65,7 +64,7 @@
                wrapText="true"
                maxWidth="Infinity"
                styleClass="standard-error"/>
-        <HBox spacing="10" alignment="CENTER_RIGHT" fillWidth="true" styleClass="dialog-actions">
+        <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="dialog-actions">
             <Button fx:id="cancelarButton" text="Cancelar" mnemonicParsing="false" styleClass="secondary-button"/>
             <Button fx:id="guardarButton" text="Guardar" mnemonicParsing="false" styleClass="primary-button"/>
         </HBox>

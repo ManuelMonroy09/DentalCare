@@ -21,6 +21,9 @@ public class SetupController {
     @FXML private PasswordField txtConfirmPassword;
     @FXML private Label lblError;
 
+    private double mouseOffsetX;
+    private double mouseOffsetY;
+
     private final AuthenticationService authenticationService;
     private final ApplicationContext context;
 
@@ -34,6 +37,20 @@ public class SetupController {
         boolean migrationRequired = authenticationService.requiresLegacyMigration();
         legacySection.setManaged(migrationRequired);
         legacySection.setVisible(migrationRequired);
+    }
+
+    @FXML
+    private void iniciarMovimientoVentana(javafx.scene.input.MouseEvent event) {
+        Stage stage = (Stage) txtPassword.getScene().getWindow();
+        mouseOffsetX = event.getScreenX() - stage.getX();
+        mouseOffsetY = event.getScreenY() - stage.getY();
+    }
+
+    @FXML
+    private void moverVentana(javafx.scene.input.MouseEvent event) {
+        Stage stage = (Stage) txtPassword.getScene().getWindow();
+        stage.setX(event.getScreenX() - mouseOffsetX);
+        stage.setY(event.getScreenY() - mouseOffsetY);
     }
 
     @FXML

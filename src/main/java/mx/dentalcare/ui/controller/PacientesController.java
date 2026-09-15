@@ -161,9 +161,9 @@ public class PacientesController {
             Stage stage = new Stage();
             stage.setTitle("Nuevo Paciente");
             stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setScene(new Scene(root, 650, 500));
-            stage.setMinWidth(550);
-            stage.setMinHeight(450);
+            stage.setScene(new Scene(root, 700, 620));
+            stage.setMinWidth(600);
+            stage.setMinHeight(540);
             stage.showAndWait();
             cargarPacientes();
         } catch (Exception e) { e.printStackTrace(); }
@@ -181,9 +181,9 @@ public class PacientesController {
             Stage stage = new Stage();
             stage.setTitle("Editar Paciente");
             stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setScene(new Scene(root, 650, 500));
-            stage.setMinWidth(550);
-            stage.setMinHeight(450);
+            stage.setScene(new Scene(root, 700, 620));
+            stage.setMinWidth(600);
+            stage.setMinHeight(540);
             stage.showAndWait();
             cargarPacientes();
         } catch (Exception e) { e.printStackTrace(); }
@@ -221,20 +221,19 @@ public class PacientesController {
         if (pacienteSeleccionado == null) return;
         Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
         confirmacion.setTitle("Eliminar paciente");
-        confirmacion.setHeaderText("¿Deseas eliminar este paciente?");
-        confirmacion.setContentText("ID: " + pacienteSeleccionado.getId() + "\nNombre: " + pacienteSeleccionado.getNombre() + " " + pacienteSeleccionado.getApellidoPaterno());
+        confirmacion.setHeaderText("¿Eliminar paciente?");
+        confirmacion.setContentText("El paciente dejará de aparecer en el listado. Esta acción no elimina físicamente sus datos.");
         Optional<ButtonType> resultado = confirmacion.showAndWait();
-        if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
-            try {
-                pacienteService.eliminar(pacienteSeleccionado.getId());
-                cargarPacientes();
-            } catch (IllegalArgumentException | IllegalStateException ex) {
-                Alert error = new Alert(Alert.AlertType.WARNING);
-                error.setTitle("No se puede eliminar");
-                error.setHeaderText("El paciente conserva información relacionada");
-                error.setContentText(ex.getMessage());
-                error.showAndWait();
-            }
+        if (resultado.isEmpty() || resultado.get() != ButtonType.OK) return;
+        try {
+            pacienteService.eliminar(pacienteSeleccionado.getId());
+            cargarPacientes();
+        } catch (Exception e) {
+            Alert error = new Alert(Alert.AlertType.ERROR);
+            error.setTitle("Error");
+            error.setHeaderText("No fue posible eliminar el paciente");
+            error.setContentText(e.getMessage());
+            error.showAndWait();
         }
     }
 }

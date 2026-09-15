@@ -10,13 +10,8 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mx.dentalcare.ui.controller.HistorialController" spacing="16" styleClass="dialog-page">
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mx.dentalcare.ui.controller.HistorialController" spacing="16" styleClass="dialog-page" stylesheets="@../css/dentalcare.css,@../css/ui-standard.css,@../css/dentalcare-overrides.css">
     <padding><Insets top="24" right="28" bottom="24" left="28"/></padding>
-    <stylesheets>
-        <String fx:value="@../css/dentalcare.css"/>
-        <String fx:value="@../css/ui-standard.css"/>
-        <String fx:value="@../css/dentalcare-overrides.css"/>
-    </stylesheets>
     <VBox spacing="16" VBox.vgrow="ALWAYS" styleClass="standard-section">
         <VBox spacing="4">
             <Label text="Historial clínico" styleClass="page-title"/>

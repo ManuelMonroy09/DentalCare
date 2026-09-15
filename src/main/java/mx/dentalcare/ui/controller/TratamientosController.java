@@ -122,9 +122,9 @@ public class TratamientosController {
             Stage stage = new Stage();
             stage.setTitle("Nuevo tratamiento");
             stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setScene(new Scene(root, 620, 450));
+            stage.setScene(new Scene(root, 620, 430));
             stage.setMinWidth(620);
-            stage.setMinHeight(450);
+            stage.setMinHeight(430);
             stage.setResizable(false);
             stage.showAndWait();
             cargarTratamientos();
@@ -145,9 +145,9 @@ public class TratamientosController {
             Stage stage = new Stage();
             stage.setTitle("Editar tratamiento");
             stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setScene(new Scene(root, 620, 450));
+            stage.setScene(new Scene(root, 620, 430));
             stage.setMinWidth(620);
-            stage.setMinHeight(450);
+            stage.setMinHeight(430);
             stage.setResizable(false);
             stage.showAndWait();
             cargarTratamientos();

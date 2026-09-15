@@ -113,24 +113,67 @@ public class MainController {
         DialogPane pane = dialog.getDialogPane(); pane.setMinWidth(480); pane.setPrefWidth(560); pane.setMaxWidth(760); pane.setMinHeight(Region.USE_COMPUTED_SIZE); pane.setPrefHeight(Region.USE_COMPUTED_SIZE); return dialog;
     }
 
-    private void mostrarContenidoDialogo(Dialog<ButtonType> dialog, javafx.scene.Node contenido, ButtonType... botones) { DialogPane pane = dialog.getDialogPane(); pane.setContent(contenido); pane.getButtonTypes().setAll(botones); }
+    private void mostrarContenidoDialogo(Dialog<ButtonType> dialog, javafx.scene.Node contenido, ButtonType... botones) {
+        DialogPane pane = dialog.getDialogPane();
+        pane.setContent(contenido);
+        pane.getButtonTypes().setAll(botones);
+    }
+
     private VBox crearPanel(double spacing) { VBox panel = new VBox(spacing); panel.setPadding(new Insets(16)); panel.setFillWidth(true); panel.setMaxWidth(Double.MAX_VALUE); panel.getStyleClass().add("standard-dialog-panel"); return panel; }
     private Label crearTexto(String texto) { Label label = new Label(texto); label.setWrapText(true); label.setMaxWidth(Double.MAX_VALUE); label.setMinHeight(Region.USE_PREF_SIZE); return label; }
 
     private void estilizarBotonesDialogo(DialogPane pane) {
-        for (ButtonType tipo : pane.getButtonTypes()) {
-            Button button = (Button) pane.lookupButton(tipo);
-            if (button != null) {
-                button.setMinWidth(Region.USE_PREF_SIZE);
-                button.setPrefWidth(Region.USE_COMPUTED_SIZE);
-                button.setMaxWidth(Double.MAX_VALUE);
-                button.setMinHeight(38);
-                button.setPrefHeight(38);
-                button.setPadding(new Insets(8, 20, 8, 20));
-                button.setWrapText(false);
+        pane.applyCss();
+        javafx.scene.Node buttonBarNode = pane.lookup(".button-bar");
+        if (buttonBarNode instanceof ButtonBar bar) {
+            javafx.scene.Node contenido = pane.getContent();
+            VBox contenidoActual = new VBox(0);
+            contenidoActual.setFillWidth(true);
+            contenidoActual.setMaxWidth(Double.MAX_VALUE);
+            contenidoActual.getStyleClass().add("dialog-content-with-buttons");
+            if (contenido != null) {
+                VBox.setVgrow(contenido, Priority.ALWAYS);
+                contenidoActual.getChildren().add(contenido);
             }
+            pane.setContent(contenidoActual);
+
+            HBox botonesPanel = new HBox(10);
+            botonesPanel.setAlignment(Pos.CENTER_RIGHT);
+            botonesPanel.setFillHeight(true);
+            botonesPanel.setMaxWidth(Double.MAX_VALUE);
+            botonesPanel.setPadding(new Insets(14, 16, 16, 16));
+            botonesPanel.setStyle("-fx-border-color: #e5e7eb; -fx-border-width: 1px 0 0 0; -fx-background-color: #ffffff;");
+
+            for (ButtonType tipo : pane.getButtonTypes()) {
+                Button nativeButton = (Button) pane.lookupButton(tipo);
+                if (nativeButton == null) continue;
+                Button visualButton = new Button(nativeButton.getText());
+                visualButton.setMinHeight(38);
+                visualButton.setPrefHeight(38);
+                visualButton.setMinWidth(Region.USE_COMPUTED_SIZE);
+                visualButton.setPrefWidth(Region.USE_COMPUTED_SIZE);
+                visualButton.setMaxWidth(Region.USE_COMPUTED_SIZE);
+                visualButton.setPadding(new Insets(8, 18, 8, 18));
+                visualButton.setWrapText(false);
+                visualButton.setMnemonicParsing(false);
+                visualButton.setStyle("-fx-font-weight: bold; -fx-background-radius: 8px; -fx-border-radius: 8px;");
+                visualButton.setOnAction(event -> nativeButton.fire());
+                botonesPanel.getChildren().add(visualButton);
+                bar.getButtons().remove(nativeButton);
+                nativeButton.setVisible(false);
+                nativeButton.setManaged(false);
+            }
+
+            contenidoActual.getChildren().add(botonesPanel);
+            bar.setVisible(false);
+            bar.setManaged(false);
+            bar.setMaxHeight(0);
+            bar.setPrefHeight(0);
+            bar.setMinHeight(0);
         }
-        pane.lookupAll(".button-bar").forEach(node -> { if (node instanceof ButtonBar bar) { bar.setButtonMinWidth(Region.USE_PREF_SIZE); bar.setPrefWidth(Region.USE_COMPUTED_SIZE); } });
+        pane.setMinWidth(520);
+        pane.setPrefWidth(620);
+        pane.setMaxWidth(820);
     }
 
     private String nombrePermiso(UserPermission permission) { return switch (permission) { case VER_INICIO -> "Inicio"; case VER_PACIENTES -> "Pacientes"; case GESTIONAR_CITAS -> "Agenda y citas"; case VER_TRATAMIENTOS -> "Tratamientos"; case VER_HISTORIAL -> "Historial"; case VER_FINANZAS -> "Finanzas"; case VER_CONFIGURACION -> "Configuración"; case GESTIONAR_USUARIOS -> "Gestión de usuarios"; case VER_ROLES -> "Roles y permisos"; case VER_AUDITORIA -> "Auditoría"; }; }

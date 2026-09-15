@@ -225,7 +225,13 @@ public class FinanzasController {
         ButtonType imprimir = new ButtonType("Ver recibo");
         ButtonType despues = new ButtonType("Ahora no", ButtonBar.ButtonData.CANCEL_CLOSE);
         alert.getButtonTypes().setAll(imprimir, despues);
-        configurarDialogo(alert, 460, 200);
+        configurarDialogo(alert, 520, 220);
+        Label contenido = (Label) alert.getDialogPane().lookup(".content.label");
+        if (contenido != null) {
+            contenido.setWrapText(true);
+            contenido.setMaxWidth(450);
+            contenido.setMinHeight(Label.USE_PREF_SIZE);
+        }
         if (alert.showAndWait().orElse(despues) == imprimir) mostrarVistaPrevia(pago, cargo);
     }
 

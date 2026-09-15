@@ -18,7 +18,7 @@
     <content>
         <VBox spacing="16" fillWidth="true" styleClass="dialog-standard">
             <padding><Insets top="26" right="30" bottom="24" left="30"/></padding>
-            <VBox spacing="4">
+            <VBox spacing="4" styleClass="standard-section">
                 <Label text="Detalle de cita" styleClass="page-title"/>
                 <Label text="Consulta la información de la cita seleccionada." styleClass="page-subtitle" wrapText="true"/>
             </VBox>
@@ -72,7 +72,7 @@
                     <Label fx:id="lblNotas" text="-" wrapText="true" maxWidth="Infinity" styleClass="standard-muted"/>
                 </VBox>
             </VBox>
-            <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="standard-actions">
+            <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="dialog-actions">
                 <Button fx:id="btnCerrar" text="Cerrar" mnemonicParsing="false" styleClass="secondary-button"/>
                 <Button fx:id="btnEditar" text="Editar cita" mnemonicParsing="false" styleClass="primary-button"/>
             </HBox>

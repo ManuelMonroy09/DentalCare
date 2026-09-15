@@ -10,7 +10,6 @@ import mx.dentalcare.domain.cita.Cita;
 import mx.dentalcare.domain.cita.EstadoCita;
 import mx.dentalcare.domain.configuracion.ConfiguracionConsultorio;
 import mx.dentalcare.domain.financiero.Cargo;
-import mx.dentalcare.domain.financiero.EstadoCargo;
 import mx.dentalcare.domain.financiero.MetodoPago;
 import mx.dentalcare.domain.financiero.Pago;
 import mx.dentalcare.domain.paciente.Paciente;
@@ -283,19 +282,17 @@ public class FinanzasController {
         agregarTexto(ticket, "Paciente: " + nombre, "-fx-font-size: 11px;");
         agregarTexto(ticket, "Concepto: " + valor(cargo.getConcepto()), "-fx-font-size: 11px;");
         agregarTexto(ticket, "Método: " + (pago.getMetodoPago() == null ? "" : pago.getMetodoPago().getDescripcion()), "-fx-font-size: 11px;");
-        agregarTexto(ticket, "--------------------------------", "-fx-font-size: 10px;");
-        agregarTexto(ticket, "Cargo total:  " + moneda(cargo.getImporte()), "-fx-font-size: 11px;");
-        agregarTexto(ticket, "Pago recibido: " + moneda(pago.getMonto()), "-fx-font-size: 13px; -fx-font-weight: bold;");
+        agregarTexto(ticket, "Importe pagado: " + moneda(pago.getMonto()), "-fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 8px 0 0 0;");
         agregarTexto(ticket, "Saldo pendiente: " + moneda(pendiente), "-fx-font-size: 11px;");
-        if (!vacio(configuracion.getPieRecibo())) agregarTexto(ticket, configuracion.getPieRecibo(), "-fx-font-size: 11px; -fx-padding: 10px 0 0 0;");
+        agregarTexto(ticket, "Gracias por su visita.", "-fx-font-size: 11px; -fx-padding: 10px 0 0 0; -fx-alignment: center;");
         return ticket;
     }
 
     private void imprimirTicket(VBox ticket) {
-        ticket.applyCss(); ticket.autosize(); ticket.layout();
         PrinterJob job = PrinterJob.createPrinterJob();
-        if (job == null) { mostrarError("Impresión", "No hay una impresora disponible en el sistema."); return; }
-        if (!job.showPrintDialog(cargosTable.getScene().getWindow())) return;
+        if (job == null) { mostrarError("Impresión", "No hay una impresora disponible."); return; }
+        boolean preparado = job.showPrintDialog(ticket.getScene() == null ? null : ticket.getScene().getWindow());
+        if (!preparado) return;
         boolean impreso = job.printPage(ticket);
         if (impreso) job.endJob(); else mostrarError("Impresión", "No fue posible enviar el recibo a la impresora.");
     }
@@ -335,11 +332,12 @@ public class FinanzasController {
     private void cargarDatos() {
         var cargos = finanzasService.obtenerCargos();
         cargosTable.setItems(FXCollections.observableArrayList(cargos));
-        BigDecimal ingresos = finanzasService.obtenerIngresosDelDia();
+        LocalDate hoy = LocalDate.now();
+        BigDecimal ingresos = finanzasService.obtenerIngresos(hoy, hoy);
         BigDecimal pendiente = cargos.stream()
                 .map(cargo -> finanzasService.obtenerSaldoPendiente(cargo.getId()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        long cobrosHoy = finanzasService.obtenerPagosDelDia().size();
+        int cobrosHoy = finanzasService.obtenerCantidadPagos(hoy, hoy);
         ingresosLabel.setText(moneda(ingresos));
         pendienteLabel.setText(moneda(pendiente));
         cobrosHoyLabel.setText(String.valueOf(cobrosHoy));

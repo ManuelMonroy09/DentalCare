@@ -7,7 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import mx.dentalcare.model.Tratamiento;
+import mx.dentalcare.domain.tratamiento.Tratamiento;
 import mx.dentalcare.service.TratamientoService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -160,7 +160,11 @@ public class TratamientosController {
         Tratamiento tratamientoSeleccionado = tratamientosTable.getSelectionModel().getSelectedItem();
         if (tratamientoSeleccionado == null) return;
         try {
-            tratamientoService.cambiarEstado(tratamientoSeleccionado);
+            if (tratamientoSeleccionado.isActivo()) {
+                tratamientoService.desactivar(tratamientoSeleccionado.getId());
+            } else {
+                tratamientoService.activar(tratamientoSeleccionado.getId());
+            }
             cargarTratamientos();
         } catch (Exception e) {
             e.printStackTrace();

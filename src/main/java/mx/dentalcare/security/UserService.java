@@ -127,8 +127,8 @@ public class UserService {
         if (record == null) {
             throw new IllegalArgumentException("No se encontró el usuario.");
         }
-        if (record.role == UserRole.ADMINISTRADOR && !active) {
-            throw new IllegalArgumentException("El administrador principal no puede desactivarse.");
+        if (record.username.equalsIgnoreCase(securitySession.requireCurrentUser().getUsername()) && !active) {
+            throw new IllegalArgumentException("No puedes desactivar el usuario con el que has iniciado sesión.");
         }
         record.active = active;
         saveStore(store);

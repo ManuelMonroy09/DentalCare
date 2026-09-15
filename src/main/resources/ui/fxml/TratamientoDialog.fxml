@@ -17,53 +17,53 @@
       fillWidth="true"
       styleClass="standard-page,dialog-standard">
     <padding>
-        <Insets top="14" right="16" bottom="14" left="16"/>
+        <Insets top="12" right="14" bottom="12" left="14"/>
     </padding>
 
-    <VBox spacing="2" fillWidth="true" styleClass="standard-section">
+    <VBox spacing="1" fillWidth="true" styleClass="standard-section">
         <padding>
-            <Insets top="12" right="14" bottom="12" left="14"/>
+            <Insets top="9" right="12" bottom="9" left="12"/>
         </padding>
         <Label fx:id="tituloLabel" text="Nuevo tratamiento" styleClass="page-title"/>
         <Label text="Configura los datos principales del tratamiento." styleClass="page-subtitle" wrapText="true"/>
     </VBox>
 
-    <VBox spacing="9" fillWidth="true" styleClass="standard-section">
+    <VBox spacing="7" fillWidth="true" styleClass="standard-section">
         <padding>
-            <Insets top="12" right="14" bottom="12" left="14"/>
+            <Insets top="9" right="12" bottom="9" left="12"/>
         </padding>
 
-        <VBox spacing="4" fillWidth="true">
+        <VBox spacing="3" fillWidth="true">
             <Label text="Nombre" styleClass="standard-form-label"/>
             <TextField fx:id="nombreField" promptText="Ej. Limpieza dental" maxWidth="Infinity" styleClass="form-control"/>
         </VBox>
 
-        <VBox spacing="4" fillWidth="true">
+        <VBox spacing="3" fillWidth="true">
             <Label text="Descripción" styleClass="standard-form-label"/>
             <TextArea fx:id="descripcionArea"
                       promptText="Describe brevemente el tratamiento..."
                       prefRowCount="2"
-                      minHeight="60"
-                      prefHeight="60"
-                      maxHeight="70"
+                      minHeight="56"
+                      prefHeight="56"
+                      maxHeight="64"
                       wrapText="true"
                       maxWidth="Infinity"
                       styleClass="form-textarea"/>
         </VBox>
 
-        <HBox spacing="12" fillHeight="true">
-            <VBox spacing="4" HBox.hgrow="ALWAYS">
+        <HBox spacing="10">
+            <VBox spacing="3" HBox.hgrow="ALWAYS">
                 <Label text="Precio" styleClass="standard-form-label"/>
                 <TextField fx:id="precioField" promptText="0.00" maxWidth="Infinity" styleClass="form-control"/>
             </VBox>
-            <VBox spacing="4" HBox.hgrow="ALWAYS">
+            <VBox spacing="3" HBox.hgrow="ALWAYS">
                 <Label text="Duración (minutos)" styleClass="standard-form-label"/>
                 <Spinner fx:id="duracionSpinner" editable="true" maxWidth="Infinity" styleClass="form-spinner"/>
             </VBox>
         </HBox>
     </VBox>
 
-    <VBox spacing="6" fillWidth="true" VBox.vgrow="NEVER">
+    <VBox spacing="4" fillWidth="true">
         <Label fx:id="lblError"
                text=""
                managed="false"
@@ -71,7 +71,7 @@
                wrapText="true"
                maxWidth="Infinity"
                styleClass="standard-error"/>
-        <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="dialog-actions">
+        <HBox spacing="8" alignment="CENTER_RIGHT" styleClass="dialog-actions">
             <Button fx:id="cancelarButton" text="Cancelar" mnemonicParsing="false" styleClass="secondary-button"/>
             <Button fx:id="guardarButton" text="Guardar" mnemonicParsing="false" styleClass="primary-button"/>
         </HBox>

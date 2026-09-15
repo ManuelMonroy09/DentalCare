@@ -93,7 +93,7 @@ public class MainController {
     }
 
     private void editarNombreUsuario(UserService.StoredUser selected, TableView<UserService.StoredUser> table) {
-        Dialog<ButtonType> dialog = crearDialogoEstandar("Editar usuario", "Editar nombre visible"); TextField nombre = new TextField(selected.displayName); nombre.getStyleClass().add("users-field"); nombre.setMaxWidth(Double.MAX_VALUE); Label usuario = crearTexto("Usuario: " + selected.username); Label nota = crearTexto("El usuario no puede modificarse."); VBox content = crearPanel(8); content.getChildren().addAll(usuario, new Label("Nombre visible"), nombre, nota);
+        Dialog<ButtonType> dialog = crearDialogoEstandar("Editar usuario", "Editar nombre visible"); TextField nombre = new TextField(selected.displayName); nombre.getStyleClass().add("users-field"); nombre.setMaxWidth(Double.MAX_VALUE); Label usuario = crearTexto("Usuario: " + selected.username); Label nota = crearTexto("El nombre de usuario es fijo. Aquí puedes actualizar únicamente el nombre visible."); VBox content = crearPanel(8); content.getChildren().addAll(usuario, new Label("Nombre visible"), nombre, nota);
         mostrarContenidoDialogo(dialog, content, ButtonType.OK, ButtonType.CANCEL); Button guardar = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK); if (guardar != null) guardar.setText("Guardar"); Button cancelar = (Button) dialog.getDialogPane().lookupButton(ButtonType.CANCEL); if (cancelar != null) cancelar.setText("Cancelar"); estilizarBotonesDialogo(dialog.getDialogPane());
         Optional<ButtonType> result = dialog.showAndWait(); if (result.isEmpty() || result.get() != ButtonType.OK) return; try { userService.updateDisplayName(selected.username, nombre.getText()); table.getItems().setAll(userService.listUsers()); configurarUsuario(); mostrarInformacion("Usuario actualizado", "El nombre visible fue actualizado correctamente."); } catch (Exception e) { mostrarError(e.getMessage() == null ? "No fue posible actualizar el usuario." : e.getMessage()); }
     }
@@ -149,10 +149,10 @@ public class MainController {
                 String texto = nativeButton.getText();
                 Button visualButton = new Button(texto);
                 double ancho = switch (texto) {
-                    case "Crear usuario" -> 140;
-                    case "Cancelar", "Guardar" -> 110;
-                    case "Cerrar" -> 90;
-                    default -> Math.max(100, texto.length() * 9.0 + 40);
+                    case "Crear usuario" -> 190;
+                    case "Cancelar", "Guardar" -> 145;
+                    case "Cerrar" -> 110;
+                    default -> Math.max(120, texto.length() * 10.0 + 50);
                 };
                 visualButton.setMinWidth(ancho);
                 visualButton.setPrefWidth(ancho);
@@ -163,6 +163,7 @@ public class MainController {
                 visualButton.setPadding(new Insets(8, 18, 8, 18));
                 visualButton.setWrapText(false);
                 visualButton.setMnemonicParsing(false);
+                visualButton.setTextOverrun(OverrunStyle.ELLIPSIS);
                 visualButton.setStyle("-fx-font-weight: bold; -fx-background-radius: 8px; -fx-border-radius: 8px;");
                 visualButton.setOnAction(event -> nativeButton.fire());
                 botonesPanel.getChildren().add(visualButton);
@@ -178,9 +179,9 @@ public class MainController {
             bar.setPrefHeight(0);
             bar.setMinHeight(0);
         }
-        pane.setMinWidth(520);
-        pane.setPrefWidth(620);
-        pane.setMaxWidth(820);
+        pane.setMinWidth(560);
+        pane.setPrefWidth(680);
+        pane.setMaxWidth(860);
     }
 
     private String nombrePermiso(UserPermission permission) { return switch (permission) { case VER_INICIO -> "Inicio"; case VER_PACIENTES -> "Pacientes"; case GESTIONAR_CITAS -> "Agenda y citas"; case VER_TRATAMIENTOS -> "Tratamientos"; case VER_HISTORIAL -> "Historial"; case VER_FINANZAS -> "Finanzas"; case VER_CONFIGURACION -> "Configuración"; case GESTIONAR_USUARIOS -> "Gestión de usuarios"; case VER_ROLES -> "Roles y permisos"; case VER_AUDITORIA -> "Auditoría"; }; }

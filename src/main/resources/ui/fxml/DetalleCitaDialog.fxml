@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <ScrollPane xmlns="http://javafx.com/javafx/21"
-            xmlns:fx="http://javafx.com/javafx/1"
+            xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="mx.dentalcare.ui.controller.DetalleCitaController"
             stylesheets="@../css/dentalcare.css,@../css/ui-standard.css"
             styleClass="standard-page"
@@ -18,23 +18,19 @@
     <content>
         <VBox spacing="16" fillWidth="true" styleClass="dialog-standard">
             <padding><Insets top="26" right="30" bottom="24" left="30"/></padding>
-
             <VBox spacing="4">
                 <Label text="Detalle de cita" styleClass="page-title"/>
                 <Label text="Consulta la información de la cita seleccionada." styleClass="page-subtitle" wrapText="true"/>
             </VBox>
-
             <VBox spacing="14" styleClass="standard-section">
                 <VBox spacing="2">
                     <Label text="Información de la cita" styleClass="standard-section-title"/>
                     <Label text="Datos generales de la atención programada." styleClass="standard-section-subtitle"/>
                 </VBox>
-
                 <VBox spacing="5">
                     <Label text="Paciente" styleClass="standard-form-label"/>
                     <Label fx:id="lblPaciente" text="-" wrapText="true" styleClass="standard-value"/>
                 </VBox>
-
                 <HBox spacing="24">
                     <VBox spacing="5" HBox.hgrow="ALWAYS">
                         <Label text="Fecha" styleClass="standard-form-label"/>
@@ -49,24 +45,20 @@
                         <Label fx:id="lblDuracion" text="-" wrapText="true" styleClass="standard-value"/>
                     </VBox>
                 </HBox>
-
                 <VBox spacing="5">
                     <Label text="Estado" styleClass="standard-form-label"/>
                     <Label fx:id="lblEstado" text="-" wrapText="true" styleClass="standard-value"/>
                 </VBox>
             </VBox>
-
             <VBox spacing="14" styleClass="standard-section">
                 <VBox spacing="2">
                     <Label text="Detalles de la atención" styleClass="standard-section-title"/>
                     <Label text="Motivo, tratamientos y notas asociadas a la cita." styleClass="standard-section-subtitle"/>
                 </VBox>
-
                 <VBox spacing="5">
                     <Label text="Motivo de consulta" styleClass="standard-form-label"/>
                     <Label fx:id="lblMotivo" text="-" wrapText="true" maxWidth="Infinity" styleClass="standard-value"/>
                 </VBox>
-
                 <VBox spacing="5">
                     <Label text="Tratamientos" styleClass="standard-form-label"/>
                     <Label fx:id="lblTratamientos" text="-" wrapText="true" maxWidth="Infinity" styleClass="standard-value"/>
@@ -75,13 +67,11 @@
                         <Label fx:id="lblTotalTratamientos" text="0.00" styleClass="standard-total"/>
                     </HBox>
                 </VBox>
-
                 <VBox spacing="5">
                     <Label text="Notas" styleClass="standard-form-label"/>
                     <Label fx:id="lblNotas" text="-" wrapText="true" maxWidth="Infinity" styleClass="standard-muted"/>
                 </VBox>
             </VBox>
-
             <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="standard-actions">
                 <Button fx:id="btnCerrar" text="Cerrar" mnemonicParsing="false" styleClass="secondary-button"/>
                 <Button fx:id="btnEditar" text="Editar cita" mnemonicParsing="false" styleClass="primary-button"/>

@@ -11,6 +11,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -111,6 +112,8 @@ public class MainController {
         pane.setContent(content);
         pane.setPrefWidth(520); pane.setMinWidth(520); pane.setPrefHeight(260);
         pane.getButtonTypes().add(ButtonType.OK);
+        Button cerrar = (Button) pane.lookupButton(ButtonType.OK);
+        if (cerrar != null) cerrar.setText("Cerrar");
         estilizarBotonesDialogo(pane);
         dialog.showAndWait();
     }
@@ -127,7 +130,10 @@ public class MainController {
         grid.add(new Label("Nueva:"), 0, 1); grid.add(nueva, 1, 1);
         grid.add(new Label("Confirmar:"), 0, 2); grid.add(confirmar, 1, 2);
         DialogPane pane = dialog.getDialogPane(); pane.setContent(grid); pane.setPrefWidth(560); pane.setMinWidth(560); pane.setPrefHeight(330);
-        pane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL); estilizarBotonesDialogo(pane);
+        pane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        Button guardar = (Button) pane.lookupButton(ButtonType.OK); if (guardar != null) guardar.setText("Guardar");
+        Button cancelar = (Button) pane.lookupButton(ButtonType.CANCEL); if (cancelar != null) cancelar.setText("Cancelar");
+        estilizarBotonesDialogo(pane);
         Optional<ButtonType> result = dialog.showAndWait();
         if (result.isEmpty() || result.get() != ButtonType.OK) return;
         if (!nueva.getText().equals(confirmar.getText())) { mostrarError("Las nuevas contraseñas no coinciden."); return; }
@@ -206,7 +212,8 @@ public class MainController {
         // Altura suficiente para contener todos los controles y botones sin recortes.
         pane.setPrefHeight(330); pane.setMinHeight(330);
         pane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-        Button ok = (Button) pane.lookupButton(ButtonType.OK); if (ok != null) ok.setText("Guardar cambios");
+        Button ok = (Button) pane.lookupButton(ButtonType.OK); if (ok != null) ok.setText("Guardar");
+        Button cancel = (Button) pane.lookupButton(ButtonType.CANCEL); if (cancel != null) cancel.setText("Cancelar");
         estilizarBotonesDialogo(pane);
         Optional<ButtonType> result = dialog.showAndWait(); if (result.isEmpty() || result.get() != ButtonType.OK) return;
         try { userService.updateDisplayName(selected.username, nombre.getText()); table.getItems().setAll(userService.listUsers()); configurarUsuario(); mostrarInformacion("Usuario actualizado", "El nombre visible fue actualizado correctamente."); }
@@ -218,6 +225,7 @@ public class MainController {
         Label label = new Label(mensaje); label.setWrapText(true); label.setMaxWidth(440); label.setStyle("-fx-font-size: 14px; -fx-text-fill: #374151;");
         alert.getDialogPane().setContent(label); alert.getDialogPane().setPrefWidth(520); alert.getDialogPane().setMinWidth(520);
         Button ok = (Button) alert.getDialogPane().lookupButton(ButtonType.OK); if (ok != null) ok.setText("Crear usuario"); Button cancel = (Button) alert.getDialogPane().lookupButton(ButtonType.CANCEL); if (cancel != null) cancel.setText("Cancelar");
+        estilizarBotonesDialogo(alert.getDialogPane());
         Optional<ButtonType> result = alert.showAndWait(); return result.isPresent() && result.get() == ButtonType.OK;
     }
 
@@ -232,10 +240,24 @@ public class MainController {
     private void mostrarDialogoTexto(String titulo, String encabezado, String texto, double ancho, double alto) {
         Dialog<ButtonType> dialog = new Dialog<>(); dialog.setTitle(titulo); if (encabezado != null) dialog.setHeaderText(encabezado);
         Label label = new Label(texto); label.setWrapText(true); label.setMaxWidth(ancho - 70); label.setPadding(new Insets(8));
-        DialogPane pane = dialog.getDialogPane(); pane.setContent(label); pane.setPrefWidth(ancho); pane.setMinWidth(ancho); pane.setPrefHeight(alto); pane.getButtonTypes().add(ButtonType.OK); estilizarBotonesDialogo(pane); dialog.showAndWait();
+        DialogPane pane = dialog.getDialogPane(); pane.setContent(label); pane.setPrefWidth(ancho); pane.setMinWidth(ancho); pane.setPrefHeight(alto); pane.getButtonTypes().add(ButtonType.OK);
+        Button aceptar = (Button) pane.lookupButton(ButtonType.OK); if (aceptar != null) aceptar.setText("Aceptar");
+        estilizarBotonesDialogo(pane); dialog.showAndWait();
     }
 
-    private void estilizarBotonesDialogo(DialogPane pane) { for (ButtonType tipo : pane.getButtonTypes()) { Button button = (Button) pane.lookupButton(tipo); if (button != null) { button.setMinWidth(110); button.setPrefWidth(110); button.setMinHeight(38); } } }
+    private void estilizarBotonesDialogo(DialogPane pane) {
+        for (ButtonType tipo : pane.getButtonTypes()) {
+            Button button = (Button) pane.lookupButton(tipo);
+            if (button != null) {
+                // No fijar un ancho único: JavaFX calcula el espacio necesario para cada texto.
+                button.setMinWidth(Region.USE_PREF_SIZE);
+                button.setPrefWidth(Region.USE_COMPUTED_SIZE);
+                button.setMaxWidth(Region.USE_PREF_SIZE);
+                button.setMinHeight(38);
+                button.setPadding(new Insets(8, 18, 8, 18));
+            }
+        }
+    }
 
     private String nombrePermiso(UserPermission permission) {
         return switch (permission) { case VER_INICIO -> "Inicio"; case VER_PACIENTES -> "Pacientes"; case GESTIONAR_CITAS -> "Agenda y citas"; case VER_TRATAMIENTOS -> "Tratamientos"; case VER_HISTORIAL -> "Historial"; case VER_FINANZAS -> "Finanzas"; case VER_CONFIGURACION -> "Configuración"; case GESTIONAR_USUARIOS -> "Gestión de usuarios"; case VER_ROLES -> "Roles y permisos"; case VER_AUDITORIA -> "Auditoría"; };
@@ -250,7 +272,9 @@ public class MainController {
 
     private void mostrarInformacion(String titulo, String mensaje) {
         Dialog<ButtonType> dialog = new Dialog<>(); dialog.setTitle(titulo); Label label = new Label(mensaje); label.setWrapText(true); label.setAlignment(Pos.CENTER); label.setTextAlignment(javafx.scene.text.TextAlignment.CENTER); label.setStyle("-fx-font-size: 17px; -fx-font-weight: bold; -fx-text-fill: #1f2937;"); label.setMaxWidth(330); label.setPrefWidth(330); label.setMinHeight(55);
-        VBox content = new VBox(label); content.setAlignment(Pos.CENTER); content.setPadding(new Insets(18, 24, 12, 24)); DialogPane pane = dialog.getDialogPane(); pane.setContent(content); pane.setPrefWidth(390); pane.setMinWidth(390); pane.setPrefHeight(155); pane.setMinHeight(155); pane.getButtonTypes().add(ButtonType.OK); estilizarBotonesDialogo(pane); dialog.showAndWait();
+        VBox content = new VBox(label); content.setAlignment(Pos.CENTER); content.setPadding(new Insets(18, 24, 12, 24)); DialogPane pane = dialog.getDialogPane(); pane.setContent(content); pane.setPrefWidth(390); pane.setMinWidth(390); pane.setPrefHeight(155); pane.setMinHeight(155); pane.getButtonTypes().add(ButtonType.OK);
+        Button aceptar = (Button) pane.lookupButton(ButtonType.OK); if (aceptar != null) aceptar.setText("Aceptar");
+        estilizarBotonesDialogo(pane); dialog.showAndWait();
     }
 
     private void mostrarError(String mensaje) { mostrarDialogoTexto("DentalCare", null, mensaje, 520, 250); }

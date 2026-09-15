@@ -13,7 +13,7 @@
 <ScrollPane xmlns="http://javafx.com/javafx/21"
         xmlns:fx="http://javafx.com/fxml/1"
         fx:controller="mx.dentalcare.ui.controller.PacienteDialogController"
-        styleClass="standard-page"
+        styleClass="dialog-page"
         fitToWidth="true"
         hbarPolicy="NEVER"
         vbarPolicy="AS_NEEDED">
@@ -22,49 +22,36 @@
         <String fx:value="@../css/ui-standard.css"/>
     </stylesheets>
     <content>
-        <VBox spacing="16" fillWidth="true" styleClass="dialog-standard">
-            <padding><Insets top="26" right="30" bottom="24" left="30"/></padding>
-            <VBox spacing="4">
-                <Label fx:id="tituloLabel" text="Nuevo paciente" styleClass="page-title"/>
-                <Label text="Registra la información básica del paciente." styleClass="page-subtitle" wrapText="true"/>
-            </VBox>
-            <VBox spacing="14" styleClass="standard-section">
-                <VBox spacing="2">
-                    <Label text="Información personal" styleClass="standard-section-title"/>
-                    <Label text="Captura los datos necesarios para identificar y contactar al paciente." styleClass="standard-section-subtitle" wrapText="true"/>
+        <VBox fillWidth="true" spacing="16" styleClass="dialog-shell">
+            <padding><Insets top="24" right="28" bottom="24" left="28"/></padding>
+            <VBox spacing="16" styleClass="standard-section">
+                <VBox spacing="4">
+                    <Label fx:id="tituloLabel" text="Nuevo paciente" styleClass="page-title"/>
+                    <Label text="Registra la información básica del paciente." styleClass="page-subtitle" wrapText="true"/>
                 </VBox>
-                <GridPane hgap="12" vgap="12">
-                    <columnConstraints>
-                        <ColumnConstraints percentWidth="50" hgrow="ALWAYS"/>
-                        <ColumnConstraints percentWidth="50" hgrow="ALWAYS"/>
-                    </columnConstraints>
-                    <VBox spacing="6" GridPane.columnIndex="0">
-                        <Label text="Nombre(s)" styleClass="standard-form-label"/>
-                        <TextField fx:id="nombreField" promptText="Nombre" maxWidth="Infinity"/>
+                <VBox spacing="14">
+                    <VBox spacing="2">
+                        <Label text="Información personal" styleClass="standard-section-title"/>
+                        <Label text="Captura los datos necesarios para identificar y contactar al paciente." styleClass="standard-section-subtitle" wrapText="true"/>
                     </VBox>
-                    <VBox spacing="6" GridPane.columnIndex="1">
-                        <Label text="Apellido paterno" styleClass="standard-form-label"/>
-                        <TextField fx:id="apellidoPaternoField" promptText="Apellido paterno" maxWidth="Infinity"/>
-                    </VBox>
-                    <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="1">
-                        <Label text="Apellido materno" styleClass="standard-form-label"/>
-                        <TextField fx:id="apellidoMaternoField" promptText="Apellido materno" maxWidth="Infinity"/>
-                    </VBox>
-                    <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                        <Label text="Teléfono" styleClass="standard-form-label"/>
-                        <TextField fx:id="telefonoField" promptText="Teléfono" maxWidth="Infinity"/>
-                    </VBox>
-                    <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.columnSpan="2">
-                        <Label text="Correo electrónico" styleClass="standard-form-label"/>
-                        <TextField fx:id="emailField" promptText="correo@ejemplo.com" maxWidth="Infinity"/>
-                    </VBox>
-                </GridPane>
+                    <GridPane hgap="12" vgap="12">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="50" hgrow="ALWAYS"/>
+                            <ColumnConstraints percentWidth="50" hgrow="ALWAYS"/>
+                        </columnConstraints>
+                        <VBox spacing="6" GridPane.columnIndex="0"><Label text="Nombre(s)" styleClass="standard-form-label"/><TextField fx:id="nombreField" promptText="Nombre" maxWidth="Infinity"/></VBox>
+                        <VBox spacing="6" GridPane.columnIndex="1"><Label text="Apellido paterno" styleClass="standard-form-label"/><TextField fx:id="apellidoPaternoField" promptText="Apellido paterno" maxWidth="Infinity"/></VBox>
+                        <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="1"><Label text="Apellido materno" styleClass="standard-form-label"/><TextField fx:id="apellidoMaternoField" promptText="Apellido materno" maxWidth="Infinity"/></VBox>
+                        <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="1"><Label text="Teléfono" styleClass="standard-form-label"/><TextField fx:id="telefonoField" promptText="Teléfono" maxWidth="Infinity"/></VBox>
+                        <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.columnSpan="2"><Label text="Correo electrónico" styleClass="standard-form-label"/><TextField fx:id="emailField" promptText="correo@ejemplo.com" maxWidth="Infinity"/></VBox>
+                    </GridPane>
+                </VBox>
+                <Label fx:id="errorLabel" wrapText="true" maxWidth="Infinity" styleClass="standard-error"/>
+                <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="dialog-actions">
+                    <Button fx:id="cancelarButton" text="Cancelar" mnemonicParsing="false" styleClass="secondary-button"/>
+                    <Button fx:id="guardarButton" text="Guardar" mnemonicParsing="false" styleClass="primary-button"/>
+                </HBox>
             </VBox>
-            <Label fx:id="errorLabel" wrapText="true" maxWidth="Infinity" styleClass="standard-error"/>
-            <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="standard-actions">
-                <Button fx:id="cancelarButton" text="Cancelar" mnemonicParsing="false"/>
-                <Button fx:id="guardarButton" text="Guardar" mnemonicParsing="false"/>
-            </HBox>
         </VBox>
     </content>
 </ScrollPane>

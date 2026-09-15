@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -22,6 +23,7 @@ public class LoginController {
 
     @FXML private StackPane authRoot;
     @FXML private HBox authShell;
+    @FXML private TextField txtUsername;
     @FXML private PasswordField txtPassword;
     @FXML private Label lblError;
 
@@ -61,13 +63,14 @@ public class LoginController {
     @FXML
     private void iniciarSesion() {
         ocultarError();
+        String username = txtUsername.getText();
         String password = txtPassword.getText();
 
         try {
-            authenticationService.login(password);
+            authenticationService.login(username, password);
             mostrarTransicion();
         } catch (SecurityException e) {
-            mostrarError("La contraseña es incorrecta.");
+            mostrarError("El usuario o la contraseña son incorrectos.");
             txtPassword.clear();
             txtPassword.requestFocus();
         } catch (IllegalArgumentException e) {
@@ -84,6 +87,7 @@ public class LoginController {
     }
 
     private void mostrarTransicion() {
+        txtUsername.setDisable(true);
         txtPassword.setDisable(true);
 
         StackPane overlay = new StackPane();
@@ -122,6 +126,7 @@ public class LoginController {
                 abrirAplicacion();
             } catch (Exception e) {
                 authRoot.getChildren().remove(overlay);
+                txtUsername.setDisable(false);
                 txtPassword.setDisable(false);
                 mostrarError("No fue posible abrir DentalCare. Verifica la configuración de seguridad.");
             }

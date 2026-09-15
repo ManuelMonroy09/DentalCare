@@ -10,7 +10,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
@@ -37,44 +36,19 @@ import java.util.Set;
 @Component
 public class NuevaCitaController {
 
-    @FXML
-    private ComboBox<Paciente> cmbPaciente;
-
-    @FXML
-    private DatePicker dateFecha;
-
-    @FXML
-    private ComboBox<String> cmbHora;
-
-    @FXML
-    private ComboBox<Integer> cmbDuracion;
-
-    @FXML
-    private TextArea txtMotivo;
-
-    @FXML
-    private ComboBox<Tratamiento> cmbTratamiento;
-
-    @FXML
-    private Button btnAgregarTratamiento;
-
-    @FXML
-    private ListView<TratamientoAplicado> lstTratamientos;
-
-    @FXML
-    private Label lblTotalTratamientos;
-
-    @FXML
-    private TextArea txtNotas;
-
-    @FXML
-    private Label lblError;
-
-    @FXML
-    private Button btnCancelar;
-
-    @FXML
-    private Button btnGuardar;
+    @FXML private ComboBox<Paciente> cmbPaciente;
+    @FXML private DatePicker dateFecha;
+    @FXML private ComboBox<String> cmbHora;
+    @FXML private ComboBox<Integer> cmbDuracion;
+    @FXML private TextArea txtMotivo;
+    @FXML private ComboBox<Tratamiento> cmbTratamiento;
+    @FXML private Button btnAgregarTratamiento;
+    @FXML private ListView<TratamientoAplicado> lstTratamientos;
+    @FXML private Label lblTotalTratamientos;
+    @FXML private TextArea txtNotas;
+    @FXML private Label lblError;
+    @FXML private Button btnCancelar;
+    @FXML private Button btnGuardar;
 
     private final PacientesService pacientesService;
     private final CitaService citaService;
@@ -84,9 +58,7 @@ public class NuevaCitaController {
     private final ObservableList<TratamientoAplicado> tratamientosSeleccionados = FXCollections.observableArrayList();
     private static final DateTimeFormatter FORMATO_HORA = DateTimeFormatter.ofPattern("HH:mm");
 
-    public NuevaCitaController(PacientesService pacientesService,
-                               CitaService citaService,
-                               TratamientoService tratamientoService) {
+    public NuevaCitaController(PacientesService pacientesService, CitaService citaService, TratamientoService tratamientoService) {
         this.pacientesService = pacientesService;
         this.citaService = citaService;
         this.tratamientoService = tratamientoService;
@@ -100,7 +72,6 @@ public class NuevaCitaController {
         configurarTratamientos();
         configurarListaTratamientos();
         configurarEventos();
-
         dateFecha.setValue(LocalDate.now());
         cmbDuracion.getSelectionModel().select(Integer.valueOf(60));
         actualizarTotalTratamientos();
@@ -108,24 +79,16 @@ public class NuevaCitaController {
 
     private void configurarPacientes() {
         List<Paciente> pacientes = pacientesService.obtenerTodos();
-        pacientes.sort(Comparator.comparing(
-                Paciente::getNombre,
-                Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)
-        ));
-
+        pacientes.sort(Comparator.comparing(Paciente::getNombre, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)));
         cmbPaciente.getItems().setAll(pacientes);
-
         cmbPaciente.setCellFactory(listView -> new ListCell<>() {
-            @Override
-            protected void updateItem(Paciente paciente, boolean empty) {
+            @Override protected void updateItem(Paciente paciente, boolean empty) {
                 super.updateItem(paciente, empty);
                 setText(empty || paciente == null ? null : formatearPaciente(paciente));
             }
         });
-
         cmbPaciente.setButtonCell(new ListCell<>() {
-            @Override
-            protected void updateItem(Paciente paciente, boolean empty) {
+            @Override protected void updateItem(Paciente paciente, boolean empty) {
                 super.updateItem(paciente, empty);
                 setText(empty || paciente == null ? null : formatearPaciente(paciente));
             }
@@ -136,20 +99,15 @@ public class NuevaCitaController {
         String nombre = paciente.getNombre() != null ? paciente.getNombre().trim() : "";
         String apellidoPaterno = paciente.getApellidoPaterno() != null ? paciente.getApellidoPaterno().trim() : "";
         String apellidoMaterno = paciente.getApellidoMaterno() != null ? paciente.getApellidoMaterno().trim() : "";
-
-        return (nombre + " " + apellidoPaterno + " " + apellidoMaterno)
-                .trim()
-                .replaceAll("\\s+", " ");
+        return (nombre + " " + apellidoPaterno + " " + apellidoMaterno).trim().replaceAll("\\s+", " ");
     }
 
     private void configurarHoras() {
         cmbHora.getItems().clear();
-
         for (int hora = 8; hora <= 19; hora++) {
             agregarHora(hora, 0);
             agregarHora(hora, 30);
         }
-
         cmbHora.getSelectionModel().select("08:00");
     }
 
@@ -163,23 +121,16 @@ public class NuevaCitaController {
 
     private void configurarTratamientos() {
         List<Tratamiento> tratamientos = new ArrayList<>(tratamientoService.obtenerActivos());
-        tratamientos.sort(Comparator.comparing(
-                Tratamiento::getNombre,
-                Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)
-        ));
+        tratamientos.sort(Comparator.comparing(Tratamiento::getNombre, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)));
         cmbTratamiento.getItems().setAll(tratamientos);
-
         cmbTratamiento.setCellFactory(listView -> new ListCell<>() {
-            @Override
-            protected void updateItem(Tratamiento tratamiento, boolean empty) {
+            @Override protected void updateItem(Tratamiento tratamiento, boolean empty) {
                 super.updateItem(tratamiento, empty);
                 setText(empty || tratamiento == null ? null : formatearTratamiento(tratamiento));
             }
         });
-
         cmbTratamiento.setButtonCell(new ListCell<>() {
-            @Override
-            protected void updateItem(Tratamiento tratamiento, boolean empty) {
+            @Override protected void updateItem(Tratamiento tratamiento, boolean empty) {
                 super.updateItem(tratamiento, empty);
                 setText(empty || tratamiento == null ? null : formatearTratamiento(tratamiento));
             }
@@ -187,14 +138,8 @@ public class NuevaCitaController {
     }
 
     private String formatearTratamiento(Tratamiento tratamiento) {
-        if (tratamiento == null) {
-            return "";
-        }
-
-        BigDecimal precio = tratamiento.getPrecio() != null
-                ? tratamiento.getPrecio()
-                : BigDecimal.ZERO;
-
+        if (tratamiento == null) return "";
+        BigDecimal precio = tratamiento.getPrecio() != null ? tratamiento.getPrecio() : BigDecimal.ZERO;
         return tratamiento.getNombre() + "  ·  $" + precio.setScale(2).toPlainString();
     }
 
@@ -205,14 +150,12 @@ public class NuevaCitaController {
             private final Label lblPrecio = new Label();
             private final Button btnEliminar = new Button("×");
             private final HBox contenedor = new HBox(10, lblNombre, lblPrecio, btnEliminar);
-
             {
                 HBox.setHgrow(lblNombre, Priority.ALWAYS);
                 btnEliminar.setFocusTraversable(false);
                 btnEliminar.getStyleClass().add("danger-button");
                 contenedor.setMaxWidth(Double.MAX_VALUE);
                 contenedor.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-
                 btnEliminar.setOnAction(event -> {
                     TratamientoAplicado tratamiento = getItem();
                     if (tratamiento != null) {
@@ -221,19 +164,14 @@ public class NuevaCitaController {
                     }
                 });
             }
-
-            @Override
-            protected void updateItem(TratamientoAplicado tratamiento, boolean empty) {
+            @Override protected void updateItem(TratamientoAplicado tratamiento, boolean empty) {
                 super.updateItem(tratamiento, empty);
                 if (empty || tratamiento == null) {
                     setGraphic(null);
                     return;
                 }
-
-                lblNombre.setText(tratamiento.getTratamiento().getNombre());
-                BigDecimal precio = tratamiento.getPrecio() != null
-                        ? tratamiento.getPrecio()
-                        : BigDecimal.ZERO;
+                lblNombre.setText(tratamiento.getNombre());
+                BigDecimal precio = tratamiento.getPrecio() != null ? tratamiento.getPrecio() : BigDecimal.ZERO;
                 lblPrecio.setText("$" + precio.setScale(2).toPlainString());
                 setGraphic(contenedor);
             }
@@ -248,22 +186,14 @@ public class NuevaCitaController {
 
     private void agregarTratamiento() {
         Tratamiento tratamiento = cmbTratamiento.getValue();
-        if (tratamiento == null) {
-            return;
-        }
-
+        if (tratamiento == null) return;
         boolean yaAgregado = tratamientosSeleccionados.stream()
-                .anyMatch(item -> item.getTratamiento() != null
-                        && item.getTratamiento().getId() != null
-                        && item.getTratamiento().getId().equals(tratamiento.getId()));
-
-        if (yaAgregado) {
-            return;
-        }
-
-        TratamientoAplicado aplicado = new TratamientoAplicado();
-        aplicado.setTratamiento(tratamiento);
-        aplicado.setPrecio(tratamiento.getPrecio() != null ? tratamiento.getPrecio() : BigDecimal.ZERO);
+                .anyMatch(item -> item.getTratamientoId() != null && item.getTratamientoId().equals(tratamiento.getId()));
+        if (yaAgregado) return;
+        TratamientoAplicado aplicado = new TratamientoAplicado(
+                tratamiento.getId(), tratamiento.getNombre(),
+                tratamiento.getPrecio() != null ? tratamiento.getPrecio() : BigDecimal.ZERO,
+                tratamiento.getDuracionMinutos());
         tratamientosSeleccionados.add(aplicado);
         cmbTratamiento.getSelectionModel().clearSelection();
         actualizarTotalTratamientos();
@@ -280,27 +210,10 @@ public class NuevaCitaController {
     private void guardarCita() {
         lblError.setVisible(false);
         lblError.setManaged(false);
-
-        if (cmbPaciente.getValue() == null) {
-            mostrarError("Selecciona un paciente.");
-            return;
-        }
-
-        if (dateFecha.getValue() == null) {
-            mostrarError("Selecciona una fecha.");
-            return;
-        }
-
-        if (cmbHora.getValue() == null || cmbHora.getValue().isBlank()) {
-            mostrarError("Selecciona una hora de inicio.");
-            return;
-        }
-
-        if (cmbDuracion.getValue() == null) {
-            mostrarError("Selecciona una duración.");
-            return;
-        }
-
+        if (cmbPaciente.getValue() == null) { mostrarError("Selecciona un paciente."); return; }
+        if (dateFecha.getValue() == null) { mostrarError("Selecciona una fecha."); return; }
+        if (cmbHora.getValue() == null || cmbHora.getValue().isBlank()) { mostrarError("Selecciona una hora de inicio."); return; }
+        if (cmbDuracion.getValue() == null) { mostrarError("Selecciona una duración."); return; }
         try {
             LocalTime hora = LocalTime.parse(cmbHora.getValue(), FORMATO_HORA);
             LocalDateTime inicio = LocalDateTime.of(dateFecha.getValue(), hora);
@@ -309,30 +222,25 @@ public class NuevaCitaController {
 
             Set<Long> idsTratamientos = new HashSet<>();
             for (TratamientoAplicado aplicado : tratamientosSeleccionados) {
-                if (aplicado.getTratamiento() != null && aplicado.getTratamiento().getId() != null) {
-                    idsTratamientos.add(aplicado.getTratamiento().getId());
-                }
+                if (aplicado.getTratamientoId() != null) idsTratamientos.add(aplicado.getTratamientoId());
             }
 
+            Cita cita;
             if (modoEdicion && citaEditar != null) {
-                citaEditar.setPaciente(cmbPaciente.getValue());
-                citaEditar.setFechaHoraInicio(inicio);
-                citaEditar.setFechaHoraFin(fin);
-                citaEditar.setMotivo(txtMotivo.getText());
-                citaEditar.setNotas(txtNotas.getText());
-                citaEditar.setTratamientos(new ArrayList<>(tratamientosSeleccionados));
-                citaService.actualizar(citaEditar);
-            } else {
-                Cita cita = new Cita();
+                cita = citaEditar;
                 cita.setPaciente(cmbPaciente.getValue());
-                cita.setFechaHoraInicio(inicio);
-                cita.setFechaHoraFin(fin);
+                cita.setInicio(inicio);
+                cita.setFin(fin);
                 cita.setMotivo(txtMotivo.getText());
                 cita.setNotas(txtNotas.getText());
                 cita.setTratamientos(new ArrayList<>(tratamientosSeleccionados));
-                citaService.guardar(cita);
+            } else {
+                cita = new Cita(cmbPaciente.getValue(), inicio, fin);
+                cita.setMotivo(txtMotivo.getText());
+                cita.setNotas(txtNotas.getText());
+                cita.setTratamientos(new ArrayList<>(tratamientosSeleccionados));
             }
-
+            citaService.guardar(cita);
             cerrarVentana();
         } catch (Exception e) {
             mostrarError("No fue posible guardar la cita: " + e.getMessage());
@@ -354,9 +262,7 @@ public class NuevaCitaController {
         modoEdicion = false;
         citaEditar = null;
         dateFecha.setValue(fecha != null ? fecha : LocalDate.now());
-        if (hora != null && cmbHora.getItems().contains(hora)) {
-            cmbHora.getSelectionModel().select(hora);
-        }
+        if (hora != null && cmbHora.getItems().contains(hora)) cmbHora.getSelectionModel().select(hora);
         cmbPaciente.getSelectionModel().clearSelection();
         txtMotivo.clear();
         txtNotas.clear();
@@ -369,31 +275,20 @@ public class NuevaCitaController {
     public void prepararEdicion(Cita cita) {
         modoEdicion = true;
         citaEditar = cita;
-
-        if (cita == null) {
-            return;
-        }
-
+        if (cita == null) return;
         cmbPaciente.setValue(cita.getPaciente());
-        if (cita.getFechaHoraInicio() != null) {
-            dateFecha.setValue(cita.getFechaHoraInicio().toLocalDate());
-            String hora = cita.getFechaHoraInicio().format(FORMATO_HORA);
-            if (cmbHora.getItems().contains(hora)) {
-                cmbHora.getSelectionModel().select(hora);
-            }
+        if (cita.getInicio() != null) {
+            dateFecha.setValue(cita.getInicio().toLocalDate());
+            String hora = cita.getInicio().format(FORMATO_HORA);
+            if (cmbHora.getItems().contains(hora)) cmbHora.getSelectionModel().select(hora);
         }
-        if (cita.getFechaHoraInicio() != null && cita.getFechaHoraFin() != null) {
-            long minutos = java.time.Duration.between(cita.getFechaHoraInicio(), cita.getFechaHoraFin()).toMinutes();
-            int duracion = (int) minutos;
-            if (cmbDuracion.getItems().contains(duracion)) {
-                cmbDuracion.getSelectionModel().select(Integer.valueOf(duracion));
-            }
+        if (cita.getInicio() != null && cita.getFin() != null) {
+            int duracion = (int) java.time.Duration.between(cita.getInicio(), cita.getFin()).toMinutes();
+            if (cmbDuracion.getItems().contains(duracion)) cmbDuracion.getSelectionModel().select(Integer.valueOf(duracion));
         }
         txtMotivo.setText(cita.getMotivo());
         txtNotas.setText(cita.getNotas());
-        tratamientosSeleccionados.setAll(cita.getTratamientos() != null
-                ? cita.getTratamientos()
-                : List.of());
+        tratamientosSeleccionados.setAll(cita.getTratamientos() != null ? cita.getTratamientos() : List.of());
         actualizarTotalTratamientos();
         lblError.setVisible(false);
         lblError.setManaged(false);

@@ -17,8 +17,8 @@
         <HBox alignment="CENTER_LEFT" spacing="15" styleClass="header">
             <Label text="DentalCare" styleClass="logo"/>
             <HBox HBox.hgrow="ALWAYS"/>
-            <Label text="Administrador" styleClass="user-name"/>
-            <Button text="⚙" styleClass="icon-button"/>
+            <Label fx:id="userNameLabel" text="Administrador" styleClass="user-name"/>
+            <Button fx:id="userMenuButton" text="⋮" styleClass="icon-button" onAction="#mostrarMenuUsuario"/>
         </HBox>
     </top>
     <left>

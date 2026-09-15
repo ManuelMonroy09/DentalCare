@@ -62,33 +62,17 @@ public class MainController {
     private void configurarBoton(Button button, boolean visible) { button.setManaged(visible); button.setVisible(visible); }
 
     private void mostrarPerfil() {
-        AuthenticatedUser user = securitySession.requireCurrentUser();
-        Dialog<ButtonType> dialog = crearDialogoEstandar("Mi perfil", "Información de tu cuenta");
-        VBox content = crearPanel(12);
-        Label nombre = crearTexto("Nombre visible:  " + user.getDisplayName());
-        Label usuario = crearTexto("Usuario:  " + user.getUsername());
-        Label rol = crearTexto("Rol:  " + user.getRole().getDisplayName());
-        content.getChildren().addAll(nombre, usuario, rol);
-        mostrarContenidoDialogo(dialog, content, ButtonType.OK);
-        Button cerrar = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK); if (cerrar != null) cerrar.setText("Cerrar");
-        estilizarBotonesDialogo(dialog.getDialogPane());
-        dialog.showAndWait();
+        AuthenticatedUser user = securitySession.requireCurrentUser(); Dialog<ButtonType> dialog = crearDialogoEstandar("Mi perfil", "Información de tu cuenta");
+        VBox content = crearPanel(12); content.getChildren().addAll(crearTexto("Nombre visible:  " + user.getDisplayName()), crearTexto("Usuario:  " + user.getUsername()), crearTexto("Rol:  " + user.getRole().getDisplayName()));
+        mostrarContenidoDialogo(dialog, content, ButtonType.OK); Button cerrar = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK); if (cerrar != null) cerrar.setText("Cerrar"); estilizarBotonesDialogo(dialog.getDialogPane()); dialog.showAndWait();
     }
 
     private void cambiarPassword() {
         Dialog<ButtonType> dialog = crearDialogoEstandar("Cambiar contraseña", "Actualiza la contraseña de tu usuario");
-        PasswordField actual = new PasswordField(); actual.setPromptText("Contraseña actual");
-        PasswordField nueva = new PasswordField(); nueva.setPromptText("Nueva contraseña");
-        PasswordField confirmar = new PasswordField(); confirmar.setPromptText("Confirmar nueva contraseña");
-        GridPane grid = new GridPane(); grid.setHgap(14); grid.setVgap(14); grid.setPadding(new Insets(4));
-        grid.add(new Label("Actual:"), 0, 0); grid.add(actual, 1, 0); grid.add(new Label("Nueva:"), 0, 1); grid.add(nueva, 1, 1); grid.add(new Label("Confirmar:"), 0, 2); grid.add(confirmar, 1, 2);
-        GridPane.setHgrow(actual, Priority.ALWAYS); GridPane.setHgrow(nueva, Priority.ALWAYS); GridPane.setHgrow(confirmar, Priority.ALWAYS);
-        mostrarContenidoDialogo(dialog, grid, ButtonType.OK, ButtonType.CANCEL);
-        Button guardar = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK); if (guardar != null) guardar.setText("Guardar");
-        Button cancelar = (Button) dialog.getDialogPane().lookupButton(ButtonType.CANCEL); if (cancelar != null) cancelar.setText("Cancelar");
-        estilizarBotonesDialogo(dialog.getDialogPane());
-        Optional<ButtonType> result = dialog.showAndWait(); if (result.isEmpty() || result.get() != ButtonType.OK) return;
-        if (!nueva.getText().equals(confirmar.getText())) { mostrarError("Las nuevas contraseñas no coinciden."); return; }
+        PasswordField actual = new PasswordField(); actual.setPromptText("Contraseña actual"); PasswordField nueva = new PasswordField(); nueva.setPromptText("Nueva contraseña"); PasswordField confirmar = new PasswordField(); confirmar.setPromptText("Confirmar nueva contraseña");
+        GridPane grid = new GridPane(); grid.setHgap(14); grid.setVgap(14); grid.setPadding(new Insets(4)); grid.add(new Label("Actual:"), 0, 0); grid.add(actual, 1, 0); grid.add(new Label("Nueva:"), 0, 1); grid.add(nueva, 1, 1); grid.add(new Label("Confirmar:"), 0, 2); grid.add(confirmar, 1, 2); GridPane.setHgrow(actual, Priority.ALWAYS); GridPane.setHgrow(nueva, Priority.ALWAYS); GridPane.setHgrow(confirmar, Priority.ALWAYS);
+        mostrarContenidoDialogo(dialog, grid, ButtonType.OK, ButtonType.CANCEL); Button guardar = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK); if (guardar != null) guardar.setText("Guardar"); Button cancelar = (Button) dialog.getDialogPane().lookupButton(ButtonType.CANCEL); if (cancelar != null) cancelar.setText("Cancelar"); estilizarBotonesDialogo(dialog.getDialogPane());
+        Optional<ButtonType> result = dialog.showAndWait(); if (result.isEmpty() || result.get() != ButtonType.OK) return; if (!nueva.getText().equals(confirmar.getText())) { mostrarError("Las nuevas contraseñas no coinciden."); return; }
         try { authenticationService.changePassword(actual.getText(), nueva.getText()); mostrarInformacion("Contraseña actualizada", "Tu contraseña fue cambiada correctamente."); } catch (Exception e) { mostrarError(e.getMessage() == null ? "No fue posible cambiar la contraseña." : e.getMessage()); }
     }
 
@@ -109,103 +93,50 @@ public class MainController {
     }
 
     private void editarNombreUsuario(UserService.StoredUser selected, TableView<UserService.StoredUser> table) {
-        Dialog<ButtonType> dialog = crearDialogoEstandar("Editar usuario", "Editar nombre visible");
-        TextField nombre = new TextField(selected.displayName); nombre.getStyleClass().add("users-field"); nombre.setMaxWidth(Double.MAX_VALUE);
-        Label usuario = crearTexto("Usuario: " + selected.username); Label nota = crearTexto("El usuario no puede modificarse.");
-        VBox content = crearPanel(8); content.getChildren().addAll(usuario, new Label("Nombre visible"), nombre, nota); VBox.setVgrow(nombre, Priority.NEVER);
-        mostrarContenidoDialogo(dialog, content, ButtonType.OK, ButtonType.CANCEL);
-        Button guardar = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK); if (guardar != null) guardar.setText("Guardar");
-        Button cancelar = (Button) dialog.getDialogPane().lookupButton(ButtonType.CANCEL); if (cancelar != null) cancelar.setText("Cancelar");
-        estilizarBotonesDialogo(dialog.getDialogPane());
-        Optional<ButtonType> result = dialog.showAndWait(); if (result.isEmpty() || result.get() != ButtonType.OK) return;
-        try { userService.updateDisplayName(selected.username, nombre.getText()); table.getItems().setAll(userService.listUsers()); configurarUsuario(); mostrarInformacion("Usuario actualizado", "El nombre visible fue actualizado correctamente."); } catch (Exception e) { mostrarError(e.getMessage() == null ? "No fue posible actualizar el usuario." : e.getMessage()); }
+        Dialog<ButtonType> dialog = crearDialogoEstandar("Editar usuario", "Editar nombre visible"); TextField nombre = new TextField(selected.displayName); nombre.getStyleClass().add("users-field"); nombre.setMaxWidth(Double.MAX_VALUE); Label usuario = crearTexto("Usuario: " + selected.username); Label nota = crearTexto("El usuario no puede modificarse."); VBox content = crearPanel(8); content.getChildren().addAll(usuario, new Label("Nombre visible"), nombre, nota);
+        mostrarContenidoDialogo(dialog, content, ButtonType.OK, ButtonType.CANCEL); Button guardar = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK); if (guardar != null) guardar.setText("Guardar"); Button cancelar = (Button) dialog.getDialogPane().lookupButton(ButtonType.CANCEL); if (cancelar != null) cancelar.setText("Cancelar"); estilizarBotonesDialogo(dialog.getDialogPane());
+        Optional<ButtonType> result = dialog.showAndWait(); if (result.isEmpty() || result.get() != ButtonType.OK) return; try { userService.updateDisplayName(selected.username, nombre.getText()); table.getItems().setAll(userService.listUsers()); configurarUsuario(); mostrarInformacion("Usuario actualizado", "El nombre visible fue actualizado correctamente."); } catch (Exception e) { mostrarError(e.getMessage() == null ? "No fue posible actualizar el usuario." : e.getMessage()); }
     }
 
     private boolean confirmarAccion(String titulo, String encabezado, String mensaje) {
-        Dialog<ButtonType> dialog = crearDialogoEstandar(titulo, encabezado);
-        Label mensajeLabel = crearTexto(mensaje); mensajeLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #374151;");
-        VBox content = crearPanel(10); content.getChildren().add(mensajeLabel);
-        mostrarContenidoDialogo(dialog, content, ButtonType.OK, ButtonType.CANCEL);
-        Button ok = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK); if (ok != null) ok.setText("Crear usuario");
-        Button cancel = (Button) dialog.getDialogPane().lookupButton(ButtonType.CANCEL); if (cancel != null) cancel.setText("Cancelar");
-        estilizarBotonesDialogo(dialog.getDialogPane());
-        Optional<ButtonType> result = dialog.showAndWait(); return result.isPresent() && result.get() == ButtonType.OK;
+        Dialog<ButtonType> dialog = crearDialogoEstandar(titulo, encabezado); Label mensajeLabel = crearTexto(mensaje); mensajeLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #374151;"); VBox content = crearPanel(10); content.getChildren().add(mensajeLabel); mostrarContenidoDialogo(dialog, content, ButtonType.OK, ButtonType.CANCEL);
+        Button ok = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK); if (ok != null) ok.setText("Crear usuario"); Button cancel = (Button) dialog.getDialogPane().lookupButton(ButtonType.CANCEL); if (cancel != null) cancel.setText("Cancelar"); estilizarBotonesDialogo(dialog.getDialogPane()); Optional<ButtonType> result = dialog.showAndWait(); return result.isPresent() && result.get() == ButtonType.OK;
     }
 
     private void mostrarRolesPermisos() { StringBuilder texto = new StringBuilder(); for (UserRole role : UserRole.values()) { texto.append(role.getDisplayName()).append("\n"); for (UserPermission permission : AuthenticatedUser.permissionsFor(role)) texto.append("  • ").append(nombrePermiso(permission)).append("\n"); texto.append("\n"); } mostrarDialogoTexto("Roles y permisos", "Permisos actuales de DentalCare", texto.toString()); }
     private void mostrarAuditoria() { mostrarDialogoTexto("Auditoría", "Auditoría de seguridad", "La auditoría detallada se habilitará como siguiente capa del sistema.\n\nLos roles y privilegios ya están activos."); }
 
-    private void mostrarDialogoTexto(String titulo, String encabezado, String texto) {
-        Dialog<ButtonType> dialog = crearDialogoEstandar(titulo, encabezado);
-        Label label = crearTexto(texto);
-        VBox content = crearPanel(8); content.getChildren().add(label);
-        mostrarContenidoDialogo(dialog, content, ButtonType.OK);
-        Button cerrar = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK); if (cerrar != null) cerrar.setText("Cerrar");
-        estilizarBotonesDialogo(dialog.getDialogPane());
-        dialog.showAndWait();
-    }
+    private void mostrarDialogoTexto(String titulo, String encabezado, String texto) { Dialog<ButtonType> dialog = crearDialogoEstandar(titulo, encabezado); Label label = crearTexto(texto); VBox content = crearPanel(8); content.getChildren().add(label); mostrarContenidoDialogo(dialog, content, ButtonType.OK); Button cerrar = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK); if (cerrar != null) cerrar.setText("Cerrar"); estilizarBotonesDialogo(dialog.getDialogPane()); dialog.showAndWait(); }
 
     private Dialog<ButtonType> crearDialogoEstandar(String titulo, String encabezado) {
-        Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle(titulo);
-        if (encabezado != null && !encabezado.isBlank()) dialog.setHeaderText(encabezado);
-        DialogPane pane = dialog.getDialogPane();
-        pane.setMinWidth(480);
-        pane.setPrefWidth(560);
-        pane.setMaxWidth(760);
-        pane.setMinHeight(Region.USE_COMPUTED_SIZE);
-        pane.setPrefHeight(Region.USE_COMPUTED_SIZE);
-        return dialog;
+        Dialog<ButtonType> dialog = new Dialog<>(); dialog.setTitle(titulo); if (encabezado != null && !encabezado.isBlank()) dialog.setHeaderText(encabezado);
+        DialogPane pane = dialog.getDialogPane(); pane.setMinWidth(480); pane.setPrefWidth(560); pane.setMaxWidth(760); pane.setMinHeight(Region.USE_COMPUTED_SIZE); pane.setPrefHeight(Region.USE_COMPUTED_SIZE); return dialog;
     }
 
-    private void mostrarContenidoDialogo(Dialog<ButtonType> dialog, javafx.scene.Node contenido, ButtonType... botones) {
-        DialogPane pane = dialog.getDialogPane();
-        pane.setContent(contenido);
-        pane.getButtonTypes().setAll(botones);
-    }
-
-    private VBox crearPanel(double spacing) {
-        VBox panel = new VBox(spacing);
-        panel.setPadding(new Insets(16));
-        panel.setFillWidth(true);
-        panel.setMaxWidth(Double.MAX_VALUE);
-        panel.getStyleClass().add("standard-dialog-panel");
-        return panel;
-    }
-
-    private Label crearTexto(String texto) {
-        Label label = new Label(texto);
-        label.setWrapText(true);
-        label.setMaxWidth(Double.MAX_VALUE);
-        label.setMinHeight(Region.USE_PREF_SIZE);
-        return label;
-    }
+    private void mostrarContenidoDialogo(Dialog<ButtonType> dialog, javafx.scene.Node contenido, ButtonType... botones) { DialogPane pane = dialog.getDialogPane(); pane.setContent(contenido); pane.getButtonTypes().setAll(botones); }
+    private VBox crearPanel(double spacing) { VBox panel = new VBox(spacing); panel.setPadding(new Insets(16)); panel.setFillWidth(true); panel.setMaxWidth(Double.MAX_VALUE); panel.getStyleClass().add("standard-dialog-panel"); return panel; }
+    private Label crearTexto(String texto) { Label label = new Label(texto); label.setWrapText(true); label.setMaxWidth(Double.MAX_VALUE); label.setMinHeight(Region.USE_PREF_SIZE); return label; }
 
     private void estilizarBotonesDialogo(DialogPane pane) {
         for (ButtonType tipo : pane.getButtonTypes()) {
             Button button = (Button) pane.lookupButton(tipo);
             if (button != null) {
-                button.setMinWidth(110);
+                button.setMinWidth(Region.USE_PREF_SIZE);
                 button.setPrefWidth(Region.USE_COMPUTED_SIZE);
+                button.setMaxWidth(Double.MAX_VALUE);
                 button.setMinHeight(38);
-                button.setPadding(new Insets(8, 18, 8, 18));
+                button.setPrefHeight(38);
+                button.setPadding(new Insets(8, 20, 8, 20));
+                button.setWrapText(false);
             }
         }
+        pane.lookupAll(".button-bar").forEach(node -> { if (node instanceof ButtonBar bar) { bar.setButtonMinWidth(Region.USE_PREF_SIZE); bar.setPrefWidth(Region.USE_COMPUTED_SIZE); } });
     }
 
     private String nombrePermiso(UserPermission permission) { return switch (permission) { case VER_INICIO -> "Inicio"; case VER_PACIENTES -> "Pacientes"; case GESTIONAR_CITAS -> "Agenda y citas"; case VER_TRATAMIENTOS -> "Tratamientos"; case VER_HISTORIAL -> "Historial"; case VER_FINANZAS -> "Finanzas"; case VER_CONFIGURACION -> "Configuración"; case GESTIONAR_USUARIOS -> "Gestión de usuarios"; case VER_ROLES -> "Roles y permisos"; case VER_AUDITORIA -> "Auditoría"; }; }
     private void cerrarSesion() { try { authenticationService.logout(); Stage applicationStage = (Stage) contentArea.getScene().getWindow(); applicationStage.close(); FXMLLoader loader = new FXMLLoader(getClass().getResource("/ui/fxml/LoginView.fxml")); loader.setControllerFactory(context::getBean); Parent root = loader.load(); Stage loginStage = new Stage(); loginStage.initStyle(StageStyle.UNDECORATED); loginStage.setTitle("DentalCare | Iniciar sesión"); loginStage.setScene(new Scene(root, 900, 540)); loginStage.setResizable(false); loginStage.show(); loginStage.centerOnScreen(); } catch (Exception e) { mostrarError("No fue posible cerrar la sesión correctamente."); } }
     private void cargarVista(String ruta) { try { FXMLLoader loader = new FXMLLoader(getClass().getResource(ruta)); loader.setControllerFactory(context::getBean); Parent view = loader.load(); contentArea.getChildren().setAll(view); } catch (Exception e) { throw new RuntimeException("No fue posible cargar la vista: " + ruta, e); } }
 
-    private void mostrarInformacion(String titulo, String mensaje) {
-        Dialog<ButtonType> dialog = crearDialogoEstandar(titulo, null);
-        Label label = crearTexto(mensaje); label.setAlignment(Pos.CENTER); label.setTextAlignment(javafx.scene.text.TextAlignment.CENTER); label.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1f2937;");
-        VBox content = crearPanel(8); content.setAlignment(Pos.CENTER); content.getChildren().add(label);
-        mostrarContenidoDialogo(dialog, content, ButtonType.OK);
-        Button cerrar = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK); if (cerrar != null) cerrar.setText("Cerrar");
-        estilizarBotonesDialogo(dialog.getDialogPane());
-        dialog.showAndWait();
-    }
-
+    private void mostrarInformacion(String titulo, String mensaje) { Dialog<ButtonType> dialog = crearDialogoEstandar(titulo, null); Label label = crearTexto(mensaje); label.setAlignment(Pos.CENTER); label.setTextAlignment(javafx.scene.text.TextAlignment.CENTER); label.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1f2937;"); VBox content = crearPanel(8); content.setAlignment(Pos.CENTER); content.getChildren().add(label); mostrarContenidoDialogo(dialog, content, ButtonType.OK); Button cerrar = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK); if (cerrar != null) cerrar.setText("Cerrar"); estilizarBotonesDialogo(dialog.getDialogPane()); dialog.showAndWait(); }
     private void mostrarError(String mensaje) { mostrarDialogoTexto("DentalCare", "No fue posible completar la operación", mensaje); }
 }

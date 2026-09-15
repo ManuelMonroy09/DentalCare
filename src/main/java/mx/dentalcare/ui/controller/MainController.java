@@ -130,7 +130,6 @@ public class MainController {
             VBox contenidoActual = new VBox(0);
             contenidoActual.setFillWidth(true);
             contenidoActual.setMaxWidth(Double.MAX_VALUE);
-            contenidoActual.getStyleClass().add("dialog-content-with-buttons");
             if (contenido != null) {
                 VBox.setVgrow(contenido, Priority.ALWAYS);
                 contenidoActual.getChildren().add(contenido);
@@ -147,12 +146,20 @@ public class MainController {
             for (ButtonType tipo : pane.getButtonTypes()) {
                 Button nativeButton = (Button) pane.lookupButton(tipo);
                 if (nativeButton == null) continue;
-                Button visualButton = new Button(nativeButton.getText());
+                String texto = nativeButton.getText();
+                Button visualButton = new Button(texto);
+                double ancho = switch (texto) {
+                    case "Crear usuario" -> 140;
+                    case "Cancelar", "Guardar" -> 110;
+                    case "Cerrar" -> 90;
+                    default -> Math.max(100, texto.length() * 9.0 + 40);
+                };
+                visualButton.setMinWidth(ancho);
+                visualButton.setPrefWidth(ancho);
+                visualButton.setMaxWidth(ancho);
                 visualButton.setMinHeight(38);
                 visualButton.setPrefHeight(38);
-                visualButton.setMinWidth(Region.USE_COMPUTED_SIZE);
-                visualButton.setPrefWidth(Region.USE_COMPUTED_SIZE);
-                visualButton.setMaxWidth(Region.USE_COMPUTED_SIZE);
+                visualButton.setMaxHeight(38);
                 visualButton.setPadding(new Insets(8, 18, 8, 18));
                 visualButton.setWrapText(false);
                 visualButton.setMnemonicParsing(false);

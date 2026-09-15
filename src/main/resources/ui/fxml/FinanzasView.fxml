@@ -12,14 +12,12 @@
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="mx.dentalcare.ui.controller.FinanzasController"
       spacing="18"
-      styleClass="content">
+      styleClass="content standard-page">
     <padding><Insets top="5" right="0" bottom="5" left="0"/></padding>
-
     <VBox spacing="4">
         <Label text="Finanzas" styleClass="page-title"/>
         <Label text="Control de cargos, pagos, anticipos y saldos pendientes del consultorio." styleClass="page-subtitle"/>
     </VBox>
-
     <HBox spacing="12">
         <VBox spacing="3" styleClass="stat-card" HBox.hgrow="ALWAYS">
             <Label text="Ingresos de hoy" styleClass="page-subtitle"/>
@@ -34,7 +32,6 @@
             <Label fx:id="cobrosHoyLabel" text="0" styleClass="stat-value"/>
         </VBox>
     </HBox>
-
     <HBox alignment="CENTER_LEFT" spacing="8">
         <Button text="Registrar pago" onAction="#registrarPago" styleClass="primary-button"/>
         <Button text="Registrar anticipo" onAction="#registrarAnticipo" styleClass="secondary-button"/>
@@ -42,9 +39,7 @@
         <Button text="Ver detalle" onAction="#verDetalle" styleClass="secondary-button"/>
         <Button text="Sincronizar cargos" onAction="#sincronizarCargos" styleClass="secondary-button"/>
     </HBox>
-
     <Label fx:id="mensajeLabel" text="" wrapText="true" maxWidth="900" styleClass="page-subtitle"/>
-
     <TableView fx:id="cargosTable" VBox.vgrow="ALWAYS" styleClass="patients-table">
         <columns>
             <TableColumn fx:id="fechaColumn" text="Fecha" prefWidth="105"/>

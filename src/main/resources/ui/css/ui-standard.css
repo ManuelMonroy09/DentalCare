@@ -1,0 +1,191 @@
+/* =========================================================
+   DENTALCARE - ESTÁNDAR VISUAL DEL SISTEMA
+   ========================================================= */
+
+.standard-page {
+    -fx-background-color: #f6f7f9;
+}
+
+.standard-section {
+    -fx-background-color: white;
+    -fx-background-radius: 10px;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1px;
+    -fx-border-radius: 10px;
+    -fx-padding: 18px;
+}
+
+.standard-section-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #111827;
+}
+
+.standard-section-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #6b7280;
+}
+
+.standard-form-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #4b5563;
+}
+
+.standard-value {
+    -fx-font-size: 14px;
+    -fx-text-fill: #111827;
+}
+
+.standard-muted {
+    -fx-font-size: 13px;
+    -fx-text-fill: #6b7280;
+}
+
+.standard-error {
+    -fx-text-fill: #dc2626;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+/* Controles del sistema: mismo lenguaje visual en todos los módulos */
+.standard-page .text-field,
+.standard-page .combo-box,
+.standard-page .date-picker,
+.standard-section .text-field,
+.standard-section .combo-box,
+.standard-section .date-picker,
+.dialog-standard .text-field,
+.dialog-standard .combo-box,
+.dialog-standard .date-picker {
+    -fx-pref-height: 44px;
+    -fx-min-height: 44px;
+    -fx-background-color: white;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-font-size: 14px;
+}
+
+.standard-page .text-field:focused,
+.standard-page .combo-box:focused,
+.standard-page .date-picker:focused,
+.standard-section .text-field:focused,
+.standard-section .combo-box:focused,
+.standard-section .date-picker:focused,
+.dialog-standard .text-field:focused,
+.dialog-standard .combo-box:focused,
+.dialog-standard .date-picker:focused {
+    -fx-border-color: #2563eb;
+    -fx-border-width: 2px;
+}
+
+.standard-page .text-field:hover,
+.standard-page .combo-box:hover,
+.standard-page .date-picker:hover,
+.standard-section .text-field:hover,
+.standard-section .combo-box:hover,
+.standard-section .date-picker:hover,
+.dialog-standard .text-field:hover,
+.dialog-standard .combo-box:hover,
+.dialog-standard .date-picker:hover {
+    -fx-border-color: #9ca3af;
+}
+
+.standard-page .text-area,
+.standard-section .text-area,
+.dialog-standard .text-area {
+    -fx-background-color: white;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-font-size: 14px;
+}
+
+.standard-page .text-area:focused,
+.standard-section .text-area:focused,
+.dialog-standard .text-area:focused {
+    -fx-border-color: #2563eb;
+    -fx-border-width: 2px;
+}
+
+.standard-page .spinner,
+.standard-section .spinner,
+.dialog-standard .spinner {
+    -fx-pref-height: 44px;
+    -fx-min-height: 44px;
+    -fx-background-color: white;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+}
+
+.standard-page .table-view,
+.standard-section .table-view {
+    -fx-background-color: white;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+}
+
+.standard-page .table-view .column-header,
+.standard-section .table-view .column-header {
+    -fx-background-color: #f9fafb;
+    -fx-border-color: #e5e7eb;
+}
+
+.standard-page .table-view .column-header .label,
+.standard-section .table-view .column-header .label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #4b5563;
+}
+
+.standard-page .table-view .table-cell,
+.standard-section .table-view .table-cell {
+    -fx-font-size: 13px;
+    -fx-text-fill: #374151;
+}
+
+.standard-list {
+    -fx-background-color: #f9fafb;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+}
+
+.standard-total {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #111827;
+}
+
+.standard-actions {
+    -fx-padding: 4px 0 0 0;
+}
+
+/* Tarjetas existentes pasan a compartir el mismo acabado */
+.stat-card {
+    -fx-background-color: white;
+    -fx-background-radius: 10px;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1px;
+    -fx-border-radius: 10px;
+    -fx-padding: 18px;
+}
+
+.section-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #111827;
+}
+
+.stat-value {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #111827;
+}

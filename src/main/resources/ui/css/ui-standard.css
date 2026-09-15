@@ -48,7 +48,6 @@
     -fx-font-weight: bold;
 }
 
-/* Controles del sistema: mismo lenguaje visual en todos los módulos */
 .standard-page .text-field,
 .standard-page .combo-box,
 .standard-page .date-picker,
@@ -124,7 +123,9 @@
 }
 
 .standard-page .table-view,
-.standard-section .table-view {
+.standard-section .table-view,
+.standard-page .patients-table,
+.standard-page .treatments-table {
     -fx-background-color: white;
     -fx-border-color: #e5e7eb;
     -fx-border-width: 1px;
@@ -133,19 +134,25 @@
 }
 
 .standard-page .table-view .column-header,
-.standard-section .table-view .column-header {
+.standard-section .table-view .column-header,
+.standard-page .patients-table .column-header,
+.standard-page .treatments-table .column-header {
     -fx-background-color: #f9fafb;
     -fx-border-color: #e5e7eb;
 }
 
 .standard-page .table-view .column-header .label,
-.standard-section .table-view .column-header .label {
+.standard-section .table-view .column-header .label,
+.standard-page .patients-table .column-header .label,
+.standard-page .treatments-table .column-header .label {
     -fx-font-weight: bold;
     -fx-text-fill: #4b5563;
 }
 
 .standard-page .table-view .table-cell,
-.standard-section .table-view .table-cell {
+.standard-section .table-view .table-cell,
+.standard-page .patients-table .table-cell,
+.standard-page .treatments-table .table-cell {
     -fx-font-size: 13px;
     -fx-text-fill: #374151;
 }
@@ -168,7 +175,6 @@
     -fx-padding: 4px 0 0 0;
 }
 
-/* Tarjetas existentes pasan a compartir el mismo acabado */
 .stat-card {
     -fx-background-color: white;
     -fx-background-radius: 10px;

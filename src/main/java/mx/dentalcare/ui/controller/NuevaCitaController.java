@@ -29,12 +29,11 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Component
 public class NuevaCitaController {
+    @FXML private Label lblTitulo;
     @FXML private ComboBox<Paciente> cmbPaciente;
     @FXML private DatePicker dateFecha;
     @FXML private ComboBox<String> cmbHora;
@@ -80,18 +79,17 @@ public class NuevaCitaController {
         List<Paciente> pacientes = pacientesService.obtenerTodos();
         pacientes.sort(Comparator.comparing(Paciente::getNombre, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)));
         cmbPaciente.getItems().setAll(pacientes);
-        cmbPaciente.setCellFactory(listView -> new ListCell<>() {
+        cmbPaciente.setCellFactory(listView -> crearCeldaPaciente());
+        cmbPaciente.setButtonCell(crearCeldaPaciente());
+    }
+
+    private ListCell<Paciente> crearCeldaPaciente() {
+        return new ListCell<>() {
             @Override protected void updateItem(Paciente paciente, boolean empty) {
                 super.updateItem(paciente, empty);
                 setText(empty || paciente == null ? null : formatearPaciente(paciente));
             }
-        });
-        cmbPaciente.setButtonCell(new ListCell<>() {
-            @Override protected void updateItem(Paciente paciente, boolean empty) {
-                super.updateItem(paciente, empty);
-                setText(empty || paciente == null ? null : formatearPaciente(paciente));
-            }
-        });
+        };
     }
 
     private String formatearPaciente(Paciente paciente) {
@@ -251,6 +249,8 @@ public class NuevaCitaController {
     public void prepararNuevaCita(LocalDate fecha, String hora) {
         modoEdicion = false;
         citaEditar = null;
+        lblTitulo.setText("Nueva cita");
+        btnGuardar.setText("Guardar cita");
         dateFecha.setValue(fecha != null ? fecha : LocalDate.now());
         if (hora != null && cmbHora.getItems().contains(hora)) cmbHora.getSelectionModel().select(hora);
         cmbPaciente.getSelectionModel().clearSelection();
@@ -270,7 +270,9 @@ public class NuevaCitaController {
         modoEdicion = true;
         citaEditar = cita;
         if (cita == null) return;
-        cmbPaciente.setValue(cita.getPaciente());
+        lblTitulo.setText("Editar cita");
+        btnGuardar.setText("Guardar cambios");
+        seleccionarPaciente(cita.getPaciente());
         if (cita.getInicio() != null) {
             dateFecha.setValue(cita.getInicio().toLocalDate());
             String hora = cita.getInicio().format(FORMATO_HORA);
@@ -286,6 +288,20 @@ public class NuevaCitaController {
         actualizarTotalTratamientos();
         lblError.setVisible(false);
         lblError.setManaged(false);
+    }
+
+    private void seleccionarPaciente(Paciente paciente) {
+        cmbPaciente.getSelectionModel().clearSelection();
+        if (paciente == null) return;
+        Paciente coincidencia = cmbPaciente.getItems().stream()
+                .filter(item -> item != null && paciente.getId() != null && paciente.getId().equals(item.getId()))
+                .findFirst()
+                .orElse(null);
+        if (coincidencia != null) {
+            cmbPaciente.getSelectionModel().select(coincidencia);
+        } else {
+            cmbPaciente.getSelectionModel().select(paciente);
+        }
     }
 
     public void prepararParaEdicion(Cita cita) {

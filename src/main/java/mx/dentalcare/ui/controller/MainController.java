@@ -252,7 +252,7 @@ public class MainController {
     private void mostrarDialogoTexto(String titulo, String encabezado, String texto, double ancho, double alto) {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle(titulo);
-        dialog.setHeaderText(encabezado);
+        if (encabezado != null) dialog.setHeaderText(encabezado);
         Label label = new Label(texto);
         label.setWrapText(true);
         label.setMaxWidth(ancho - 70);
@@ -300,6 +300,30 @@ public class MainController {
         catch (Exception e) { throw new RuntimeException("No fue posible cargar la vista: " + ruta, e); }
     }
 
-    private void mostrarInformacion(String titulo, String mensaje) { mostrarDialogoTexto(titulo, null, mensaje, 500, 250); }
+    private void mostrarInformacion(String titulo, String mensaje) {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle(titulo);
+        Label label = new Label(mensaje);
+        label.setWrapText(true);
+        label.setAlignment(Pos.CENTER);
+        label.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
+        label.setStyle("-fx-font-size: 17px; -fx-font-weight: bold; -fx-text-fill: #1f2937;");
+        label.setMaxWidth(330);
+        label.setPrefWidth(330);
+        label.setMinHeight(55);
+        VBox content = new VBox(label);
+        content.setAlignment(Pos.CENTER);
+        content.setPadding(new Insets(18, 24, 12, 24));
+        DialogPane pane = dialog.getDialogPane();
+        pane.setContent(content);
+        pane.setPrefWidth(390);
+        pane.setMinWidth(390);
+        pane.setPrefHeight(155);
+        pane.setMinHeight(155);
+        pane.getButtonTypes().add(ButtonType.OK);
+        estilizarBotonesDialogo(pane);
+        dialog.showAndWait();
+    }
+
     private void mostrarError(String mensaje) { mostrarDialogoTexto("DentalCare", null, mensaje, 520, 250); }
 }

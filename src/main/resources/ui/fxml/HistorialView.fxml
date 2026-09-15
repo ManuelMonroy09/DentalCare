@@ -10,47 +10,49 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx/21"
-        xmlns:fx="http://javafx.com/fxml/1"
-        fx:controller="mx.dentalcare.ui.controller.HistorialController"
-        spacing="20"
-        styleClass="content standard-page"
-        stylesheets="@../css/dentalcare-overrides.css">
-    <padding><Insets top="5" right="0" bottom="5" left="0"/></padding>
-    <VBox spacing="5">
-        <Label text="Historial clínico" styleClass="page-title"/>
-        <Label text="Consulta y seguimiento de las atenciones realizadas en el consultorio." styleClass="page-subtitle"/>
-    </VBox>
-    <VBox spacing="10" styleClass="standard-section">
-        <VBox spacing="2">
-            <Label text="Filtros de búsqueda" styleClass="standard-section-title"/>
-            <Label text="Combina los criterios para localizar rápidamente las atenciones del paciente." styleClass="standard-section-subtitle"/>
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mx.dentalcare.ui.controller.HistorialController" spacing="16" styleClass="dialog-page">
+    <padding><Insets top="24" right="28" bottom="24" left="28"/></padding>
+    <stylesheets>
+        <String fx:value="@../css/dentalcare.css"/>
+        <String fx:value="@../css/ui-standard.css"/>
+        <String fx:value="@../css/dentalcare-overrides.css"/>
+    </stylesheets>
+    <VBox spacing="16" VBox.vgrow="ALWAYS" styleClass="standard-section">
+        <VBox spacing="4">
+            <Label text="Historial clínico" styleClass="page-title"/>
+            <Label text="Consulta y seguimiento de las atenciones realizadas en el consultorio." styleClass="page-subtitle" wrapText="true"/>
         </VBox>
-        <HBox alignment="CENTER_LEFT" spacing="10">
-            <TextField fx:id="buscarField" promptText="Buscar paciente, motivo o tratamiento..." HBox.hgrow="ALWAYS" styleClass="search-field"/>
-            <ComboBox fx:id="pacienteCombo" promptText="Paciente" prefWidth="220" styleClass="form-control"/>
-            <ComboBox fx:id="tratamientoCombo" promptText="Tratamiento" prefWidth="220" styleClass="form-control"/>
-        </HBox>
-        <HBox alignment="CENTER_LEFT" spacing="10">
-            <Label text="Periodo" styleClass="standard-form-label"/>
-            <DatePicker fx:id="fechaDesdePicker" promptText="Desde" prefWidth="150" styleClass="form-control"/>
-            <DatePicker fx:id="fechaHastaPicker" promptText="Hasta" prefWidth="150" styleClass="form-control"/>
-            <Button fx:id="limpiarFiltrosButton" text="Limpiar filtros" mnemonicParsing="false" styleClass="secondary-button"/>
+        <VBox spacing="10" styleClass="standard-section">
+            <VBox spacing="2">
+                <Label text="Filtros de búsqueda" styleClass="standard-section-title"/>
+                <Label text="Combina los criterios para localizar rápidamente las atenciones del paciente." styleClass="standard-section-subtitle" wrapText="true"/>
+            </VBox>
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <TextField fx:id="buscarField" promptText="Buscar paciente, motivo o tratamiento..." HBox.hgrow="ALWAYS" styleClass="search-field"/>
+                <ComboBox fx:id="pacienteCombo" promptText="Paciente" prefWidth="220" styleClass="form-control"/>
+                <ComboBox fx:id="tratamientoCombo" promptText="Tratamiento" prefWidth="220" styleClass="form-control"/>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label text="Periodo" styleClass="standard-form-label"/>
+                <DatePicker fx:id="fechaDesdePicker" promptText="Desde" prefWidth="150" styleClass="form-control"/>
+                <DatePicker fx:id="fechaHastaPicker" promptText="Hasta" prefWidth="150" styleClass="form-control"/>
+                <Button fx:id="limpiarFiltrosButton" text="Limpiar filtros" mnemonicParsing="false" styleClass="secondary-button"/>
+            </HBox>
+        </VBox>
+        <TableView fx:id="historialTable" VBox.vgrow="ALWAYS" styleClass="patients-table">
+            <columns>
+                <TableColumn fx:id="fechaColumn" text="Fecha" prefWidth="105"/>
+                <TableColumn fx:id="pacienteColumn" text="Paciente" prefWidth="190"/>
+                <TableColumn fx:id="horarioColumn" text="Horario" prefWidth="145"/>
+                <TableColumn fx:id="motivoColumn" text="Motivo de consulta" prefWidth="270"/>
+                <TableColumn fx:id="tratamientosColumn" text="Tratamientos" prefWidth="260"/>
+                <TableColumn fx:id="totalColumn" text="Total" prefWidth="110"/>
+            </columns>
+        </TableView>
+        <HBox alignment="CENTER_LEFT" spacing="15" styleClass="dialog-actions">
+            <Label fx:id="resumenLabel" text="0 consultas atendidas   ·   0 tratamientos   ·   Total: 0.00" styleClass="page-subtitle"/>
+            <Label fx:id="vacioLabel" text="" styleClass="page-subtitle" HBox.hgrow="ALWAYS"/>
+            <Button fx:id="btnDetalle" text="Ver detalle" mnemonicParsing="false" onAction="#abrirDetalle" styleClass="primary-button"/>
         </HBox>
     </VBox>
-    <TableView fx:id="historialTable" VBox.vgrow="ALWAYS" styleClass="patients-table">
-        <columns>
-            <TableColumn fx:id="fechaColumn" text="Fecha" prefWidth="105"/>
-            <TableColumn fx:id="pacienteColumn" text="Paciente" prefWidth="190"/>
-            <TableColumn fx:id="horarioColumn" text="Horario" prefWidth="145"/>
-            <TableColumn fx:id="motivoColumn" text="Motivo de consulta" prefWidth="270"/>
-            <TableColumn fx:id="tratamientosColumn" text="Tratamientos" prefWidth="260"/>
-            <TableColumn fx:id="totalColumn" text="Total" prefWidth="110"/>
-        </columns>
-    </TableView>
-    <HBox alignment="CENTER_LEFT" spacing="15">
-        <Label fx:id="resumenLabel" text="0 consultas atendidas   ·   0 tratamientos   ·   Total: 0.00" styleClass="page-subtitle"/>
-        <Label fx:id="vacioLabel" text="" styleClass="page-subtitle" HBox.hgrow="ALWAYS"/>
-        <Button fx:id="btnDetalle" text="Ver detalle" mnemonicParsing="false" onAction="#abrirDetalle" styleClass="primary-button"/>
-    </HBox>
 </VBox>

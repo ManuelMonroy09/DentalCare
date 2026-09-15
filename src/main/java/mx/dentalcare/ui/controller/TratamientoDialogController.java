@@ -110,16 +110,8 @@ public class TratamientoDialogController {
 
             cerrar();
         } catch (Exception e) {
-            registrarError("No fue posible guardar el tratamiento.", e);
             mostrarError(e.getMessage() != null ? e.getMessage() : "No fue posible guardar el tratamiento.");
         }
-    }
-
-    private void registrarError(String contexto, Exception e) {
-        System.err.println("\n========== DENTALCARE ERROR ==========");
-        System.err.println(contexto);
-        e.printStackTrace(System.err);
-        System.err.println("======================================\n");
     }
 
     private void mostrarError(String mensaje) {

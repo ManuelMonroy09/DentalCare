@@ -34,7 +34,7 @@ public class MainController {
     private final AuthenticationService authenticationService;
 
     public MainController(ApplicationContext context, SecuritySession securitySession, UserService userService, AuthenticationService authenticationService) { this.context = context; this.securitySession = securitySession; this.userService = userService; this.authenticationService = authenticationService; }
-    @FXML public void initialize() { configurarPrivilegios(); configurarUsuario(); }
+    @FXML public void initialize() { configurarPrivilegios(); configurarUsuario(); mostrarInicio(); }
     @FXML private void mostrarInicio() { cargarVista("/ui/fxml/DashboardView.fxml"); }
     @FXML private void mostrarPacientes() { cargarVista("/ui/fxml/PacientesView.fxml"); }
     @FXML private void mostrarCitas() { cargarVista("/ui/fxml/AgendaView.fxml"); }

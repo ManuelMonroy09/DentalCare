@@ -73,6 +73,10 @@ public class MasterKeyService {
         catch (Exception e) { throw new RuntimeException("No fue posible eliminar la configuración de seguridad.", e); }
     }
 
+    public synchronized void clearConfigurationSessionOnly() {
+        securitySession.clear();
+    }
+
     private SecretKey generateMasterKey() {
         byte[] bytes = new byte[EncryptionConstants.MASTER_KEY_LENGTH_BYTES];
         secureRandom.nextBytes(bytes);

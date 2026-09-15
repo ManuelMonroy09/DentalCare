@@ -41,15 +41,15 @@ public class UserService {
     }
 
     public synchronized void initializeAdmin(String password) {
-        if (Files.exists(USERS_FILE)) {
-            return;
+        if (!Files.exists(USERS_FILE)) {
+            SecretKey masterKey = securitySession.requireMasterKey();
+            UserStore store = new UserStore();
+            store.users = new ArrayList<>();
+            store.users.add(createRecord("admin", "Administrador", UserRole.ADMINISTRADOR, password, masterKey));
+            saveStore(store);
         }
 
-        SecretKey masterKey = securitySession.requireMasterKey();
-        UserStore store = new UserStore();
-        store.users = new ArrayList<>();
-        store.users.add(createRecord("admin", "Administrador", UserRole.ADMINISTRADOR, password, masterKey));
-        saveStore(store);
+        securitySession.setCurrentUser(new AuthenticatedUser("admin", "Administrador", UserRole.ADMINISTRADOR));
     }
 
     public synchronized AuthenticatedUser authenticate(String username, String password) {
@@ -62,9 +62,7 @@ public class UserService {
 
             masterKeyService.unlock(password);
             initializeAdmin(password);
-            AuthenticatedUser user = new AuthenticatedUser("admin", "Administrador", UserRole.ADMINISTRADOR);
-            securitySession.setCurrentUser(user);
-            return user;
+            return securitySession.requireCurrentUser();
         }
 
         UserStore store = loadStore();

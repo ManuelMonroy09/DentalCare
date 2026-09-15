@@ -50,7 +50,7 @@ public class NuevaCitaController {
     private ComboBox<Integer> cmbDuracion;
 
     @FXML
-    private TextField txtMotivo;
+    private TextArea txtMotivo;
 
     @FXML
     private ComboBox<Tratamiento> cmbTratamiento;
@@ -225,13 +225,12 @@ public class NuevaCitaController {
             @Override
             protected void updateItem(TratamientoAplicado tratamiento, boolean empty) {
                 super.updateItem(tratamiento, empty);
-
                 if (empty || tratamiento == null) {
                     setGraphic(null);
                     return;
                 }
 
-                lblNombre.setText(tratamiento.getNombre());
+                lblNombre.setText(tratamiento.getTratamiento().getNombre());
                 BigDecimal precio = tratamiento.getPrecio() != null
                         ? tratamiento.getPrecio()
                         : BigDecimal.ZERO;
@@ -241,212 +240,109 @@ public class NuevaCitaController {
         });
     }
 
-    private void agregarTratamientoSeleccionado() {
-        limpiarError();
+    private void configurarEventos() {
+        btnAgregarTratamiento.setOnAction(event -> agregarTratamiento());
+        btnCancelar.setOnAction(event -> cerrarVentana());
+        btnGuardar.setOnAction(event -> guardarCita());
+    }
 
-        Tratamiento tratamiento = cmbTratamiento.getSelectionModel().getSelectedItem();
-
+    private void agregarTratamiento() {
+        Tratamiento tratamiento = cmbTratamiento.getValue();
         if (tratamiento == null) {
-            mostrarError("Selecciona un tratamiento.");
             return;
         }
 
-        if (!tratamiento.isActivo()) {
-            mostrarError("No se puede agregar un tratamiento inactivo.");
+        boolean yaAgregado = tratamientosSeleccionados.stream()
+                .anyMatch(item -> item.getTratamiento() != null
+                        && item.getTratamiento().getId() != null
+                        && item.getTratamiento().getId().equals(tratamiento.getId()));
+
+        if (yaAgregado) {
             return;
         }
 
-        boolean yaSeleccionado = tratamientosSeleccionados.stream()
-                .anyMatch(aplicado -> aplicado != null
-                        && tratamiento.getId() != null
-                        && tratamiento.getId().equals(aplicado.getTratamientoId()));
-
-        if (yaSeleccionado) {
-            mostrarError("Ese tratamiento ya está agregado a la cita.");
-            return;
-        }
-
-        tratamientosSeleccionados.add(new TratamientoAplicado(
-                tratamiento.getId(),
-                tratamiento.getNombre(),
-                tratamiento.getPrecio(),
-                tratamiento.getDuracionMinutos()
-        ));
-
+        TratamientoAplicado aplicado = new TratamientoAplicado();
+        aplicado.setTratamiento(tratamiento);
+        aplicado.setPrecio(tratamiento.getPrecio() != null ? tratamiento.getPrecio() : BigDecimal.ZERO);
+        tratamientosSeleccionados.add(aplicado);
         cmbTratamiento.getSelectionModel().clearSelection();
         actualizarTotalTratamientos();
     }
 
     private void actualizarTotalTratamientos() {
         BigDecimal total = tratamientosSeleccionados.stream()
-                .map(TratamientoAplicado::obtenerImporte)
+                .map(TratamientoAplicado::getPrecio)
+                .filter(precio -> precio != null)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-
         lblTotalTratamientos.setText("$" + total.setScale(2).toPlainString());
     }
 
-    private void configurarEventos() {
-        btnGuardar.setOnAction(event -> guardarCita());
-        btnCancelar.setOnAction(event -> cerrarVentana());
-        btnAgregarTratamiento.setOnAction(event -> agregarTratamientoSeleccionado());
-    }
-
-    public void prepararParaEdicion(Cita cita) {
-        if (cita == null) {
-            return;
-        }
-
-        this.citaEditar = cita;
-        this.modoEdicion = true;
-        cargarDatosCita();
-        btnGuardar.setText("Guardar cambios");
-    }
-
-    private void cargarDatosCita() {
-        if (citaEditar == null) {
-            return;
-        }
-
-        if (citaEditar.getPaciente() != null && citaEditar.getPaciente().getId() != null) {
-            Long pacienteId = citaEditar.getPaciente().getId();
-            cmbPaciente.getItems().stream()
-                    .filter(paciente -> paciente.getId() != null && paciente.getId().equals(pacienteId))
-                    .findFirst()
-                    .ifPresent(paciente -> cmbPaciente.getSelectionModel().select(paciente));
-        }
-
-        if (citaEditar.getInicio() != null) {
-            dateFecha.setValue(citaEditar.getInicio().toLocalDate());
-            cmbHora.getSelectionModel().select(citaEditar.getInicio().toLocalTime().format(FORMATO_HORA));
-        }
-
-        int duracion = (int) citaEditar.getDuracionMinutos();
-        if (!cmbDuracion.getItems().contains(duracion)) {
-            cmbDuracion.getItems().add(duracion);
-        }
-        cmbDuracion.getSelectionModel().select(duracion);
-
-        txtMotivo.setText(citaEditar.getMotivo() != null ? citaEditar.getMotivo() : "");
-        txtNotas.setText(citaEditar.getNotas() != null ? citaEditar.getNotas() : "");
-
-        tratamientosSeleccionados.clear();
-        if (citaEditar.getTratamientos() != null) {
-            tratamientosSeleccionados.addAll(citaEditar.getTratamientos());
-        }
-        actualizarTotalTratamientos();
-    }
-
-    public void prepararNuevaCita(LocalDate fecha, LocalTime hora) {
-        if (fecha != null) {
-            dateFecha.setValue(fecha);
-        }
-
-        if (hora != null) {
-            String horaFormateada = hora.format(FORMATO_HORA);
-            if (cmbHora.getItems().contains(horaFormateada)) {
-                cmbHora.getSelectionModel().select(horaFormateada);
-            }
-        }
-
-        modoEdicion = false;
-        citaEditar = null;
-        txtMotivo.clear();
-        txtNotas.clear();
-        tratamientosSeleccionados.clear();
-        actualizarTotalTratamientos();
-        btnGuardar.setText("Guardar cita");
-    }
-
     private void guardarCita() {
-        limpiarError();
+        lblError.setVisible(false);
+        lblError.setManaged(false);
+
+        if (cmbPaciente.getValue() == null) {
+            mostrarError("Selecciona un paciente.");
+            return;
+        }
+
+        if (dateFecha.getValue() == null) {
+            mostrarError("Selecciona una fecha.");
+            return;
+        }
+
+        if (cmbHora.getValue() == null || cmbHora.getValue().isBlank()) {
+            mostrarError("Selecciona una hora de inicio.");
+            return;
+        }
+
+        if (cmbDuracion.getValue() == null) {
+            mostrarError("Selecciona una duración.");
+            return;
+        }
 
         try {
-            Paciente paciente = cmbPaciente.getSelectionModel().getSelectedItem();
-            if (paciente == null) {
-                mostrarError("Selecciona un paciente.");
-                return;
+            LocalTime hora = LocalTime.parse(cmbHora.getValue(), FORMATO_HORA);
+            LocalDateTime inicio = LocalDateTime.of(dateFecha.getValue(), hora);
+            int duracion = cmbDuracion.getValue();
+            LocalDateTime fin = inicio.plusMinutes(duracion);
+
+            Set<Long> idsTratamientos = new HashSet<>();
+            for (TratamientoAplicado aplicado : tratamientosSeleccionados) {
+                if (aplicado.getTratamiento() != null && aplicado.getTratamiento().getId() != null) {
+                    idsTratamientos.add(aplicado.getTratamiento().getId());
+                }
             }
 
-            LocalDate fecha = dateFecha.getValue();
-            if (fecha == null) {
-                mostrarError("Selecciona una fecha para la cita.");
-                return;
-            }
-
-            String horaSeleccionada = cmbHora.getSelectionModel().getSelectedItem();
-            if (horaSeleccionada == null || horaSeleccionada.isBlank()) {
-                mostrarError("Selecciona una hora de inicio.");
-                return;
-            }
-
-            Integer duracion = cmbDuracion.getSelectionModel().getSelectedItem();
-            if (duracion == null || duracion <= 0) {
-                mostrarError("Selecciona una duración válida.");
-                return;
-            }
-
-            LocalDateTime inicio = LocalDateTime.of(fecha, LocalTime.parse(horaSeleccionada));
-            String motivo = obtenerMotivo();
-            String notas = txtNotas.getText();
-            List<Long> tratamientoIds = obtenerTratamientoIdsSeleccionados();
-
-            if (modoEdicion) {
-                citaEditar.setPaciente(paciente);
-                citaEditar.setInicio(inicio);
-                citaEditar.establecerDuracion(duracion);
-                citaEditar.setMotivo(motivo);
-                citaEditar.setNotas(limpiarTexto(notas));
-                citaService.guardarConTratamientos(citaEditar, tratamientoIds);
+            if (modoEdicion && citaEditar != null) {
+                citaEditar.setPaciente(cmbPaciente.getValue());
+                citaEditar.setFechaHoraInicio(inicio);
+                citaEditar.setFechaHoraFin(fin);
+                citaEditar.setMotivo(txtMotivo.getText());
+                citaEditar.setNotas(txtNotas.getText());
+                citaEditar.setTratamientos(new ArrayList<>(tratamientosSeleccionados));
+                citaService.actualizar(citaEditar);
             } else {
-                Cita cita = citaService.crear(paciente, inicio, duracion);
-                cita.setMotivo(motivo);
-                cita.setNotas(limpiarTexto(notas));
-                citaService.guardarConTratamientos(cita, tratamientoIds);
+                Cita cita = new Cita();
+                cita.setPaciente(cmbPaciente.getValue());
+                cita.setFechaHoraInicio(inicio);
+                cita.setFechaHoraFin(fin);
+                cita.setMotivo(txtMotivo.getText());
+                cita.setNotas(txtNotas.getText());
+                cita.setTratamientos(new ArrayList<>(tratamientosSeleccionados));
+                citaService.guardar(cita);
             }
 
             cerrarVentana();
-
-        } catch (IllegalStateException | IllegalArgumentException e) {
-            mostrarError(e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
-            mostrarError("No fue posible guardar la cita. Revisa los datos e inténtalo nuevamente.");
+            mostrarError("No fue posible guardar la cita: " + e.getMessage());
         }
-    }
-
-    private List<Long> obtenerTratamientoIdsSeleccionados() {
-        Set<Long> ids = new HashSet<>();
-
-        for (TratamientoAplicado tratamiento : tratamientosSeleccionados) {
-            if (tratamiento != null && tratamiento.getTratamientoId() != null) {
-                ids.add(tratamiento.getTratamientoId());
-            }
-        }
-
-        return new ArrayList<>(ids);
-    }
-
-    private String obtenerMotivo() {
-        return limpiarTexto(txtMotivo.getText());
-    }
-
-    private String limpiarTexto(String texto) {
-        if (texto == null || texto.isBlank()) {
-            return null;
-        }
-        return texto.trim();
     }
 
     private void mostrarError(String mensaje) {
-        lblError.setText(mensaje != null ? mensaje : "Ocurrió un error inesperado.");
+        lblError.setText(mensaje);
         lblError.setVisible(true);
         lblError.setManaged(true);
-    }
-
-    private void limpiarError() {
-        lblError.setText("");
-        lblError.setVisible(false);
-        lblError.setManaged(false);
     }
 
     private void cerrarVentana() {
@@ -454,16 +350,52 @@ public class NuevaCitaController {
         stage.close();
     }
 
-    public void setCitaEditar(Cita citaEditar) {
-        if (citaEditar == null) {
+    public void prepararNuevaCita(LocalDate fecha, String hora) {
+        modoEdicion = false;
+        citaEditar = null;
+        dateFecha.setValue(fecha != null ? fecha : LocalDate.now());
+        if (hora != null && cmbHora.getItems().contains(hora)) {
+            cmbHora.getSelectionModel().select(hora);
+        }
+        cmbPaciente.getSelectionModel().clearSelection();
+        txtMotivo.clear();
+        txtNotas.clear();
+        tratamientosSeleccionados.clear();
+        actualizarTotalTratamientos();
+        lblError.setVisible(false);
+        lblError.setManaged(false);
+    }
+
+    public void prepararEdicion(Cita cita) {
+        modoEdicion = true;
+        citaEditar = cita;
+
+        if (cita == null) {
             return;
         }
 
-        this.citaEditar = citaEditar;
-        this.modoEdicion = true;
-
-        if (cmbPaciente != null) {
-            cargarDatosCita();
+        cmbPaciente.setValue(cita.getPaciente());
+        if (cita.getFechaHoraInicio() != null) {
+            dateFecha.setValue(cita.getFechaHoraInicio().toLocalDate());
+            String hora = cita.getFechaHoraInicio().format(FORMATO_HORA);
+            if (cmbHora.getItems().contains(hora)) {
+                cmbHora.getSelectionModel().select(hora);
+            }
         }
+        if (cita.getFechaHoraInicio() != null && cita.getFechaHoraFin() != null) {
+            long minutos = java.time.Duration.between(cita.getFechaHoraInicio(), cita.getFechaHoraFin()).toMinutes();
+            int duracion = (int) minutos;
+            if (cmbDuracion.getItems().contains(duracion)) {
+                cmbDuracion.getSelectionModel().select(Integer.valueOf(duracion));
+            }
+        }
+        txtMotivo.setText(cita.getMotivo());
+        txtNotas.setText(cita.getNotas());
+        tratamientosSeleccionados.setAll(cita.getTratamientos() != null
+                ? cita.getTratamientos()
+                : List.of());
+        actualizarTotalTratamientos();
+        lblError.setVisible(false);
+        lblError.setManaged(false);
     }
 }

@@ -83,7 +83,7 @@
                 <ListView fx:id="lstTratamientos" prefHeight="96" maxWidth="Infinity" styleClass="standard-list"/>
                 <HBox alignment="CENTER_RIGHT" spacing="8">
                     <Label text="Total de tratamientos" styleClass="standard-form-label"/>
-                    <Label fx:id="lblTotalTratamientos" text="&#36;0.00" styleClass="standard-total"/>
+                    <Label fx:id="lblTotalTratamientos" text="0.00" styleClass="standard-total"/>
                 </HBox>
             </VBox>
             <Label fx:id="lblError" managed="false" visible="false" wrapText="true" maxWidth="Infinity" styleClass="standard-error"/>

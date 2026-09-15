@@ -16,11 +16,8 @@
         styleClass="dialog-page"
         fitToWidth="true"
         hbarPolicy="NEVER"
-        vbarPolicy="AS_NEEDED">
-    <stylesheets>
-        <String fx:value="@../css/dentalcare.css"/>
-        <String fx:value="@../css/ui-standard.css"/>
-    </stylesheets>
+        vbarPolicy="AS_NEEDED"
+        stylesheets="@../css/dentalcare.css,@../css/ui-standard.css">
     <content>
         <VBox fillWidth="true" spacing="16" styleClass="dialog-shell">
             <padding><Insets top="24" right="28" bottom="24" left="28"/></padding>

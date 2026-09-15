@@ -1,10 +1,10 @@
 package mx.dentalcare.ui.controller;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 import mx.dentalcare.domain.cita.Cita;
 import mx.dentalcare.domain.tratamiento.TratamientoAplicado;
 import mx.dentalcare.service.CitaService;
@@ -31,12 +31,17 @@ public class DashboardController {
     @FXML private Label lblIngresosHoy;
     @FXML private Label lblPorCobrar;
     @FXML private Label lblCobrosHoy;
+    @FXML private Label lblFecha;
+    @FXML private Label lblReloj;
 
     private final PacientesService pacienteService;
     private final CitaService citaService;
     private final FinanzasService finanzasService;
+    private Timeline relojTimeline;
 
     private static final DateTimeFormatter FORMATO_HORA = DateTimeFormatter.ofPattern("HH:mm");
+    private static final DateTimeFormatter FORMATO_FECHA =
+            DateTimeFormatter.ofPattern("EEEE, dd 'de' MMMM 'de' yyyy", java.util.Locale.forLanguageTag("es-MX"));
 
     public DashboardController(PacientesService pacienteService, CitaService citaService,
                                FinanzasService finanzasService) {
@@ -50,6 +55,20 @@ public class DashboardController {
         cargarResumen();
         cargarProximaCita();
         cargarResumenFinanciero();
+        iniciarReloj();
+    }
+
+    private void iniciarReloj() {
+        actualizarReloj();
+        relojTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> actualizarReloj()));
+        relojTimeline.setCycleCount(Timeline.INDEFINITE);
+        relojTimeline.play();
+    }
+
+    private void actualizarReloj() {
+        LocalDateTime ahora = LocalDateTime.now();
+        lblReloj.setText(ahora.format(FORMATO_HORA));
+        lblFecha.setText(ahora.format(FORMATO_FECHA));
     }
 
     private void cargarResumen() {

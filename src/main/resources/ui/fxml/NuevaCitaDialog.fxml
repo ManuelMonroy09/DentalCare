@@ -17,165 +17,87 @@
 <ScrollPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="mx.dentalcare.ui.controller.NuevaCitaController"
+            stylesheets="@../css/dentalcare.css,@../css/ui-standard.css"
             fitToWidth="true"
             hbarPolicy="NEVER"
             vbarPolicy="AS_NEEDED"
-            style="-fx-background-color: #f6f7f9; -fx-border-color: transparent;">
-
+            styleClass="standard-page">
     <content>
-        <VBox styleClass="root" spacing="16">
+        <VBox spacing="16" fillWidth="true" styleClass="dialog-standard">
+            <padding><Insets top="26" right="30" bottom="24" left="30"/></padding>
 
-            <padding>
-                <Insets top="26" right="30" bottom="24" left="30"/>
-            </padding>
-
-            <!-- Encabezado -->
             <VBox spacing="4">
                 <Label text="Nueva cita" styleClass="page-title"/>
-                <Label text="Programa la atención del paciente y define los detalles de la cita."
-                       styleClass="page-subtitle"
-                       wrapText="true"/>
+                <Label text="Programa la atención del paciente y define los detalles de la cita." styleClass="page-subtitle" wrapText="true"/>
             </VBox>
 
-            <!-- Información principal -->
-            <VBox spacing="14"
-                  style="-fx-background-color: white; -fx-background-radius: 10px; -fx-border-color: #e5e7eb; -fx-border-width: 1px; -fx-border-radius: 10px; -fx-padding: 18px;">
+            <VBox spacing="14" styleClass="standard-section">
                 <VBox spacing="2">
-                    <Label text="Información de la cita"
-                           style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
-                    <Label text="Selecciona al paciente y establece cuándo se realizará la atención."
-                           style="-fx-font-size: 13px; -fx-text-fill: #6b7280;"
-                           wrapText="true"/>
+                    <Label text="Información de la cita" styleClass="standard-section-title"/>
+                    <Label text="Selecciona al paciente y establece cuándo se realizará la atención." styleClass="standard-section-subtitle" wrapText="true"/>
                 </VBox>
-
                 <VBox spacing="6">
-                    <Label text="Paciente" styleClass="form-label"/>
-                    <ComboBox fx:id="cmbPaciente"
-                              promptText="Selecciona un paciente"
-                              maxWidth="Infinity"
-                              styleClass="form-control"/>
+                    <Label text="Paciente" styleClass="standard-form-label"/>
+                    <ComboBox fx:id="cmbPaciente" promptText="Selecciona un paciente" maxWidth="Infinity" styleClass="form-control"/>
                 </VBox>
-
                 <GridPane hgap="12" vgap="12">
                     <columnConstraints>
                         <ColumnConstraints percentWidth="38" hgrow="ALWAYS"/>
                         <ColumnConstraints percentWidth="31" hgrow="ALWAYS"/>
                         <ColumnConstraints percentWidth="31" hgrow="ALWAYS"/>
                     </columnConstraints>
-
                     <VBox spacing="6" GridPane.columnIndex="0">
-                        <Label text="Fecha" styleClass="form-label"/>
-                        <DatePicker fx:id="dateFecha"
-                                    maxWidth="Infinity"
-                                    styleClass="form-control"/>
+                        <Label text="Fecha" styleClass="standard-form-label"/>
+                        <DatePicker fx:id="dateFecha" maxWidth="Infinity" styleClass="form-control"/>
                     </VBox>
-
                     <VBox spacing="6" GridPane.columnIndex="1">
-                        <Label text="Hora de inicio" styleClass="form-label"/>
-                        <ComboBox fx:id="cmbHora"
-                                  promptText="Selecciona una hora"
-                                  maxWidth="Infinity"
-                                  styleClass="form-control"/>
+                        <Label text="Hora de inicio" styleClass="standard-form-label"/>
+                        <ComboBox fx:id="cmbHora" promptText="Selecciona una hora" maxWidth="Infinity" styleClass="form-control"/>
                     </VBox>
-
                     <VBox spacing="6" GridPane.columnIndex="2">
-                        <Label text="Duración" styleClass="form-label"/>
-                        <ComboBox fx:id="cmbDuracion"
-                                  maxWidth="Infinity"
-                                  styleClass="form-control"/>
+                        <Label text="Duración" styleClass="standard-form-label"/>
+                        <ComboBox fx:id="cmbDuracion" promptText="Selecciona una duración" maxWidth="Infinity" styleClass="form-control"/>
                     </VBox>
                 </GridPane>
             </VBox>
 
-            <!-- Detalles de atención -->
-            <VBox spacing="14"
-                  style="-fx-background-color: white; -fx-background-radius: 10px; -fx-border-color: #e5e7eb; -fx-border-width: 1px; -fx-border-radius: 10px; -fx-padding: 18px;">
+            <VBox spacing="14" styleClass="standard-section">
                 <VBox spacing="2">
-                    <Label text="Detalles de la atención"
-                           style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
-                    <Label text="Agrega el motivo de consulta y cualquier información útil para la atención."
-                           style="-fx-font-size: 13px; -fx-text-fill: #6b7280;"
-                           wrapText="true"/>
+                    <Label text="Detalles de la atención" styleClass="standard-section-title"/>
+                    <Label text="Agrega el motivo de consulta y cualquier información útil para la atención." styleClass="standard-section-subtitle" wrapText="true"/>
                 </VBox>
-
                 <VBox spacing="6">
-                    <Label text="Motivo de consulta" styleClass="form-label"/>
-                    <TextField fx:id="txtMotivo"
-                               promptText="Ej. Dolor intenso en la muela inferior derecha"
-                               maxWidth="Infinity"
-                               styleClass="form-control"/>
+                    <Label text="Motivo de consulta" styleClass="standard-form-label"/>
+                    <TextField fx:id="txtMotivo" promptText="Ej. Dolor intenso en la muela inferior derecha" maxWidth="Infinity" styleClass="form-control"/>
                 </VBox>
-
                 <VBox spacing="6">
-                    <Label text="Notas" styleClass="form-label"/>
-                    <TextArea fx:id="txtNotas"
-                              promptText="Notas adicionales de la cita..."
-                              wrapText="true"
-                              prefRowCount="3"
-                              maxWidth="Infinity"
-                              styleClass="form-textarea"/>
+                    <Label text="Notas" styleClass="standard-form-label"/>
+                    <TextArea fx:id="txtNotas" promptText="Notas adicionales de la cita..." wrapText="true" prefRowCount="3" maxWidth="Infinity" styleClass="form-textarea"/>
                 </VBox>
             </VBox>
 
-            <!-- Tratamientos -->
-            <VBox spacing="14"
-                  style="-fx-background-color: white; -fx-background-radius: 10px; -fx-border-color: #e5e7eb; -fx-border-width: 1px; -fx-border-radius: 10px; -fx-padding: 18px;">
+            <VBox spacing="14" styleClass="standard-section">
                 <VBox spacing="2">
-                    <Label text="Tratamientos"
-                           style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
-                    <Label text="Agrega los tratamientos que se realizarán durante esta cita."
-                           style="-fx-font-size: 13px; -fx-text-fill: #6b7280;"
-                           wrapText="true"/>
+                    <Label text="Tratamientos" styleClass="standard-section-title"/>
+                    <Label text="Agrega los tratamientos que se realizarán durante esta cita." styleClass="standard-section-subtitle" wrapText="true"/>
                 </VBox>
-
                 <HBox spacing="10" alignment="CENTER_LEFT">
-                    <ComboBox fx:id="cmbTratamiento"
-                              promptText="Selecciona un tratamiento"
-                              maxWidth="Infinity"
-                              HBox.hgrow="ALWAYS"
-                              styleClass="form-control"/>
-                    <Button fx:id="btnAgregarTratamiento"
-                            text="+ Agregar"
-                            mnemonicParsing="false"
-                            styleClass="secondary-button"/>
+                    <ComboBox fx:id="cmbTratamiento" promptText="Selecciona un tratamiento" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="form-control"/>
+                    <Button fx:id="btnAgregarTratamiento" text="+ Agregar" mnemonicParsing="false" styleClass="secondary-button"/>
                 </HBox>
-
-                <ListView fx:id="lstTratamientos"
-                          prefHeight="96"
-                          maxWidth="Infinity"
-                          style="-fx-background-color: #f9fafb; -fx-border-color: #e5e7eb; -fx-border-radius: 8px; -fx-background-radius: 8px;"/>
-
+                <ListView fx:id="lstTratamientos" prefHeight="96" maxWidth="Infinity" styleClass="standard-list"/>
                 <HBox alignment="CENTER_RIGHT" spacing="8">
-                    <Label text="Total de tratamientos"
-                           style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #6b7280;"/>
-                    <Label fx:id="lblTotalTratamientos"
-                           text="$0.00"
-                           style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
+                    <Label text="Total de tratamientos" styleClass="standard-form-label"/>
+                    <Label fx:id="lblTotalTratamientos" text="$0.00" styleClass="standard-total"/>
                 </HBox>
             </VBox>
 
-            <!-- Mensaje de validación -->
-            <Label fx:id="lblError"
-                   managed="false"
-                   visible="false"
-                   wrapText="true"
-                   maxWidth="Infinity"
-                   styleClass="form-error"/>
+            <Label fx:id="lblError" managed="false" visible="false" wrapText="true" maxWidth="Infinity" styleClass="standard-error"/>
 
-            <!-- Acciones -->
-            <HBox spacing="10"
-                  alignment="CENTER_RIGHT"
-                  style="-fx-padding: 2px 0 2px 0;">
-                <Button fx:id="btnCancelar"
-                        text="Cancelar"
-                        mnemonicParsing="false"
-                        styleClass="secondary-button"/>
-                <Button fx:id="btnGuardar"
-                        text="Guardar cita"
-                        mnemonicParsing="false"
-                        styleClass="primary-button"/>
+            <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="standard-actions">
+                <Button fx:id="btnCancelar" text="Cancelar" mnemonicParsing="false" styleClass="secondary-button"/>
+                <Button fx:id="btnGuardar" text="Guardar cita" mnemonicParsing="false" styleClass="primary-button"/>
             </HBox>
-
         </VBox>
     </content>
 </ScrollPane>

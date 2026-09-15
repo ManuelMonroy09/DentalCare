@@ -11,6 +11,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -63,7 +64,8 @@ public class MainController {
     private void mostrarPerfil() {
         AuthenticatedUser user = securitySession.requireCurrentUser(); Dialog<ButtonType> dialog = crearDialogoEstandar("Mi perfil", "Información de tu cuenta");
         VBox content = crearPanel(12); content.getChildren().addAll(crearTexto("Nombre visible:  " + user.getDisplayName()), crearTexto("Usuario:  " + user.getUsername()), crearTexto("Rol:  " + user.getRole().getDisplayName()));
-        mostrarContenidoDialogo(dialog, content, ButtonType.OK); Button cerrar = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK); if (cerrar != null) cerrar.setText("Cerrar"); dialog.showAndWait(); }
+        mostrarContenidoDialogo(dialog, content, ButtonType.OK); Button cerrar = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK); if (cerrar != null) cerrar.setText("Cerrar"); dialog.showAndWait();
+    }
 
     private void cambiarPassword() {
         Dialog<ButtonType> dialog = crearDialogoEstandar("Cambiar contraseña", "Actualiza la contraseña de tu usuario");
@@ -107,6 +109,94 @@ public class MainController {
 
     private void mostrarRolesPermisos() { StringBuilder texto = new StringBuilder(); for (UserRole role : UserRole.values()) { texto.append(role.getDisplayName()).append("\n"); for (UserPermission permission : AuthenticatedUser.permissionsFor(role)) texto.append("  • ").append(nombrePermiso(permission)).append("\n"); texto.append("\n"); } mostrarDialogoTexto("Roles y permisos", "Permisos actuales de DentalCare", texto.toString()); }
     private void mostrarAuditoria() { mostrarDialogoTexto("Auditoría", "Auditoría de seguridad", "La auditoría detallada se habilitará como siguiente capa del sistema.\n\nLos roles y privilegios ya están activos."); }
+
+    private void mostrarDialogoTexto(String titulo, String encabezado, String texto) { Dialog<ButtonType> dialog = crearDialogoEstandar(titulo, encabezado); Label label = crearTexto(texto); VBox content = crearPanel(8); content.getChildren().add(label); mostrarContenidoDialogo(dialog, content, ButtonType.OK); Button cerrar = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK); if (cerrar != null) cerrar.setText("Cerrar"); dialog.showAndWait(); }
+
+    private Dialog<ButtonType> crearDialogoEstandar(String titulo, String encabezado) {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("DentalCare | " + titulo);
+        DialogPane pane = dialog.getDialogPane();
+        pane.getStyleClass().add("standard-dialog");
+
+        String css = getClass().getResource("/ui/css/dialog.css").toExternalForm();
+        if (!pane.getStylesheets().contains(css)) pane.getStylesheets().add(css);
+
+        Label tituloLabel = new Label(titulo);
+        tituloLabel.getStyleClass().add("standard-dialog-title");
+        VBox header = new VBox(5);
+        header.getStyleClass().add("standard-dialog-header");
+        header.getChildren().add(tituloLabel);
+
+        if (encabezado != null && !encabezado.isBlank()) {
+            Label subtituloLabel = new Label(encabezado);
+            subtituloLabel.getStyleClass().add("standard-dialog-subtitle");
+            subtituloLabel.setWrapText(true);
+            header.getChildren().add(subtituloLabel);
+        }
+
+        pane.setHeader(header);
+        pane.setMinWidth(520);
+        pane.setPrefWidth(Region.USE_COMPUTED_SIZE);
+        pane.setMaxWidth(820);
+        pane.setMinHeight(Region.USE_COMPUTED_SIZE);
+        pane.setPrefHeight(Region.USE_COMPUTED_SIZE);
+        pane.setMaxHeight(Region.USE_COMPUTED_SIZE);
+        return dialog;
+    }
+
+    private void mostrarContenidoDialogo(Dialog<ButtonType> dialog, javafx.scene.Node contenido, ButtonType... botones) {
+        DialogPane pane = dialog.getDialogPane();
+        VBox contenedor = new VBox();
+        contenedor.getStyleClass().add("standard-dialog-content");
+        contenedor.setFillWidth(true);
+        contenedor.setMaxWidth(Double.MAX_VALUE);
+        contenedor.getChildren().add(contenido);
+        VBox.setVgrow(contenido, Priority.ALWAYS);
+        pane.setContent(contenedor);
+        pane.getButtonTypes().setAll(botones);
+        estilizarBotonesDialogo(pane);
+    }
+
+    private VBox crearPanel(double spacing) {
+        VBox panel = new VBox(spacing);
+        panel.setPadding(new Insets(16));
+        panel.setFillWidth(true);
+        panel.setMaxWidth(Double.MAX_VALUE);
+        panel.getStyleClass().add("standard-dialog-panel");
+        return panel;
+    }
+
+    private Label crearTexto(String texto) {
+        Label label = new Label(texto);
+        label.getStyleClass().add("standard-dialog-text");
+        label.setWrapText(true);
+        label.setMaxWidth(Double.MAX_VALUE);
+        label.setMinHeight(Region.USE_PREF_SIZE);
+        return label;
+    }
+
+    private void estilizarBotonesDialogo(DialogPane pane) {
+        pane.applyCss();
+        for (ButtonType tipo : pane.getButtonTypes()) {
+            javafx.scene.Node node = pane.lookupButton(tipo);
+            if (!(node instanceof Button button)) continue;
+            button.getStyleClass().removeAll("dialog-primary-button", "dialog-secondary-button");
+            if (tipo == ButtonType.CANCEL || tipo == ButtonType.CLOSE) {
+                button.getStyleClass().add("dialog-secondary-button");
+            } else {
+                button.getStyleClass().add("dialog-primary-button");
+            }
+            button.setMinWidth(Region.USE_PREF_SIZE);
+            button.setPrefWidth(Region.USE_COMPUTED_SIZE);
+            button.setMaxWidth(Region.USE_PREF_SIZE);
+            button.setMinHeight(40);
+            button.setPrefHeight(40);
+            button.setMaxHeight(44);
+            button.setWrapText(false);
+            button.setMnemonicParsing(false);
+            button.setTextOverrun(OverrunStyle.CLIP);
+        }
+    }
 
     private String nombrePermiso(UserPermission permission) { return switch (permission) { case VER_INICIO -> "Inicio"; case VER_PACIENTES -> "Pacientes"; case GESTIONAR_CITAS -> "Agenda y citas"; case VER_TRATAMIENTOS -> "Tratamientos"; case VER_HISTORIAL -> "Historial"; case VER_FINANZAS -> "Finanzas"; case VER_CONFIGURACION -> "Configuración"; case GESTIONAR_USUARIOS -> "Gestión de usuarios"; case VER_ROLES -> "Roles y permisos"; case VER_AUDITORIA -> "Auditoría"; }; }
     private void cerrarSesion() { try { authenticationService.logout(); Stage applicationStage = (Stage) contentArea.getScene().getWindow(); applicationStage.close(); FXMLLoader loader = new FXMLLoader(getClass().getResource("/ui/fxml/LoginView.fxml")); loader.setControllerFactory(context::getBean); Parent root = loader.load(); Stage loginStage = new Stage(); loginStage.initStyle(StageStyle.UNDECORATED); loginStage.setTitle("DentalCare | Iniciar sesión"); loginStage.setScene(new Scene(root, 900, 540)); loginStage.setResizable(false); loginStage.show(); loginStage.centerOnScreen(); } catch (Exception e) { mostrarError("No fue posible cerrar la sesión correctamente."); } }

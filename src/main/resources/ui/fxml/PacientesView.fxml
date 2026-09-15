@@ -10,7 +10,7 @@
 
 <VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mx.dentalcare.ui.controller.PacientesController" spacing="16" styleClass="standard-page">
     <padding><Insets top="24" right="28" bottom="24" left="28"/></padding>
-    <VBox spacing="16" styleClass="standard-section">
+    <VBox spacing="16" VBox.vgrow="ALWAYS" styleClass="standard-section">
         <HBox alignment="CENTER_LEFT" spacing="15">
             <VBox HBox.hgrow="ALWAYS" spacing="5">
                 <Label text="Pacientes" styleClass="page-title"/>

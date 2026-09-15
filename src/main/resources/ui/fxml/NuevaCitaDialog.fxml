@@ -88,8 +88,8 @@
             </VBox>
             <Label fx:id="lblError" managed="false" visible="false" wrapText="true" maxWidth="Infinity" styleClass="standard-error"/>
             <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="standard-actions">
-                <Button fx:id="btnCancelar" text="Cancelar" mnemonicParsing="false"/>
-                <Button fx:id="btnGuardar" text="Guardar cita" mnemonicParsing="false"/>
+                <Button fx:id="btnCancelar" text="Cancelar" mnemonicParsing="false" styleClass="secondary-button"/>
+                <Button fx:id="btnGuardar" text="Guardar cita" mnemonicParsing="false" styleClass="primary-button"/>
             </HBox>
         </VBox>
     </content>

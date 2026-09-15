@@ -98,19 +98,22 @@ public class SetupController {
     }
 
     private void abrirAplicacion() throws Exception {
-        Stage stage = (Stage) txtPassword.getScene().getWindow();
+        Stage setupStage = (Stage) txtPassword.getScene().getWindow();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/ui/fxml/MainView.fxml"));
         loader.setControllerFactory(context::getBean);
         Parent root = loader.load();
         Scene scene = new Scene(root, 1200, 750);
 
-        stage.setTitle("DentalCare");
-        stage.setScene(scene);
-        stage.setMinWidth(1000);
-        stage.setMinHeight(650);
-        stage.setResizable(true);
-        stage.centerOnScreen();
-        stage.show();
+        Stage applicationStage = new Stage();
+        applicationStage.setTitle("DentalCare");
+        applicationStage.setScene(scene);
+        applicationStage.setMinWidth(1000);
+        applicationStage.setMinHeight(650);
+        applicationStage.setResizable(true);
+        applicationStage.show();
+        applicationStage.centerOnScreen();
+
+        setupStage.close();
     }
 
     private void mostrarError(String mensaje) {

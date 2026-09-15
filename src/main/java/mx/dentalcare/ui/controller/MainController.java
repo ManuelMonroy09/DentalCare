@@ -3,9 +3,12 @@ package mx.dentalcare.ui.controller;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
@@ -16,7 +19,6 @@ import mx.dentalcare.security.*;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -95,29 +97,59 @@ public class MainController {
 
     private void mostrarPerfil() {
         AuthenticatedUser user = securitySession.requireCurrentUser();
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Mi perfil"); alert.setHeaderText(user.getDisplayName());
-        alert.setContentText("Usuario: " + user.getUsername() + "\nRol: " + user.getRole().getDisplayName());
-        alert.showAndWait();
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Mi perfil");
+        dialog.setHeaderText("Información de tu cuenta");
+
+        VBox content = new VBox(12);
+        content.setPadding(new Insets(8, 4, 8, 4));
+        Label nombre = new Label("Nombre visible:  " + user.getDisplayName());
+        Label usuario = new Label("Usuario:  " + user.getUsername());
+        Label rol = new Label("Rol:  " + user.getRole().getDisplayName());
+        nombre.setWrapText(true); usuario.setWrapText(true); rol.setWrapText(true);
+        content.getChildren().addAll(nombre, usuario, rol);
+
+        DialogPane pane = dialog.getDialogPane();
+        pane.setContent(content);
+        pane.setPrefWidth(520);
+        pane.setMinWidth(520);
+        pane.setPrefHeight(260);
+        pane.getButtonTypes().add(ButtonType.OK);
+        estilizarBotonesDialogo(pane);
+        dialog.showAndWait();
     }
 
     private void cambiarPassword() {
         Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Cambiar contraseña"); dialog.setHeaderText("Actualiza la contraseña de tu usuario");
-        PasswordField actual = new PasswordField(); actual.setPromptText("Contraseña actual");
-        PasswordField nueva = new PasswordField(); nueva.setPromptText("Nueva contraseña");
-        PasswordField confirmar = new PasswordField(); confirmar.setPromptText("Confirmar nueva contraseña");
-        javafx.scene.layout.GridPane grid = new javafx.scene.layout.GridPane();
-        grid.setHgap(10); grid.setVgap(10);
+        dialog.setTitle("Cambiar contraseña");
+        dialog.setHeaderText("Actualiza la contraseña de tu usuario");
+
+        PasswordField actual = new PasswordField(); actual.setPromptText("Contraseña actual"); actual.setPrefWidth(300);
+        PasswordField nueva = new PasswordField(); nueva.setPromptText("Nueva contraseña"); nueva.setPrefWidth(300);
+        PasswordField confirmar = new PasswordField(); confirmar.setPromptText("Confirmar nueva contraseña"); confirmar.setPrefWidth(300);
+        GridPane grid = new GridPane();
+        grid.setHgap(14); grid.setVgap(14); grid.setPadding(new Insets(8));
         grid.add(new Label("Actual:"), 0, 0); grid.add(actual, 1, 0);
         grid.add(new Label("Nueva:"), 0, 1); grid.add(nueva, 1, 1);
         grid.add(new Label("Confirmar:"), 0, 2); grid.add(confirmar, 1, 2);
-        dialog.getDialogPane().setContent(grid); dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        DialogPane pane = dialog.getDialogPane();
+        pane.setContent(grid);
+        pane.setPrefWidth(560);
+        pane.setMinWidth(560);
+        pane.setPrefHeight(330);
+        pane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        estilizarBotonesDialogo(pane);
+
         Optional<ButtonType> result = dialog.showAndWait();
         if (result.isEmpty() || result.get() != ButtonType.OK) return;
         if (!nueva.getText().equals(confirmar.getText())) { mostrarError("Las nuevas contraseñas no coinciden."); return; }
-        try { authenticationService.changePassword(actual.getText(), nueva.getText()); mostrarInformacion("Contraseña actualizada", "Tu contraseña fue cambiada correctamente."); }
-        catch (Exception e) { mostrarError(e.getMessage() == null ? "No fue posible cambiar la contraseña." : e.getMessage()); }
+        try {
+            authenticationService.changePassword(actual.getText(), nueva.getText());
+            mostrarInformacion("Contraseña actualizada", "Tu contraseña fue cambiada correctamente.");
+        } catch (Exception e) {
+            mostrarError(e.getMessage() == null ? "No fue posible cambiar la contraseña." : e.getMessage());
+        }
     }
 
     private void mostrarUsuarios() {
@@ -127,6 +159,8 @@ public class MainController {
 
         TableView<UserService.StoredUser> table = new TableView<>();
         table.getStyleClass().add("users-table");
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
         TableColumn<UserService.StoredUser, String> usuario = new TableColumn<>("Usuario");
         usuario.setCellValueFactory(cell -> new ReadOnlyStringWrapper(cell.getValue().username));
         TableColumn<UserService.StoredUser, String> nombre = new TableColumn<>("Nombre");
@@ -136,7 +170,11 @@ public class MainController {
         TableColumn<UserService.StoredUser, String> estado = new TableColumn<>("Estado");
         estado.setCellValueFactory(cell -> new ReadOnlyStringWrapper(cell.getValue().active ? "Activo" : "Inactivo"));
         table.getColumns().addAll(usuario, nombre, rol, estado);
-        usuario.setPrefWidth(210); nombre.setPrefWidth(330); rol.setPrefWidth(190); estado.setPrefWidth(190);
+        usuario.setMaxWidth(Double.MAX_VALUE); nombre.setMaxWidth(Double.MAX_VALUE); rol.setMaxWidth(Double.MAX_VALUE); estado.setMaxWidth(Double.MAX_VALUE);
+        usuario.prefWidthProperty().bind(table.widthProperty().multiply(0.25));
+        nombre.prefWidthProperty().bind(table.widthProperty().multiply(0.35));
+        rol.prefWidthProperty().bind(table.widthProperty().multiply(0.20));
+        estado.prefWidthProperty().bind(table.widthProperty().multiply(0.20));
         table.getItems().setAll(userService.listUsers());
         VBox.setVgrow(table, Priority.ALWAYS);
 
@@ -144,9 +182,11 @@ public class MainController {
         TextField nuevoNombre = new TextField(); nuevoNombre.setPromptText("nombre visible"); nuevoNombre.getStyleClass().add("users-field");
         PasswordField nuevaPassword = new PasswordField(); nuevaPassword.setPromptText("mínimo 8 caracteres"); nuevaPassword.getStyleClass().add("users-field");
         ComboBox<UserRole> nuevoRol = new ComboBox<>(); nuevoRol.getItems().addAll(UserRole.ADMINISTRADOR, UserRole.USUARIO); nuevoRol.setValue(UserRole.USUARIO); nuevoRol.getStyleClass().add("users-combo");
+        nuevoRol.setMaxWidth(Double.MAX_VALUE);
 
         Button crear = new Button("Crear usuario"); crear.getStyleClass().addAll("users-action-button", "users-primary-button");
         Button cambiarEstado = new Button("Activar / desactivar"); cambiarEstado.getStyleClass().addAll("users-action-button", "users-secondary-button");
+        crear.setMinWidth(145); crear.setPrefWidth(145); cambiarEstado.setMinWidth(175); cambiarEstado.setPrefWidth(175);
 
         crear.setOnAction(event -> {
             try {
@@ -172,21 +212,19 @@ public class MainController {
         VBox nombreBox = new VBox(6, lNombre, nuevoNombre); HBox.setHgrow(nombreBox, Priority.ALWAYS);
         VBox passwordBox = new VBox(6, lPassword, nuevaPassword); HBox.setHgrow(passwordBox, Priority.ALWAYS);
         VBox rolBox = new VBox(6, lRol, nuevoRol); HBox.setHgrow(rolBox, Priority.ALWAYS);
-        HBox fila1 = new HBox(14, usuarioBox, nombreBox, rolBox);
-        HBox fila2 = new HBox(14, passwordBox, crear, cambiarEstado); fila2.setAlignment(javafx.geometry.Pos.BOTTOM_LEFT);
+        HBox fila1 = new HBox(14, usuarioBox, nombreBox, passwordBox, rolBox);
+        HBox fila2 = new HBox(12, crear, cambiarEstado); fila2.setAlignment(Pos.CENTER_RIGHT);
         VBox form = new VBox(12, formTitle, fila1, fila2); form.getStyleClass().add("users-form-card");
-        VBox.setVgrow(fila1, Priority.NEVER);
 
         Label title = new Label("Usuarios"); title.getStyleClass().add("users-title");
         Label subtitle = new Label("Administra las cuentas y privilegios de acceso a DentalCare."); subtitle.getStyleClass().add("users-subtitle");
         VBox header = new VBox(4, title, subtitle); header.getStyleClass().add("users-header");
 
         VBox root = new VBox(0, header, table, form); root.getStyleClass().add("users-root");
-        root.setPadding(new javafx.geometry.Insets(0, 0, 18, 0));
+        root.setPadding(new Insets(0, 0, 18, 0));
         VBox.setVgrow(table, Priority.ALWAYS);
-        table.setMaxHeight(Double.MAX_VALUE);
-        VBox.setMargin(table, new javafx.geometry.Insets(18, 24, 14, 24));
-        VBox.setMargin(form, new javafx.geometry.Insets(0, 24, 0, 24));
+        VBox.setMargin(table, new Insets(18, 24, 14, 24));
+        VBox.setMargin(form, new Insets(0, 24, 0, 24));
 
         Scene scene = new Scene(root, 1100, 700);
         String css = getClass().getResource("/ui/css/users.css").toExternalForm();
@@ -204,11 +242,40 @@ public class MainController {
             for (UserPermission permission : AuthenticatedUser.permissionsFor(role)) texto.append("  • ").append(nombrePermiso(permission)).append("\n");
             texto.append("\n");
         }
-        Alert alert = new Alert(Alert.AlertType.INFORMATION); alert.setTitle("Roles y permisos"); alert.setHeaderText("Permisos actuales de DentalCare"); alert.setContentText(texto.toString()); alert.showAndWait();
+        mostrarDialogoTexto("Roles y permisos", "Permisos actuales de DentalCare", texto.toString(), 620, 560);
     }
 
     private void mostrarAuditoria() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION); alert.setTitle("Auditoría"); alert.setHeaderText("Auditoría de seguridad"); alert.setContentText("La auditoría detallada se habilitará como siguiente capa del sistema.\n\nLos roles y privilegios ya están activos."); alert.showAndWait();
+        mostrarDialogoTexto("Auditoría", "Auditoría de seguridad", "La auditoría detallada se habilitará como siguiente capa del sistema.\n\nLos roles y privilegios ya están activos.", 600, 300);
+    }
+
+    private void mostrarDialogoTexto(String titulo, String encabezado, String texto, double ancho, double alto) {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle(titulo);
+        dialog.setHeaderText(encabezado);
+        Label label = new Label(texto);
+        label.setWrapText(true);
+        label.setMaxWidth(ancho - 70);
+        label.setPadding(new Insets(8));
+        DialogPane pane = dialog.getDialogPane();
+        pane.setContent(label);
+        pane.setPrefWidth(ancho);
+        pane.setMinWidth(ancho);
+        pane.setPrefHeight(alto);
+        pane.getButtonTypes().add(ButtonType.OK);
+        estilizarBotonesDialogo(pane);
+        dialog.showAndWait();
+    }
+
+    private void estilizarBotonesDialogo(DialogPane pane) {
+        for (ButtonType tipo : pane.getButtonTypes()) {
+            Button button = (Button) pane.lookupButton(tipo);
+            if (button != null) {
+                button.setMinWidth(110);
+                button.setPrefWidth(110);
+                button.setMinHeight(38);
+            }
+        }
     }
 
     private String nombrePermiso(UserPermission permission) {
@@ -233,6 +300,6 @@ public class MainController {
         catch (Exception e) { throw new RuntimeException("No fue posible cargar la vista: " + ruta, e); }
     }
 
-    private void mostrarInformacion(String titulo, String mensaje) { Alert alert = new Alert(Alert.AlertType.INFORMATION); alert.setTitle(titulo); alert.setHeaderText(null); alert.setContentText(mensaje); alert.showAndWait(); }
-    private void mostrarError(String mensaje) { Alert alert = new Alert(Alert.AlertType.ERROR); alert.setTitle("DentalCare"); alert.setHeaderText(null); alert.setContentText(mensaje); alert.showAndWait(); }
+    private void mostrarInformacion(String titulo, String mensaje) { mostrarDialogoTexto(titulo, null, mensaje, 500, 250); }
+    private void mostrarError(String mensaje) { mostrarDialogoTexto("DentalCare", null, mensaje, 520, 250); }
 }

@@ -104,7 +104,7 @@ public class FinanzasController {
         ChoiceDialog<CitaAnticipoOption> citaDialog = new ChoiceDialog<>(opciones.get(0), opciones);
         citaDialog.setTitle("Registrar anticipo");
         citaDialog.setHeaderText("Seleccionar cita para registrar el anticipo");
-        citaDialog.setContentText("Cita:");
+        citaDialog.setContentText("");
         configurarDialogo(citaDialog, 600, 250);
         var citaResultado = citaDialog.showAndWait();
         if (citaResultado.isEmpty()) return;
@@ -146,9 +146,8 @@ public class FinanzasController {
             String paciente = cita.getPaciente() == null ? "Paciente" :
                     (cita.getPaciente().getNombre() + " " + cita.getPaciente().getApellidoPaterno() + " " + cita.getPaciente().getApellidoMaterno())
                             .trim().replaceAll("\\s+", " ");
-            String fecha = cita.getInicio() == null ? "Fecha no disponible" : cita.getInicio().format(FECHA_HORA);
-            String estado = cita.getEstado() == EstadoCita.CONFIRMADA ? "Confirmada" : "Programada";
-            return paciente + " · " + fecha + " · " + estado;
+            String fechaHora = cita.getInicio() == null ? "Fecha no disponible" : cita.getInicio().format(FECHA_HORA);
+            return paciente + " · " + fechaHora;
         }
     }
 
@@ -282,19 +281,19 @@ public class FinanzasController {
         agregarTexto(ticket, "Paciente: " + nombre, "-fx-font-size: 11px;");
         agregarTexto(ticket, "Concepto: " + valor(cargo.getConcepto()), "-fx-font-size: 11px;");
         agregarTexto(ticket, "Método: " + (pago.getMetodoPago() == null ? "" : pago.getMetodoPago().getDescripcion()), "-fx-font-size: 11px;");
-        agregarTexto(ticket, "Importe pagado: " + moneda(pago.getMonto()), "-fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 8px 0 0 0;");
-        agregarTexto(ticket, "Saldo pendiente: " + moneda(pendiente), "-fx-font-size: 11px;");
-        agregarTexto(ticket, "Gracias por su visita.", "-fx-font-size: 11px; -fx-padding: 10px 0 0 0; -fx-alignment: center;");
+        agregarTexto(ticket, "Importe: " + moneda(pago.getMonto()), "-fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 8px 0 0 0;");
+        agregarTexto(ticket, "Pendiente: " + moneda(pendiente), "-fx-font-size: 11px;");
+        agregarTexto(ticket, "Gracias por su visita.", "-fx-font-size: 11px; -fx-alignment: center; -fx-padding: 12px 0 0 0;");
         return ticket;
     }
 
     private void imprimirTicket(VBox ticket) {
         PrinterJob job = PrinterJob.createPrinterJob();
         if (job == null) { mostrarError("Impresión", "No hay una impresora disponible."); return; }
-        boolean preparado = job.showPrintDialog(ticket.getScene() == null ? null : ticket.getScene().getWindow());
-        if (!preparado) return;
-        boolean impreso = job.printPage(ticket);
-        if (impreso) job.endJob(); else mostrarError("Impresión", "No fue posible enviar el recibo a la impresora.");
+        if (job.showPrintDialog(ticket.getScene().getWindow())) {
+            boolean impreso = job.printPage(ticket);
+            if (impreso) job.endJob(); else mostrarError("Impresión", "No fue posible enviar el recibo a la impresora.");
+        }
     }
 
     private void agregarTexto(VBox contenedor, String texto, String estilo) {

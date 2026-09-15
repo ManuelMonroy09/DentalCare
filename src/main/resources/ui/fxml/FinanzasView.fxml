@@ -11,44 +11,66 @@
 <VBox xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="mx.dentalcare.ui.controller.FinanzasController"
-      spacing="18"
-      styleClass="content standard-page">
-    <padding><Insets top="5" right="0" bottom="5" left="0"/></padding>
-    <VBox spacing="4">
+      spacing="16"
+      fillWidth="true"
+      styleClass="standard-page">
+    <padding>
+        <Insets top="24" right="26" bottom="24" left="26"/>
+    </padding>
+
+    <VBox spacing="4" styleClass="standard-section">
         <Label text="Finanzas" styleClass="page-title"/>
-        <Label text="Control de cargos, pagos, anticipos y saldos pendientes del consultorio." styleClass="page-subtitle"/>
+        <Label text="Controla cargos, pagos, anticipos y saldos pendientes del consultorio."
+               styleClass="page-subtitle"
+               wrapText="true"/>
     </VBox>
-    <HBox spacing="12">
-        <VBox spacing="3" styleClass="stat-card" HBox.hgrow="ALWAYS">
+
+    <HBox spacing="12" fillHeight="true">
+        <VBox spacing="4" HBox.hgrow="ALWAYS" styleClass="stat-card">
             <Label text="Ingresos de hoy" styleClass="page-subtitle"/>
             <Label fx:id="ingresosLabel" text="\$0.00" styleClass="stat-value"/>
         </VBox>
-        <VBox spacing="3" styleClass="stat-card" HBox.hgrow="ALWAYS">
+        <VBox spacing="4" HBox.hgrow="ALWAYS" styleClass="stat-card">
             <Label text="Por cobrar" styleClass="page-subtitle"/>
             <Label fx:id="pendienteLabel" text="\$0.00" styleClass="stat-value"/>
         </VBox>
-        <VBox spacing="3" styleClass="stat-card" HBox.hgrow="ALWAYS">
+        <VBox spacing="4" HBox.hgrow="ALWAYS" styleClass="stat-card">
             <Label text="Cobros de hoy" styleClass="page-subtitle"/>
             <Label fx:id="cobrosHoyLabel" text="0" styleClass="stat-value"/>
         </VBox>
     </HBox>
-    <HBox alignment="CENTER_LEFT" spacing="8">
-        <Button text="Registrar pago" onAction="#registrarPago" styleClass="primary-button"/>
-        <Button text="Registrar anticipo" onAction="#registrarAnticipo" styleClass="secondary-button"/>
-        <Button text="Imprimir recibo" onAction="#imprimirRecibo" styleClass="secondary-button"/>
-        <Button text="Ver detalle" onAction="#verDetalle" styleClass="secondary-button"/>
-        <Button text="Sincronizar cargos" onAction="#sincronizarCargos" styleClass="secondary-button"/>
+
+    <HBox spacing="10" alignment="CENTER_LEFT" styleClass="standard-section">
+        <Button text="Registrar pago" mnemonicParsing="false" onAction="#registrarPago" styleClass="primary-button"/>
+        <Button text="Registrar anticipo" mnemonicParsing="false" onAction="#registrarAnticipo" styleClass="secondary-button"/>
+        <Button text="Imprimir recibo" mnemonicParsing="false" onAction="#imprimirRecibo" styleClass="secondary-button"/>
+        <Button text="Ver detalle" mnemonicParsing="false" onAction="#verDetalle" styleClass="secondary-button"/>
+        <Button text="Sincronizar cargos" mnemonicParsing="false" onAction="#sincronizarCargos" styleClass="secondary-button"/>
     </HBox>
-    <Label fx:id="mensajeLabel" text="" wrapText="true" maxWidth="900" styleClass="page-subtitle"/>
-    <TableView fx:id="cargosTable" VBox.vgrow="ALWAYS" styleClass="patients-table">
-        <columns>
-            <TableColumn fx:id="fechaColumn" text="Fecha" prefWidth="105"/>
-            <TableColumn fx:id="pacienteColumn" text="Paciente" prefWidth="190"/>
-            <TableColumn fx:id="conceptoColumn" text="Concepto" prefWidth="200"/>
-            <TableColumn fx:id="importeColumn" text="Cargo" prefWidth="110"/>
-            <TableColumn fx:id="pagadoColumn" text="Pagado" prefWidth="110"/>
-            <TableColumn fx:id="pendienteColumn" text="Pendiente" prefWidth="120"/>
-            <TableColumn fx:id="estadoColumn" text="Estado" prefWidth="110"/>
-        </columns>
-    </TableView>
+
+    <VBox spacing="8" VBox.vgrow="ALWAYS" fillWidth="true" styleClass="standard-section">
+        <Label text="Movimientos" styleClass="standard-section-title"/>
+        <Label text="Consulta los cargos y el estado de sus pagos." styleClass="standard-section-subtitle"/>
+        <Label fx:id="mensajeLabel"
+               text=""
+               managed="false"
+               visible="false"
+               wrapText="true"
+               maxWidth="Infinity"
+               styleClass="standard-error"/>
+        <TableView fx:id="cargosTable"
+                    VBox.vgrow="ALWAYS"
+                    maxWidth="Infinity"
+                    styleClass="patients-table">
+            <columns>
+                <TableColumn fx:id="fechaColumn" text="Fecha" prefWidth="105"/>
+                <TableColumn fx:id="pacienteColumn" text="Paciente" prefWidth="190"/>
+                <TableColumn fx:id="conceptoColumn" text="Concepto" prefWidth="200"/>
+                <TableColumn fx:id="importeColumn" text="Cargo" prefWidth="110"/>
+                <TableColumn fx:id="pagadoColumn" text="Pagado" prefWidth="110"/>
+                <TableColumn fx:id="pendienteColumn" text="Pendiente" prefWidth="120"/>
+                <TableColumn fx:id="estadoColumn" text="Estado" prefWidth="110"/>
+            </columns>
+        </TableView>
+    </VBox>
 </VBox>

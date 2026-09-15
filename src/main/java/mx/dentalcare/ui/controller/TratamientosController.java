@@ -179,7 +179,7 @@ public class TratamientosController {
             stage.showAndWait();
             cargarTratamientos();
         } catch (Exception e) {
-            mostrarError("No fue posible abrir el formulario de tratamiento.", e);
+            e.printStackTrace();
         }
     }
 
@@ -202,7 +202,7 @@ public class TratamientosController {
             stage.showAndWait();
             cargarTratamientos();
         } catch (Exception e) {
-            mostrarError("No fue posible abrir el formulario de edición.", e);
+            e.printStackTrace();
         }
     }
 
@@ -231,17 +231,8 @@ public class TratamientosController {
             }
             cargarTratamientos();
         } catch (Exception e) {
-            mostrarError("No fue posible " + accion + " el tratamiento.", e);
+            e.printStackTrace();
         }
-    }
-
-    private void mostrarError(String mensaje, Exception e) {
-        Alert alerta = new Alert(Alert.AlertType.ERROR);
-        alerta.setTitle("Error");
-        alerta.setHeaderText(mensaje);
-        alerta.setContentText(e.getMessage() != null ? e.getMessage() : "Ocurrió un error inesperado.");
-        estilizarAlerta(alerta);
-        alerta.showAndWait();
     }
 
     private void estilizarAlerta(Alert alerta) {

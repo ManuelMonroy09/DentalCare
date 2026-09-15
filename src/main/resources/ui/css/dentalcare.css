@@ -44,14 +44,10 @@
 .menu-button {
     -fx-background-color: transparent;
     -fx-text-fill: #4b5563;
-
     -fx-font-size: 14px;
     -fx-alignment: CENTER_LEFT;
-
     -fx-padding: 12px 15px;
-
     -fx-background-radius: 8px;
-
     -fx-cursor: hand;
 }
 
@@ -92,14 +88,10 @@
 
 .card {
     -fx-background-color: white;
-
     -fx-padding: 20px;
-
     -fx-pref-width: 200px;
     -fx-pref-height: 110px;
-
     -fx-background-radius: 10px;
-
     -fx-border-color: #e5e7eb;
     -fx-border-width: 1px;
     -fx-border-radius: 10px;
@@ -124,15 +116,11 @@
 .primary-button {
     -fx-background-color: #2563eb;
     -fx-text-fill: white;
-
     -fx-font-size: 14px;
     -fx-font-weight: bold;
-
     -fx-padding: 10px 18px;
-
     -fx-background-radius: 8px;
     -fx-border-radius: 8px;
-
     -fx-cursor: hand;
 }
 
@@ -144,20 +132,15 @@
     -fx-background-color: #1e40af;
 }
 
-
 .secondary-button {
     -fx-background-color: white;
     -fx-text-fill: #374151;
-
     -fx-border-color: #d1d5db;
     -fx-border-width: 1px;
     -fx-border-radius: 8px;
     -fx-background-radius: 8px;
-
     -fx-font-size: 14px;
-
     -fx-padding: 10px 18px;
-
     -fx-cursor: hand;
 }
 
@@ -170,18 +153,13 @@
     -fx-background-color: #e5e7eb;
 }
 
-
 .danger-button {
     -fx-background-color: #dc2626;
     -fx-text-fill: white;
-
     -fx-font-size: 14px;
-
     -fx-padding: 10px 18px;
-
     -fx-background-radius: 8px;
     -fx-border-radius: 8px;
-
     -fx-cursor: hand;
 }
 
@@ -200,14 +178,11 @@
 
 .search-field {
     -fx-background-color: white;
-
     -fx-border-color: #d1d5db;
     -fx-border-width: 1px;
     -fx-border-radius: 8px;
     -fx-background-radius: 8px;
-
     -fx-padding: 10px;
-
     -fx-font-size: 14px;
 }
 
@@ -215,11 +190,6 @@
     -fx-border-color: #2563eb;
     -fx-border-width: 2px;
 }
-
-
-/* =========================================================
-   TEXT FIELD
-   ========================================================= */
 
 .text-field {
     -fx-pref-height: 44px;
@@ -231,15 +201,9 @@
     -fx-border-color: #2563eb;
 }
 
-
-/* =========================================================
-   ERROR EN CAMPOS
-   ========================================================= */
-
 .text-field.field-error {
     -fx-border-color: #dc2626;
     -fx-border-width: 2px;
-
     -fx-border-radius: 6px;
     -fx-background-radius: 6px;
 }
@@ -256,10 +220,8 @@
 
 .patients-table {
     -fx-background-color: white;
-
     -fx-border-color: #e5e7eb;
     -fx-border-width: 1px;
-
     -fx-border-radius: 10px;
     -fx-background-radius: 10px;
 }
@@ -271,7 +233,6 @@
 .patients-table .column-header .label {
     -fx-font-weight: bold;
     -fx-text-fill: #4b5563;
-
     -fx-alignment: CENTER;
     -fx-text-alignment: CENTER;
 }
@@ -301,26 +262,16 @@
     -fx-text-fill: #4b5563;
 }
 
-
-/* =========================================================
-   CAMPOS DE FORMULARIO
-   ========================================================= */
-
 .form-control {
     -fx-pref-height: 44px;
     -fx-min-height: 44px;
     -fx-max-height: 44px;
-
     -fx-background-color: white;
-
     -fx-border-color: #d1d5db;
     -fx-border-width: 1px;
-
     -fx-border-radius: 8px;
     -fx-background-radius: 8px;
-
     -fx-padding: 8px 10px;
-
     -fx-font-size: 14px;
 }
 
@@ -333,26 +284,16 @@
     -fx-border-width: 2px;
 }
 
-
-/* =========================================================
-   COMBOBOX
-   ========================================================= */
-
 .combo-box {
     -fx-pref-height: 44px;
     -fx-min-height: 44px;
     -fx-max-height: 44px;
-
     -fx-background-color: white;
-
     -fx-border-color: #d1d5db;
     -fx-border-width: 1px;
-
     -fx-border-radius: 8px;
     -fx-background-radius: 8px;
-
     -fx-font-size: 14px;
-
     -fx-cursor: hand;
 }
 
@@ -365,49 +306,27 @@
     -fx-border-width: 2px;
 }
 
-
-/* ---------------------------------------------------------
-   TEXTO SELECCIONADO
-   --------------------------------------------------------- */
-
 .combo-box .list-cell {
     -fx-font-size: 14px;
     -fx-text-fill: #374151;
-
     -fx-padding: 0 10px;
-
     -fx-alignment: CENTER_LEFT;
 }
 
-
-/* ---------------------------------------------------------
-   LISTA DESPLEGABLE
-   --------------------------------------------------------- */
-
 .combo-box-popup .list-view {
     -fx-background-color: white;
-
     -fx-border-color: #d1d5db;
     -fx-border-width: 1px;
-
     -fx-border-radius: 8px;
     -fx-background-radius: 8px;
 }
 
-
-/* ---------------------------------------------------------
-   OPCIONES
-   --------------------------------------------------------- */
-
 .combo-box-popup .list-cell {
     -fx-background-color: white;
     -fx-text-fill: #374151;
-
     -fx-font-size: 14px;
-
     -fx-pref-height: 38px;
     -fx-min-height: 38px;
-
     -fx-padding: 8px 10px;
 }
 
@@ -420,24 +339,15 @@
     -fx-text-fill: #1d4ed8;
 }
 
-
-/* =========================================================
-   DATE PICKER
-   ========================================================= */
-
 .date-picker {
     -fx-pref-height: 44px;
     -fx-min-height: 44px;
     -fx-max-height: 44px;
-
     -fx-background-color: white;
-
     -fx-border-color: #d1d5db;
     -fx-border-width: 1px;
-
     -fx-border-radius: 8px;
     -fx-background-radius: 8px;
-
     -fx-font-size: 14px;
 }
 
@@ -450,33 +360,18 @@
     -fx-border-width: 2px;
 }
 
-
-/* ---------------------------------------------------------
-   CAMPO DE TEXTO INTERNO DEL DATE PICKER
-   --------------------------------------------------------- */
-
 .date-picker .text-field {
     -fx-pref-height: 42px;
     -fx-min-height: 42px;
     -fx-max-height: 42px;
-
     -fx-background-color: white;
-
     -fx-border-color: transparent;
-
     -fx-font-size: 14px;
-
     -fx-padding: 0 10px;
 }
 
-
-/* ---------------------------------------------------------
-   BOTÓN DEL CALENDARIO
-   --------------------------------------------------------- */
-
 .date-picker .arrow-button {
     -fx-background-color: transparent;
-
     -fx-background-radius: 0 8px 8px 0;
 }
 
@@ -484,26 +379,16 @@
     -fx-background-color: #f3f4f6;
 }
 
-
-/* =========================================================
-   TEXT AREA
-   ========================================================= */
-
 .form-textarea {
     -fx-pref-height: 85px;
     -fx-min-height: 85px;
     -fx-max-height: 85px;
-
     -fx-background-color: white;
-
     -fx-border-color: #d1d5db;
     -fx-border-width: 1px;
-
     -fx-border-radius: 8px;
     -fx-background-radius: 8px;
-
     -fx-font-size: 14px;
-
     -fx-padding: 0;
 }
 
@@ -516,74 +401,43 @@
     -fx-border-width: 2px;
 }
 
-
-/* ---------------------------------------------------------
-   CONTENIDO INTERNO DEL TEXT AREA
-   --------------------------------------------------------- */
-
 .form-textarea .content {
     -fx-background-color: white;
     -fx-background-radius: 8px;
-
     -fx-padding: 8px 10px;
 }
 
-.form-textarea .scroll-pane {
+.form-textarea .scroll-pane,
+.form-textarea .viewport {
     -fx-background-color: transparent;
 }
-
-.form-textarea .viewport {
-    -fx-background-color: white;
-}
-
-
-/* =========================================================
-   TEXT AREA GENERAL
-   ========================================================= */
 
 .text-area {
     -fx-background-color: white;
 }
 
-.text-area .content {
-    -fx-background-color: white;
-}
-
+.text-area .content,
 .text-area:focused .content {
     -fx-background-color: white;
 }
 
-
-/* =========================================================
-   MENSAJES DE ERROR
-   ========================================================= */
-
 .form-error {
     -fx-text-fill: #dc2626;
-
     -fx-font-size: 13px;
     -fx-font-weight: bold;
 }
 
 
 /* =========================================================
-   =========================================================
    AGENDA
-   =========================================================
    ========================================================= */
 
 .agenda-root {
     -fx-background-color: #f6f7f9;
 }
 
-
-/* =========================================================
-   CABECERA DE AGENDA
-   ========================================================= */
-
 .agenda-header {
     -fx-background-color: white;
-
     -fx-padding: 15px 20px 10px 20px;
 }
 
@@ -591,109 +445,63 @@
     -fx-padding: 0;
 }
 
-
-/* =========================================================
-   NAVEGACIÓN
-   ========================================================= */
-
 .agenda-navigation-button {
     -fx-background-color: white;
-
     -fx-border-color: #d1d5db;
     -fx-border-width: 1px;
-
     -fx-border-radius: 8px;
     -fx-background-radius: 8px;
-
     -fx-font-size: 22px;
     -fx-font-weight: bold;
-
     -fx-text-fill: #374151;
-
     -fx-min-width: 38px;
     -fx-pref-width: 38px;
     -fx-max-width: 38px;
-
     -fx-min-height: 36px;
     -fx-pref-height: 36px;
     -fx-max-height: 36px;
-
     -fx-padding: 0;
-
     -fx-cursor: hand;
 }
 
-.agenda-navigation-button:hover {
-    -fx-background-color: #f3f4f6;
-}
-
-.agenda-navigation-button:pressed {
-    -fx-background-color: #e5e7eb;
-}
-
-
-/* =========================================================
-   BOTÓN HOY
-   ========================================================= */
-
-.agenda-today-button {
-    -fx-background-color: white;
-
-    -fx-border-color: #d1d5db;
-    -fx-border-width: 1px;
-
-    -fx-border-radius: 8px;
-    -fx-background-radius: 8px;
-
-    -fx-font-size: 13px;
-    -fx-font-weight: bold;
-
-    -fx-text-fill: #374151;
-
-    -fx-padding: 9px 16px;
-
-    -fx-cursor: hand;
-}
-
+.agenda-navigation-button:hover,
 .agenda-today-button:hover {
     -fx-background-color: #f3f4f6;
 }
 
+.agenda-navigation-button:pressed,
 .agenda-today-button:pressed {
     -fx-background-color: #e5e7eb;
 }
 
-
-/* =========================================================
-   RANGO DE FECHAS
-   ========================================================= */
+.agenda-today-button {
+    -fx-background-color: white;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #374151;
+    -fx-padding: 9px 16px;
+    -fx-cursor: hand;
+}
 
 .agenda-date-range {
     -fx-font-size: 18px;
     -fx-font-weight: bold;
-
     -fx-text-fill: #111827;
 }
 
-
-/* =========================================================
-   SELECTOR DE VISTA
-   ========================================================= */
-
 .agenda-view-selector {
     -fx-background-color: white;
-
     -fx-border-color: #d1d5db;
     -fx-border-width: 1px;
-
     -fx-border-radius: 8px;
     -fx-background-radius: 8px;
-
     -fx-font-size: 13px;
-
     -fx-pref-width: 110px;
     -fx-min-width: 110px;
-
     -fx-cursor: hand;
 }
 
@@ -706,23 +514,14 @@
     -fx-border-width: 2px;
 }
 
-
-/* =========================================================
-   BOTÓN NUEVA CITA
-   ========================================================= */
-
 .agenda-primary-button {
     -fx-background-color: #2563eb;
     -fx-text-fill: white;
-
     -fx-font-size: 14px;
     -fx-font-weight: bold;
-
     -fx-padding: 10px 18px;
-
     -fx-background-radius: 8px;
     -fx-border-radius: 8px;
-
     -fx-cursor: hand;
 }
 
@@ -734,58 +533,35 @@
     -fx-background-color: #1e40af;
 }
 
-
-/* =========================================================
-   SCROLL DE AGENDA
-   ========================================================= */
-
-.agenda-scroll-pane {
+.agenda-scroll-pane,
+.agenda-scroll-pane > .viewport,
+.agenda-scroll-pane > .corner {
     -fx-background-color: #f6f7f9;
     -fx-border-color: transparent;
 }
 
-.agenda-scroll-pane > .viewport {
-    -fx-background-color: #f6f7f9;
-}
-
-.agenda-scroll-pane > .corner {
-    -fx-background-color: #f6f7f9;
-}
-
-
-/* =========================================================
-   ENCABEZADO SEMANAL
-   ========================================================= */
-
-.agenda-week-header {
+.agenda-week-header,
+.agenda-time-header,
+.agenda-day-header,
+.agenda-week-body,
+.agenda-time-column,
+.agenda-day-column {
     -fx-background-color: white;
-
-    -fx-border-color: #e5e7eb;
-    -fx-border-width: 0 0 1px 0;
 }
 
-.agenda-time-header {
-    -fx-background-color: white;
-
+.agenda-week-header,
+.agenda-day-header,
+.agenda-time-header,
+.agenda-time-column,
+.agenda-day-column {
     -fx-border-color: #e5e7eb;
-    -fx-border-width: 0 1px 0 0;
 }
 
 .agenda-day-header {
-    -fx-background-color: white;
-
     -fx-padding: 8px;
-
-    -fx-border-color: #e5e7eb;
     -fx-border-width: 0 1px 0 0;
-
     -fx-pref-height: 62px;
 }
-
-
-/* =========================================================
-   DÍA ACTUAL
-   ========================================================= */
 
 .agenda-day-header-today {
     -fx-background-color: #eff6ff;
@@ -794,74 +570,32 @@
 .agenda-day-name {
     -fx-font-size: 11px;
     -fx-font-weight: bold;
-
     -fx-text-fill: #6b7280;
 }
 
-.agenda-day-header-today .agenda-day-name {
+.agenda-day-header-today .agenda-day-name,
+.agenda-day-header-today .agenda-day-number {
     -fx-text-fill: #2563eb;
 }
 
 .agenda-day-number {
     -fx-font-size: 20px;
     -fx-font-weight: bold;
-
     -fx-text-fill: #111827;
 }
 
-.agenda-day-header-today .agenda-day-number {
-    -fx-text-fill: #2563eb;
-}
-
-
-/* =========================================================
-   CUERPO SEMANAL
-   ========================================================= */
-
-.agenda-week-body {
-    -fx-background-color: white;
-}
-
-
-/* =========================================================
-   COLUMNA DE HORAS
-   ========================================================= */
-
-.agenda-time-column {
-    -fx-background-color: white;
-
-    -fx-border-color: #e5e7eb;
+.agenda-time-column,
+.agenda-day-column {
     -fx-border-width: 0 1px 0 0;
 }
 
 .agenda-time-label {
     -fx-background-color: white;
-
     -fx-text-fill: #6b7280;
-
     -fx-font-size: 11px;
-
     -fx-padding: 7px 5px 0 0;
-
     -fx-alignment: TOP_RIGHT;
 }
-
-
-/* =========================================================
-   COLUMNAS DE DÍAS
-   ========================================================= */
-
-.agenda-day-column {
-    -fx-background-color: white;
-
-    -fx-border-color: #e5e7eb;
-    -fx-border-width: 0 1px 0 0;
-}
-
-
-/* =========================================================
-   LÍNEAS HORARIAS
-   ========================================================= */
 
 .agenda-hour-line {
     -fx-background-color: #e5e7eb;
@@ -871,19 +605,11 @@
     -fx-background-color: #f3f4f6;
 }
 
-
-/* =========================================================
-   EVENTOS
-   ========================================================= */
-
 .agenda-event {
     -fx-padding: 6px 7px;
-
     -fx-background-radius: 6px;
     -fx-border-radius: 6px;
-
     -fx-border-width: 0 0 0 4px;
-
     -fx-cursor: hand;
 }
 
@@ -891,211 +617,47 @@
     -fx-opacity: 0.88;
 }
 
-
-/* =========================================================
-   INFORMACIÓN DEL EVENTO
-   ========================================================= */
-
 .agenda-event-patient {
     -fx-font-size: 12px;
     -fx-font-weight: bold;
 }
 
-.agenda-event-time {
+.agenda-event-time,
+.agenda-event-reason {
     -fx-font-size: 10px;
 }
 
-.agenda-event-reason {
-    -fx-font-size: 10px;
+.agenda-event-reason,
+.agenda-event-notes {
     -fx-wrap-text: true;
 }
 
 .agenda-event-notes {
     -fx-font-size: 10px;
-    -fx-wrap-text: true;
-
     -fx-text-fill: #6b7280;
-
     -fx-padding: 2px 0 0 0;
 }
 
+.agenda-event-programada { -fx-background-color: #eff6ff; -fx-border-color: #3b82f6; }
+.agenda-event-programada .agenda-event-patient { -fx-text-fill: #1e40af; }
+.agenda-event-programada .agenda-event-time, .agenda-event-programada .agenda-event-reason { -fx-text-fill: #374151; }
+.agenda-event-confirmada { -fx-background-color: #ecfdf5; -fx-border-color: #10b981; }
+.agenda-event-confirmada .agenda-event-patient { -fx-text-fill: #047857; }
+.agenda-event-confirmada .agenda-event-time, .agenda-event-confirmada .agenda-event-reason { -fx-text-fill: #374151; }
+.agenda-event-atendida { -fx-background-color: #f3e8ff; -fx-border-color: #7c3aed; }
+.agenda-event-atendida .agenda-event-patient { -fx-text-fill: #5b21b6; }
+.agenda-event-atendida .agenda-event-time, .agenda-event-atendida .agenda-event-reason { -fx-text-fill: #4b5563; }
+.agenda-event-cancelada { -fx-background-color: #fef2f2; -fx-border-color: #dc2626; }
+.agenda-event-cancelada .agenda-event-patient { -fx-text-fill: #991b1b; }
+.agenda-event-cancelada .agenda-event-time, .agenda-event-cancelada .agenda-event-reason { -fx-text-fill: #4b5563; }
+.agenda-event-no-asistio { -fx-background-color: #fffbeb; -fx-border-color: #d97706; }
+.agenda-event-no-asistio .agenda-event-patient { -fx-text-fill: #92400e; }
+.agenda-event-no-asistio .agenda-event-time, .agenda-event-no-asistio .agenda-event-reason { -fx-text-fill: #4b5563; }
 
-/* =========================================================
-   EVENTO - PROGRAMADA
-   ========================================================= */
-
-.agenda-event-programada {
-    -fx-background-color: #eff6ff;
-    -fx-border-color: #3b82f6;
-}
-
-.agenda-event-programada .agenda-event-patient {
-    -fx-text-fill: #1e40af;
-}
-
-.agenda-event-programada .agenda-event-time,
-.agenda-event-programada .agenda-event-reason {
-    -fx-text-fill: #374151;
-}
-
-
-/* =========================================================
-   EVENTO - CONFIRMADA
-   ========================================================= */
-
-.agenda-event-confirmada {
-    -fx-background-color: #ecfdf5;
-    -fx-border-color: #10b981;
-}
-
-.agenda-event-confirmada .agenda-event-patient {
-    -fx-text-fill: #047857;
-}
-
-.agenda-event-confirmada .agenda-event-time,
-.agenda-event-confirmada .agenda-event-reason {
-    -fx-text-fill: #374151;
-}
-
-
-/* =========================================================
-   EVENTO - ATENDIDA
-   ========================================================= */
-
-.agenda-event-atendida {
-    -fx-background-color: #f3e8ff;
-    -fx-border-color: #7c3aed;
-}
-
-.agenda-event-atendida .agenda-event-patient {
-    -fx-text-fill: #5b21b6;
-}
-
-.agenda-event-atendida .agenda-event-time,
-.agenda-event-atendida .agenda-event-reason {
-    -fx-text-fill: #4b5563;
-}
-
-/* =========================================================
-   EVENTO - CANCELADA
-   ========================================================= */
-
-.agenda-event-cancelada {
-    -fx-background-color: #fef2f2;
-    -fx-border-color: #dc2626;
-}
-
-.agenda-event-cancelada .agenda-event-patient {
-    -fx-text-fill: #991b1b;
-}
-
-.agenda-event-cancelada .agenda-event-time,
-.agenda-event-cancelada .agenda-event-reason {
-    -fx-text-fill: #4b5563;
-}
-
-
-/* =========================================================
-   EVENTO - NO ASISTIÓ
-   ========================================================= */
-
-.agenda-event-no-asistio {
-    -fx-background-color: #fffbeb;
-    -fx-border-color: #d97706;
-}
-
-.agenda-event-no-asistio .agenda-event-patient {
-    -fx-text-fill: #92400e;
-}
-
-.agenda-event-no-asistio .agenda-event-time,
-.agenda-event-no-asistio .agenda-event-reason {
-    -fx-text-fill: #4b5563;
-}
-/* =========================================================
-   DETALLE DE CITA
-   ========================================================= */
-
-.detail-value {
-    -fx-font-size: 15px;
-    -fx-text-fill: #111827;
-}
-
-.detail-status {
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #2563eb;
-}
-
-.detail-notes {
-    -fx-background-color: white;
-    -fx-border-color: #e5e7eb;
-    -fx-border-radius: 8px;
-    -fx-background-radius: 8px;
-
-    -fx-padding: 10px;
-
-    -fx-font-size: 14px;
-    -fx-text-fill: #374151;
-}
-
-.context-menu-section-label {
-    -fx-font-size: 11px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #777777;
-    -fx-padding: 6px 10px 4px 10px;
-}
-/* =========================================================
-   INDICADOR DE HORA ACTUAL
-   ========================================================= */
-
-.agenda-current-time-line {
-    -fx-background-color: #e53935;
-    -fx-background-radius: 2;
-    -fx-opacity: 0.95;
-}
-
-/* =========================================================
-   AGENDA - DRAG & DROP
-   ========================================================= */
-
-.agenda-event-dragging {
-    -fx-opacity: 0.75;
-}
-
-.agenda-event-drag-valid {
-    -fx-border-color: #43a047;
-    -fx-border-width: 2px;
-}
-
-.agenda-event-drag-conflict {
-    -fx-border-color: #e53935;
-    -fx-border-width: 2px;
-    -fx-opacity: 0.75;
-}
-
-/* =========================================================
-   AGENDA - RESIZE DE CITAS
-   ========================================================= */
-
-.agenda-event-resizing {
-    -fx-opacity: 0.75;
-}
-
-.agenda-event-resize-valid {
-    -fx-border-color: #43a047;
-    -fx-border-width: 2px;
-}
-
-.agenda-event-resize-conflict {
-    -fx-border-color: #e53935;
-    -fx-border-width: 2px;
-    -fx-opacity: 0.75;
-}
-
-/* =========================================================
-   AGENDA - BUSQUEDA DE PACIENTE
-   ========================================================= */
+.agenda-current-time-line { -fx-background-color: #e53935; -fx-background-radius: 2; -fx-opacity: 0.95; }
+.agenda-event-dragging, .agenda-event-resizing { -fx-opacity: 0.75; }
+.agenda-event-drag-valid, .agenda-event-resize-valid { -fx-border-color: #43a047; -fx-border-width: 2px; }
+.agenda-event-drag-conflict, .agenda-event-resize-conflict { -fx-border-color: #e53935; -fx-border-width: 2px; -fx-opacity: 0.75; }
 
 .agenda-search-field {
     -fx-pref-height: 34px;
@@ -1108,141 +670,126 @@
     -fx-font-size: 13px;
 }
 
-.agenda-search-field:focused {
-    -fx-border-color: #2563eb;
-    -fx-border-width: 1px;
-}
+.agenda-search-field:focused { -fx-border-color: #2563eb; }
+
+.agenda-month-calendar { -fx-background-color: #ffffff; }
+.agenda-month-header { -fx-background-color: #f8fafc; -fx-border-color: #e5e7eb; -fx-border-width: 0 0 1px 0; }
+.agenda-month-day-name { -fx-padding: 11px 0; -fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #6b7280; }
+.agenda-month-week { -fx-background-color: #ffffff; -fx-pref-height: 125px; -fx-min-height: 125px; -fx-max-height: 125px; }
+.agenda-month-cell { -fx-background-color: #ffffff; -fx-border-color: #e5e7eb; -fx-border-width: 0 1px 1px 0; -fx-padding: 6px; }
+.agenda-month-cell:hover { -fx-background-color: #f8fafc; }
+.agenda-month-cell-other { -fx-background-color: #fafafa; }
+.agenda-month-cell-other:hover { -fx-background-color: #f3f4f6; }
+.agenda-month-cell-today { -fx-background-color: #eff6ff; -fx-border-color: #93c5fd; -fx-border-width: 0 1px 1px 2px; }
+.agenda-month-cell-today:hover { -fx-background-color: #dbeafe; }
+.agenda-month-day-number { -fx-min-width: 26px; -fx-min-height: 26px; -fx-pref-width: 26px; -fx-pref-height: 26px; -fx-alignment: CENTER; -fx-background-radius: 50%; -fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #374151; }
+.agenda-month-cell-other .agenda-month-day-number { -fx-text-fill: #9ca3af; }
+.agenda-month-cell-today .agenda-month-day-number { -fx-background-color: #2563eb; -fx-text-fill: white; }
+.agenda-month-event { -fx-padding: 3px 6px; -fx-background-radius: 4px; -fx-border-radius: 4px; -fx-font-size: 11px; -fx-font-weight: bold; -fx-cursor: hand; -fx-text-overflow: ellipsis; }
+.agenda-month-event:hover { -fx-opacity: 0.85; }
+.agenda-month-more { -fx-padding: 2px 6px; -fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #2563eb; -fx-cursor: hand; }
+.agenda-month-more:hover { -fx-text-fill: #1d4ed8; }
+
 
 /* =========================================================
-   AGENDA - VISTA MES
+   DETALLE DE CITA
    ========================================================= */
 
-.agenda-month-calendar {
-    -fx-background-color: #ffffff;
+.detail-value { -fx-font-size: 15px; -fx-text-fill: #111827; }
+.detail-status { -fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #2563eb; }
+.detail-notes { -fx-background-color: white; -fx-border-color: #e5e7eb; -fx-border-radius: 8px; -fx-background-radius: 8px; -fx-padding: 10px; -fx-font-size: 14px; -fx-text-fill: #374151; }
+.context-menu-section-label { -fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #777777; -fx-padding: 6px 10px 4px 10px; }
+
+
+/* =========================================================
+   DASHBOARD / INICIO
+   ========================================================= */
+
+.standard-page {
+    -fx-background-color: #f6f7f9;
 }
 
-.agenda-month-header {
-    -fx-background-color: #f8fafc;
+.standard-page .page-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #111827;
+}
+
+.standard-page .page-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: #6b7280;
+}
+
+.standard-page > .card {
+    -fx-background-color: white;
     -fx-border-color: #e5e7eb;
-    -fx-border-width: 0 0 1px 0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 12px;
+    -fx-background-radius: 12px;
+    -fx-padding: 20px;
 }
 
-.agenda-month-day-name {
-    -fx-padding: 11px 0;
-    -fx-font-size: 11px;
+.standard-page > HBox > .card {
+    -fx-min-height: 125px;
+    -fx-pref-height: 125px;
+    -fx-padding: 18px 20px;
+}
+
+.standard-page > HBox > .card:hover,
+.standard-page > .card:hover {
+    -fx-border-color: #d1d5db;
+}
+
+.standard-page > HBox > .card .card-title,
+.standard-page > .card > .card-title {
+    -fx-font-size: 13px;
     -fx-font-weight: bold;
     -fx-text-fill: #6b7280;
 }
 
-.agenda-month-week {
-    -fx-background-color: #ffffff;
-    -fx-pref-height: 125px;
-    -fx-min-height: 125px;
-    -fx-max-height: 125px;
+.standard-page > HBox > .card .card-value {
+    -fx-font-size: 30px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #111827;
 }
 
-.agenda-month-cell {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #e5e7eb;
-    -fx-border-width: 0 1px 1px 0;
-    -fx-padding: 6px;
-    -fx-cursor: default;
+.standard-page > .card > .page-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #111827;
 }
 
-.agenda-month-cell:hover {
-    -fx-background-color: #f8fafc;
-}
-
-.agenda-month-cell-other {
-    -fx-background-color: #fafafa;
-}
-
-.agenda-month-cell-other:hover {
-    -fx-background-color: #f3f4f6;
-}
-
-.agenda-month-cell-today {
-    -fx-background-color: #eff6ff;
-    -fx-border-color: #93c5fd;
-    -fx-border-width: 0 1px 1px 2px;
-}
-
-.agenda-month-cell-today:hover {
-    -fx-background-color: #dbeafe;
-}
-
-.agenda-month-day-number {
-    -fx-min-width: 26px;
-    -fx-min-height: 26px;
-    -fx-pref-width: 26px;
-    -fx-pref-height: 26px;
-
-    -fx-alignment: CENTER;
-
-    -fx-background-radius: 50%;
-
-    -fx-font-size: 12px;
+.dashboard-next-treatment {
+    -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-text-fill: #374151;
 }
 
-.agenda-month-cell-other .agenda-month-day-number {
-    -fx-text-fill: #9ca3af;
+.standard-page > .card:last-child {
+    -fx-padding: 18px 20px 20px 20px;
 }
 
-.agenda-month-cell-today .agenda-month-day-number {
-    -fx-background-color: #2563eb;
-    -fx-text-fill: white;
+.dashboard-summary-item {
+    -fx-padding: 12px 14px;
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 8px;
+    -fx-border-color: #eef0f3;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
 }
 
-.agenda-month-event {
-    -fx-padding: 3px 6px;
-
-    -fx-background-radius: 4px;
-    -fx-border-radius: 4px;
-
-    -fx-font-size: 11px;
+.dashboard-summary-label {
+    -fx-font-size: 12px;
     -fx-font-weight: bold;
-
-    -fx-cursor: hand;
-
-    -fx-text-overflow: ellipsis;
+    -fx-text-fill: #6b7280;
 }
 
-.agenda-month-event:hover {
-    -fx-opacity: 0.85;
-}
-.agenda-month-more {
-    -fx-padding: 2px 6px;
-
-    -fx-font-size: 11px;
+.dashboard-summary-value {
+    -fx-font-size: 20px;
     -fx-font-weight: bold;
-
-    -fx-text-fill: #2563eb;
-
-    -fx-cursor: hand;
+    -fx-text-fill: #111827;
 }
 
-.agenda-month-more:hover {
-    -fx-text-fill: #1d4ed8;
-}
-.agenda-month-event {
-    -fx-padding: 3px 6px;
-
-    -fx-background-radius: 4px;
-    -fx-border-radius: 4px;
-
-    -fx-font-size: 11px;
-    -fx-font-weight: bold;
-
-    -fx-text-overflow: ellipsis;
-
-    -fx-cursor: hand;
-}
-
-.agenda-month-event:hover {
-    -fx-opacity: 0.85;
-}
 
 /* =========================================================
    DASHBOARD - CITAS
@@ -1254,57 +801,13 @@
     -fx-background-radius: 8px;
 }
 
-.dashboard-appointment-time {
-    -fx-min-width: 55px;
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-}
-
-.dashboard-appointment-patient {
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-}
-
-.dashboard-appointment-reason {
-    -fx-font-size: 12px;
-    -fx-text-fill: #6b7280;
-}
-
-.dashboard-appointment-status {
-    -fx-padding: 5px 9px;
-    -fx-background-radius: 12px;
-    -fx-font-size: 11px;
-    -fx-font-weight: bold;
-}
-
-/* Estados */
-
-.status-programada {
-    -fx-background-color: #e5e7eb;
-    -fx-text-fill: #374151;
-}
-
-.status-confirmada {
-    -fx-background-color: #dbeafe;
-    -fx-text-fill: #1d4ed8;
-}
-
-.status-atendida {
-    -fx-background-color: #dcfce7;
-    -fx-text-fill: #15803d;
-}
-
-.status-cancelada {
-    -fx-background-color: #fee2e2;
-    -fx-text-fill: #b91c1c;
-}
-
-.status-no-asistio {
-    -fx-background-color: #fef3c7;
-    -fx-text-fill: #92400e;
-}
-
-.status-default {
-    -fx-background-color: #e5e7eb;
-    -fx-text-fill: #374151;
-}
+.dashboard-appointment-time { -fx-min-width: 55px; -fx-font-size: 14px; -fx-font-weight: bold; }
+.dashboard-appointment-patient { -fx-font-size: 14px; -fx-font-weight: bold; }
+.dashboard-appointment-reason { -fx-font-size: 12px; -fx-text-fill: #6b7280; }
+.dashboard-appointment-status { -fx-padding: 5px 9px; -fx-background-radius: 12px; -fx-font-size: 11px; -fx-font-weight: bold; }
+.status-programada { -fx-background-color: #e5e7eb; -fx-text-fill: #374151; }
+.status-confirmada { -fx-background-color: #dbeafe; -fx-text-fill: #1d4ed8; }
+.status-atendida { -fx-background-color: #dcfce7; -fx-text-fill: #15803d; }
+.status-cancelada { -fx-background-color: #fee2e2; -fx-text-fill: #b91c1c; }
+.status-no-asistio { -fx-background-color: #fef3c7; -fx-text-fill: #92400e; }
+.status-default { -fx-background-color: #e5e7eb; -fx-text-fill: #374151; }

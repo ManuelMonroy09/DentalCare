@@ -1,11 +1,12 @@
 /* =========================================================
    DENTALCARE - AJUSTES VISUALES
-   ========================================================= */
+   =========================================================
+*/
 
 /* =========================================================
    AGENDA - TARJETAS DE CITAS
-   ========================================================= */
-
+   =========================================================
+*/
 .agenda-event {
     -fx-padding: 4px 6px;
     -fx-background-radius: 7px;
@@ -20,8 +21,44 @@
 .agenda-event-notes, .agenda-event-reason { -fx-font-size: 0px; -fx-padding: 0; -fx-min-height: 0; -fx-pref-height: 0; -fx-max-height: 0; -fx-opacity: 0; }
 
 /* =========================================================
-   DASHBOARD
-   ========================================================= */
+   DASHBOARD / INICIO
+   =========================================================
+*/
+.dashboard-page {
+    -fx-background-color: #f6f7f9;
+}
+
+.dashboard-header-card {
+    -fx-background-color: white;
+    -fx-background-radius: 12px;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1px;
+    -fx-border-radius: 12px;
+    -fx-padding: 22px 24px;
+}
+
+.dashboard-header-card .page-title {
+    -fx-font-size: 24px;
+}
+
+.dashboard-header-card .page-subtitle {
+    -fx-font-size: 13px;
+}
+
+.dashboard-stat-card {
+    -fx-min-height: 112px;
+    -fx-pref-height: 112px;
+    -fx-padding: 18px 20px;
+}
+
+.dashboard-stat-card .card-value {
+    -fx-font-size: 26px;
+}
+
+.dashboard-section-card {
+    -fx-padding: 20px 22px;
+}
+
 .dashboard-next-treatment { -fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #374151; }
 .dashboard-summary-item { -fx-padding: 4px 0; }
 .dashboard-summary-label { -fx-font-size: 12px; -fx-text-fill: #6b7280; }
@@ -29,7 +66,8 @@
 
 /* =========================================================
    AUTENTICACIÓN
-   ========================================================= */
+   =========================================================
+*/
 .auth-root { -fx-background-color: transparent; }
 .auth-shell { -fx-background-color: white; -fx-background-radius: 18px; -fx-border-color: #e5e7eb; -fx-border-width: 1px; -fx-border-radius: 18px; -fx-effect: dropshadow(gaussian, rgba(17,24,39,0.13), 30, 0.18, 0, 10); -fx-clip: null; }
 .auth-brand-panel { -fx-background-color: #2563eb; -fx-background-radius: 18px 0 0 18px; -fx-padding: 48px; }
@@ -67,47 +105,12 @@
 
 /* =========================================================
    FINANZAS
-   ========================================================= */
-.stat-card {
-    -fx-padding: 16px 18px;
-    -fx-background-color: white;
-    -fx-background-radius: 10px;
-    -fx-border-color: #e5e7eb;
-    -fx-border-radius: 10px;
-}
-.stat-value {
-    -fx-font-size: 24px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #111827;
-}
-
-/* =========================================================
-   FINANZAS - BOTONES DE LA VISTA PRINCIPAL
    =========================================================
- */
-.button.primary-button,
-.button.secondary-button {
-    -fx-opacity: 1;
-    -fx-padding: 9px 16px;
-    -fx-font-size: 13px;
-    -fx-font-weight: bold;
-    -fx-text-overrun: clip;
-    -fx-alignment: CENTER;
-    -fx-cursor: hand;
-}
-.button.primary-button {
-    -fx-background-color: #2563eb;
-    -fx-text-fill: white;
-    -fx-background-radius: 8px;
-    -fx-border-radius: 8px;
-}
+*/
+.stat-card { -fx-padding: 16px 18px; -fx-background-color: white; -fx-background-radius: 10px; -fx-border-color: #e5e7eb; -fx-border-radius: 10px; }
+.stat-value { -fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #111827; }
+.button.primary-button, .button.secondary-button { -fx-opacity: 1; -fx-padding: 9px 16px; -fx-font-size: 13px; -fx-font-weight: bold; -fx-text-overrun: clip; -fx-alignment: CENTER; -fx-cursor: hand; }
+.button.primary-button { -fx-background-color: #2563eb; -fx-text-fill: white; -fx-background-radius: 8px; -fx-border-radius: 8px; }
 .button.primary-button:hover { -fx-background-color: #1d4ed8; }
-.button.secondary-button {
-    -fx-background-color: white;
-    -fx-text-fill: #374151;
-    -fx-border-color: #d1d5db;
-    -fx-border-width: 1px;
-    -fx-border-radius: 8px;
-    -fx-background-radius: 8px;
-}
+.button.secondary-button { -fx-background-color: white; -fx-text-fill: #374151; -fx-border-color: #d1d5db; -fx-border-width: 1px; -fx-border-radius: 8px; -fx-background-radius: 8px; }
 .button.secondary-button:hover { -fx-background-color: #f3f4f6; -fx-border-color: #9ca3af; }

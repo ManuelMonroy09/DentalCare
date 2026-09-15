@@ -8,7 +8,7 @@
 .users-table .column-header { -fx-background-color: transparent; -fx-size: 42px; }
 .users-table .column-header .label { -fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #4b5563; -fx-alignment: CENTER; -fx-text-alignment: CENTER; }
 .users-table .filler { -fx-background-color: #f9fafb; }
-.users-table .table-cell { -fx-font-size: 13px; -fx-text-fill: #374151; -fx-padding: 8px 12px; -fx-alignment: CENTER_LEFT; }
+.users-table .table-cell { -fx-font-size: 13px; -fx-text-fill: #374151; -fx-padding: 8px 12px; -fx-alignment: CENTER; -fx-text-alignment: CENTER; }
 .users-table .table-row-cell { -fx-background-color: white; -fx-cell-size: 44px; }
 .users-table .table-row-cell:hover { -fx-background-color: #f9fafb; }
 .users-table .table-row-cell:selected { -fx-background-color: #eff6ff; }

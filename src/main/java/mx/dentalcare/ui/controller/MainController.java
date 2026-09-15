@@ -176,7 +176,6 @@ public class MainController {
         rol.prefWidthProperty().bind(table.widthProperty().multiply(0.20));
         estado.prefWidthProperty().bind(table.widthProperty().multiply(0.20));
         table.getItems().setAll(userService.listUsers());
-        VBox.setVgrow(table, Priority.ALWAYS);
 
         TextField nuevoUsuario = new TextField(); nuevoUsuario.setPromptText("usuario"); nuevoUsuario.getStyleClass().add("users-field");
         TextField nuevoNombre = new TextField(); nuevoNombre.setPromptText("nombre visible"); nuevoNombre.getStyleClass().add("users-field");
@@ -185,16 +184,39 @@ public class MainController {
         nuevoRol.setMaxWidth(Double.MAX_VALUE);
 
         Button crear = new Button("Crear usuario"); crear.getStyleClass().addAll("users-action-button", "users-primary-button");
+        Button editar = new Button("Editar nombre"); editar.getStyleClass().addAll("users-action-button", "users-secondary-button");
         Button cambiarEstado = new Button("Activar / desactivar"); cambiarEstado.getStyleClass().addAll("users-action-button", "users-secondary-button");
-        crear.setMinWidth(145); crear.setPrefWidth(145); cambiarEstado.setMinWidth(175); cambiarEstado.setPrefWidth(175);
+        crear.setMaxWidth(Double.MAX_VALUE); editar.setMaxWidth(Double.MAX_VALUE); cambiarEstado.setMaxWidth(Double.MAX_VALUE);
 
         crear.setOnAction(event -> {
             try {
-                userService.createUser(nuevoUsuario.getText(), nuevoNombre.getText(), nuevaPassword.getText(), nuevoRol.getValue());
-                table.getItems().setAll(userService.listUsers()); nuevoUsuario.clear(); nuevoNombre.clear(); nuevaPassword.clear();
+                String username = nuevoUsuario.getText().trim();
+                String displayName = nuevoNombre.getText().trim();
+                String password = nuevaPassword.getText();
+                UserRole role = nuevoRol.getValue();
+
+                if (username.isBlank()) { mostrarError("El usuario es obligatorio."); return; }
+                if (displayName.isBlank()) { mostrarError("El nombre visible es obligatorio."); return; }
+                if (password == null || password.length() < 8) { mostrarError("La contraseña debe tener al menos 8 caracteres."); return; }
+                if (role == null) { mostrarError("Selecciona un rol."); return; }
+
+                String confirmacion = "Usuario: " + username + "\nNombre visible: " + displayName + "\nRol: " + role.getDisplayName()
+                        + "\n\nVerifica que el usuario esté escrito correctamente.\nEl nombre de usuario no podrá modificarse posteriormente.\n\n¿Deseas crear esta cuenta?";
+                if (!confirmarAccion("Confirmar creación", "Verifica los datos del usuario", confirmacion)) return;
+
+                userService.createUser(username, displayName, password, role);
+                table.getItems().setAll(userService.listUsers());
+                nuevoUsuario.clear(); nuevoNombre.clear(); nuevaPassword.clear(); nuevoRol.setValue(UserRole.USUARIO);
                 mostrarInformacion("Usuario creado", "El usuario ya puede iniciar sesión.");
             } catch (Exception e) { mostrarError(e.getMessage() == null ? "No fue posible crear el usuario." : e.getMessage()); }
         });
+
+        editar.setOnAction(event -> {
+            UserService.StoredUser selected = table.getSelectionModel().getSelectedItem();
+            if (selected == null) { mostrarError("Selecciona un usuario primero."); return; }
+            editarNombreUsuario(selected, table);
+        });
+
         cambiarEstado.setOnAction(event -> {
             UserService.StoredUser selected = table.getSelectionModel().getSelectedItem();
             if (selected == null) { mostrarError("Selecciona un usuario primero."); return; }
@@ -208,23 +230,39 @@ public class MainController {
         Label lPassword = new Label("Contraseña"); lPassword.getStyleClass().add("users-form-label");
         Label lRol = new Label("Rol"); lRol.getStyleClass().add("users-form-label");
 
-        VBox usuarioBox = new VBox(6, lUsuario, nuevoUsuario); HBox.setHgrow(usuarioBox, Priority.ALWAYS);
-        VBox nombreBox = new VBox(6, lNombre, nuevoNombre); HBox.setHgrow(nombreBox, Priority.ALWAYS);
-        VBox passwordBox = new VBox(6, lPassword, nuevaPassword); HBox.setHgrow(passwordBox, Priority.ALWAYS);
-        VBox rolBox = new VBox(6, lRol, nuevoRol); HBox.setHgrow(rolBox, Priority.ALWAYS);
-        HBox fila1 = new HBox(14, usuarioBox, nombreBox, passwordBox, rolBox);
-        HBox fila2 = new HBox(12, crear, cambiarEstado); fila2.setAlignment(Pos.CENTER_RIGHT);
-        VBox form = new VBox(12, formTitle, fila1, fila2); form.getStyleClass().add("users-form-card");
+        VBox usuarioBox = new VBox(6, lUsuario, nuevoUsuario);
+        VBox nombreBox = new VBox(6, lNombre, nuevoNombre);
+        VBox passwordBox = new VBox(6, lPassword, nuevaPassword);
+        VBox rolBox = new VBox(6, lRol, nuevoRol);
+        usuarioBox.setMaxWidth(Double.MAX_VALUE); nombreBox.setMaxWidth(Double.MAX_VALUE); passwordBox.setMaxWidth(Double.MAX_VALUE); rolBox.setMaxWidth(Double.MAX_VALUE);
+        VBox.setVgrow(usuarioBox, Priority.NEVER); VBox.setVgrow(nombreBox, Priority.NEVER); VBox.setVgrow(passwordBox, Priority.NEVER); VBox.setVgrow(rolBox, Priority.NEVER);
+
+        VBox form = new VBox(14, formTitle, usuarioBox, nombreBox, passwordBox, rolBox, crear);
+        form.getStyleClass().add("users-form-card");
 
         Label title = new Label("Usuarios"); title.getStyleClass().add("users-title");
         Label subtitle = new Label("Administra las cuentas y privilegios de acceso a DentalCare."); subtitle.getStyleClass().add("users-subtitle");
         VBox header = new VBox(4, title, subtitle); header.getStyleClass().add("users-header");
 
-        VBox root = new VBox(0, header, table, form); root.getStyleClass().add("users-root");
-        root.setPadding(new Insets(0, 0, 18, 0));
+        VBox tablePanel = new VBox(table);
+        tablePanel.getStyleClass().add("users-table-panel");
         VBox.setVgrow(table, Priority.ALWAYS);
-        VBox.setMargin(table, new Insets(18, 24, 14, 24));
-        VBox.setMargin(form, new Insets(0, 24, 0, 24));
+
+        VBox actions = new VBox(10, editar, cambiarEstado);
+        actions.getStyleClass().add("users-selection-actions");
+        Label actionsTitle = new Label("Usuario seleccionado"); actionsTitle.getStyleClass().add("users-form-title");
+        VBox rightPanel = new VBox(14, tablePanel, actionsTitle, actions);
+        rightPanel.getStyleClass().add("users-right-panel");
+        VBox.setVgrow(tablePanel, Priority.ALWAYS);
+
+        HBox mainContent = new HBox(18, form, rightPanel);
+        mainContent.getStyleClass().add("users-main-content");
+        HBox.setHgrow(rightPanel, Priority.ALWAYS);
+        form.setPrefWidth(300); form.setMinWidth(280); form.setMaxWidth(340);
+
+        VBox root = new VBox(0, header, mainContent);
+        root.getStyleClass().add("users-root");
+        VBox.setVgrow(mainContent, Priority.ALWAYS);
 
         Scene scene = new Scene(root, 1100, 700);
         String css = getClass().getResource("/ui/css/users.css").toExternalForm();
@@ -233,6 +271,65 @@ public class MainController {
         stage.setResizable(true);
         stage.show();
         stage.centerOnScreen();
+    }
+
+    private void editarNombreUsuario(UserService.StoredUser selected, TableView<UserService.StoredUser> table) {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Editar usuario");
+        dialog.setHeaderText("Editar nombre visible");
+
+        TextField nombre = new TextField(selected.displayName);
+        nombre.setPrefWidth(360);
+        nombre.getStyleClass().add("users-field");
+
+        Label usuario = new Label("Usuario: " + selected.username);
+        usuario.getStyleClass().add("users-edit-username");
+        Label nota = new Label("El usuario no puede modificarse.");
+        nota.getStyleClass().add("users-edit-note");
+
+        VBox content = new VBox(10, usuario, new Label("Nombre visible"), nombre, nota);
+        content.setPadding(new Insets(8));
+
+        DialogPane pane = dialog.getDialogPane();
+        pane.setContent(content);
+        pane.setPrefWidth(500);
+        pane.setMinWidth(500);
+        pane.setPrefHeight(260);
+        pane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        Button ok = (Button) pane.lookupButton(ButtonType.OK);
+        ok.setText("Guardar cambios");
+        estilizarBotonesDialogo(pane);
+
+        Optional<ButtonType> result = dialog.showAndWait();
+        if (result.isEmpty() || result.get() != ButtonType.OK) return;
+
+        try {
+            userService.updateDisplayName(selected.username, nombre.getText());
+            table.getItems().setAll(userService.listUsers());
+            configurarUsuario();
+            mostrarInformacion("Usuario actualizado", "El nombre visible fue actualizado correctamente.");
+        } catch (Exception e) {
+            mostrarError(e.getMessage() == null ? "No fue posible actualizar el usuario." : e.getMessage());
+        }
+    }
+
+    private boolean confirmarAccion(String titulo, String encabezado, String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(titulo);
+        alert.setHeaderText(encabezado);
+        Label label = new Label(mensaje);
+        label.setWrapText(true);
+        label.setMaxWidth(440);
+        label.setStyle("-fx-font-size: 14px; -fx-text-fill: #374151;");
+        alert.getDialogPane().setContent(label);
+        alert.getDialogPane().setPrefWidth(520);
+        alert.getDialogPane().setMinWidth(520);
+        Button ok = (Button) alert.getDialogPane().lookupButton(ButtonType.OK);
+        if (ok != null) ok.setText("Crear usuario");
+        Button cancel = (Button) alert.getDialogPane().lookupButton(ButtonType.CANCEL);
+        if (cancel != null) cancel.setText("Cancelar");
+        Optional<ButtonType> result = alert.showAndWait();
+        return result.isPresent() && result.get() == ButtonType.OK;
     }
 
     private void mostrarRolesPermisos() {

@@ -1,0 +1,25 @@
+/* Gestión de usuarios */
+.users-root { -fx-background-color: #f6f7f9; -fx-font-family: "Segoe UI"; }
+.users-header { -fx-background-color: white; -fx-padding: 22px 24px 16px 24px; -fx-border-color: #e5e7eb; -fx-border-width: 0 0 1px 0; }
+.users-title { -fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #111827; }
+.users-subtitle { -fx-font-size: 13px; -fx-text-fill: #6b7280; }
+.users-table { -fx-background-color: white; -fx-border-color: #e5e7eb; -fx-border-width: 1px; -fx-border-radius: 10px; -fx-background-radius: 10px; -fx-table-cell-border-color: #f3f4f6; }
+.users-table .column-header-background { -fx-background-color: #f9fafb; -fx-background-radius: 10px 10px 0 0; }
+.users-table .column-header { -fx-background-color: transparent; -fx-size: 42px; }
+.users-table .column-header .label { -fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #4b5563; -fx-alignment: CENTER_LEFT; }
+.users-table .table-cell { -fx-font-size: 13px; -fx-text-fill: #374151; -fx-padding: 8px 12px; -fx-alignment: CENTER_LEFT; }
+.users-table .table-row-cell { -fx-background-color: white; -fx-cell-size: 44px; }
+.users-table .table-row-cell:hover { -fx-background-color: #f9fafb; }
+.users-table .table-row-cell:selected { -fx-background-color: #eff6ff; }
+.users-table .table-row-cell:selected .table-cell { -fx-text-fill: #1d4ed8; }
+.users-form-card { -fx-background-color: white; -fx-padding: 18px; -fx-background-radius: 10px; -fx-border-color: #e5e7eb; -fx-border-width: 1px; -fx-border-radius: 10px; }
+.users-form-title { -fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #111827; }
+.users-form-label { -fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #4b5563; }
+.users-field { -fx-pref-height: 40px; -fx-min-height: 40px; -fx-background-color: white; -fx-border-color: #d1d5db; -fx-border-width: 1px; -fx-border-radius: 8px; -fx-background-radius: 8px; -fx-padding: 8px 10px; -fx-font-size: 13px; }
+.users-field:focused { -fx-border-color: #2563eb; -fx-border-width: 2px; }
+.users-combo { -fx-pref-height: 40px; -fx-min-height: 40px; -fx-background-color: white; -fx-border-color: #d1d5db; -fx-border-width: 1px; -fx-border-radius: 8px; -fx-background-radius: 8px; }
+.users-action-button { -fx-min-height: 40px; -fx-pref-height: 40px; -fx-padding: 9px 16px; -fx-font-size: 13px; -fx-font-weight: bold; -fx-background-radius: 8px; -fx-border-radius: 8px; -fx-cursor: hand; }
+.users-primary-button { -fx-background-color: #2563eb; -fx-text-fill: white; }
+.users-primary-button:hover { -fx-background-color: #1d4ed8; }
+.users-secondary-button { -fx-background-color: white; -fx-text-fill: #374151; -fx-border-color: #d1d5db; -fx-border-width: 1px; }
+.users-secondary-button:hover { -fx-background-color: #f3f4f6; }

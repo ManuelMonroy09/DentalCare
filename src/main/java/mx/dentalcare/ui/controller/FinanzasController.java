@@ -221,18 +221,15 @@ public class FinanzasController {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Pago registrado");
         alert.setHeaderText("Pago registrado correctamente");
-        alert.setContentText("¿Deseas imprimir el recibo para el paciente?");
-        ButtonType imprimir = new ButtonType("Ver recibo");
+        alert.setContentText("Selecciona qué recibo deseas generar:");
+        ButtonType completo = new ButtonType("Recibo completo");
+        ButtonType pagoActual = new ButtonType("Este pago");
         ButtonType despues = new ButtonType("Ahora no", ButtonBar.ButtonData.CANCEL_CLOSE);
-        alert.getButtonTypes().setAll(imprimir, despues);
-        configurarDialogo(alert, 520, 220);
-        Label contenido = (Label) alert.getDialogPane().lookup(".content.label");
-        if (contenido != null) {
-            contenido.setWrapText(true);
-            contenido.setMaxWidth(450);
-            contenido.setMinHeight(Label.USE_PREF_SIZE);
-        }
-        if (alert.showAndWait().orElse(despues) == imprimir) mostrarVistaPrevia(pago, cargo);
+        alert.getButtonTypes().setAll(completo, pagoActual, despues);
+        configurarDialogo(alert, 520, 230);
+        ButtonType resultado = alert.showAndWait().orElse(despues);
+        if (resultado == completo) mostrarVistaPrevia(pago, cargo, true);
+        else if (resultado == pagoActual) mostrarVistaPrevia(pago, cargo, false);
     }
 
     @FXML
@@ -241,15 +238,53 @@ public class FinanzasController {
         if (cargo == null) { mensajeLabel.setText("Selecciona un cargo para imprimir su recibo."); return; }
         List<Pago> pagos = finanzasService.obtenerPagosPorCargo(cargo.getId());
         if (pagos.isEmpty()) { mensajeLabel.setText("El cargo seleccionado no tiene pagos registrados."); return; }
-        Pago ultimoPago = pagos.stream()
-                .max(Comparator.comparing(Pago::getFecha, Comparator.nullsFirst(Comparator.naturalOrder()))
-                        .thenComparing(Pago::getId, Comparator.nullsFirst(Comparator.naturalOrder())))
-                .orElse(pagos.get(pagos.size() - 1));
-        mostrarVistaPrevia(ultimoPago, cargo);
+
+        Alert opcion = new Alert(Alert.AlertType.CONFIRMATION);
+        opcion.setTitle("Imprimir recibo");
+        opcion.setHeaderText("Selecciona el tipo de recibo");
+        opcion.setContentText("Puedes imprimir el estado completo del cargo o únicamente un pago registrado.");
+        ButtonType completo = new ButtonType("Recibo completo");
+        ButtonType pagoEspecifico = new ButtonType("Seleccionar pago");
+        ButtonType cancelar = new ButtonType("Cancelar", ButtonBar.ButtonData.CANCEL_CLOSE);
+        opcion.getButtonTypes().setAll(completo, pagoEspecifico, cancelar);
+        configurarDialogo(opcion, 560, 250);
+        ButtonType resultado = opcion.showAndWait().orElse(cancelar);
+        if (resultado == completo) {
+            Pago referencia = pagos.get(0);
+            mostrarVistaPrevia(referencia, cargo, true);
+            return;
+        }
+        if (resultado != pagoEspecifico) return;
+
+        List<PagoOption> opciones = pagos.stream().map(PagoOption::new).toList();
+        ChoiceDialog<PagoOption> pagoDialog = new ChoiceDialog<>(opciones.get(0), opciones);
+        pagoDialog.setTitle("Seleccionar pago");
+        pagoDialog.setHeaderText("Selecciona el movimiento que deseas imprimir");
+        pagoDialog.setContentText("");
+        configurarDialogo(pagoDialog, 560, 280);
+        pagoDialog.showAndWait().ifPresent(seleccion -> mostrarVistaPrevia(seleccion.pago(), cargo, false));
+    }
+
+    private record PagoOption(Pago pago) {
+        @Override
+        public String toString() {
+            String fecha = pago.getFecha() == null ? "Fecha no disponible" : pago.getFecha().format(FECHA_HORA);
+            String metodo = pago.getMetodoPago() == null ? "" : " · " + pago.getMetodoPago().getDescripcion();
+            return fecha + " · " + monedaTexto(pago.getMonto()) + metodo;
+        }
+
+        private static String monedaTexto(BigDecimal monto) {
+            if (monto == null) return "$0.00";
+            return "$" + monto.setScale(2, RoundingMode.HALF_UP).toPlainString();
+        }
     }
 
     private void mostrarVistaPrevia(Pago pago, Cargo cargo) {
-        VBox ticket = construirTicket(pago, cargo);
+        mostrarVistaPrevia(pago, cargo, true);
+    }
+
+    private void mostrarVistaPrevia(Pago pago, Cargo cargo, boolean completo) {
+        VBox ticket = construirTicket(pago, cargo, completo);
         ScrollPane scroll = new ScrollPane(ticket);
         scroll.setFitToWidth(true);
         scroll.setFitToHeight(true);
@@ -257,24 +292,26 @@ public class FinanzasController {
         scroll.setStyle("-fx-background-color: white;");
         Dialog<ButtonType> dialogo = new Dialog<>();
         dialogo.setTitle("Vista previa del recibo");
-        dialogo.setHeaderText("Vista previa del recibo de pago");
+        dialogo.setHeaderText(completo ? "Recibo completo" : "Recibo de pago");
         dialogo.getDialogPane().setContent(scroll);
-        dialogo.getDialogPane().setPrefWidth(380);
-        dialogo.getDialogPane().setPrefHeight(620);
+        dialogo.getDialogPane().setPrefWidth(400);
+        dialogo.getDialogPane().setPrefHeight(completo ? 700 : 620);
         ButtonType imprimir = new ButtonType("Imprimir", ButtonBar.ButtonData.OK_DONE);
         ButtonType cancelar = new ButtonType("Cerrar", ButtonBar.ButtonData.CANCEL_CLOSE);
         dialogo.getDialogPane().getButtonTypes().setAll(imprimir, cancelar);
-        configurarDialogo(dialogo, 380, 620);
+        configurarDialogo(dialogo, 400, completo ? 700 : 620);
         dialogo.showAndWait().ifPresent(resultado -> { if (resultado == imprimir) imprimirTicket(ticket); });
     }
 
-    private VBox construirTicket(Pago pago, Cargo cargo) {
+    private VBox construirTicket(Pago pago, Cargo cargo, boolean completo) {
         ConfiguracionConsultorio configuracion = configuracionService.obtener();
         Paciente paciente = pacientes.get(cargo.getPacienteId());
         String nombre = paciente == null ? "Paciente #" + cargo.getPacienteId() : nombrePaciente(cargo.getPacienteId());
+        BigDecimal totalCargo = dinero(cargo.getImporte());
+        BigDecimal totalPagado = finanzasService.obtenerTotalPagado(cargo.getId());
         BigDecimal pendiente = finanzasService.obtenerSaldoPendiente(cargo.getId());
         VBox ticket = new VBox(6);
-        ticket.setPrefWidth(280); ticket.setMinWidth(280); ticket.setMaxWidth(280);
+        ticket.setPrefWidth(300); ticket.setMinWidth(300); ticket.setMaxWidth(300);
         ticket.setStyle("-fx-background-color: white; -fx-padding: 16px; -fx-font-family: 'Segoe UI';");
         agregarTexto(ticket, valor(configuracion.getNombreConsultorio()), "-fx-font-size: 18px; -fx-font-weight: bold; -fx-alignment: center;");
         if (!vacio(configuracion.getNombreOdontologo())) agregarTexto(ticket, configuracion.getNombreOdontologo(), "-fx-font-size: 12px; -fx-alignment: center;");
@@ -282,13 +319,27 @@ public class FinanzasController {
         if (!vacio(configuracion.getTelefono())) agregarTexto(ticket, "Tel. " + configuracion.getTelefono(), "-fx-font-size: 11px; -fx-alignment: center;");
         if (!vacio(configuracion.getEmail())) agregarTexto(ticket, configuracion.getEmail(), "-fx-font-size: 11px; -fx-alignment: center;");
         agregarTexto(ticket, "RECIBO DE PAGO", "-fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 8px 0 4px 0;");
-        agregarTexto(ticket, "Folio de pago: #" + valor(pago.getId()), "-fx-font-size: 11px;");
-        agregarTexto(ticket, "Fecha: " + (pago.getFecha() == null ? "" : pago.getFecha().format(FECHA_HORA)), "-fx-font-size: 11px;");
         agregarTexto(ticket, "Paciente: " + nombre, "-fx-font-size: 11px;");
         agregarTexto(ticket, "Concepto: " + valor(cargo.getConcepto()), "-fx-font-size: 11px;");
-        agregarTexto(ticket, "Método: " + (pago.getMetodoPago() == null ? "" : pago.getMetodoPago().getDescripcion()), "-fx-font-size: 11px;");
-        agregarTexto(ticket, "Importe: " + moneda(pago.getMonto()), "-fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 8px 0 0 0;");
-        agregarTexto(ticket, "Pendiente: " + moneda(pendiente), "-fx-font-size: 11px;");
+        agregarTexto(ticket, "Importe del tratamiento: " + moneda(totalCargo), "-fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 8px 0 0 0;");
+
+        if (completo) {
+            agregarTexto(ticket, "DETALLE DE PAGOS", "-fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 8px 0 2px 0;");
+            List<Pago> pagos = finanzasService.obtenerPagosPorCargo(cargo.getId());
+            for (Pago movimiento : pagos) {
+                String fecha = movimiento.getFecha() == null ? "" : movimiento.getFecha().format(FECHA_HORA);
+                String metodo = movimiento.getMetodoPago() == null ? "" : " · " + movimiento.getMetodoPago().getDescripcion();
+                agregarTexto(ticket, fecha + metodo + " · " + moneda(movimiento.getMonto()), "-fx-font-size: 10px;");
+            }
+            agregarTexto(ticket, "Total pagado: " + moneda(totalPagado), "-fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 8px 0 0 0;");
+            agregarTexto(ticket, "Pendiente: " + moneda(pendiente), "-fx-font-size: 11px;");
+        } else {
+            agregarTexto(ticket, "Movimiento: " + (pago.getFecha() == null ? "" : pago.getFecha().format(FECHA_HORA)), "-fx-font-size: 11px;");
+            agregarTexto(ticket, "Método: " + (pago.getMetodoPago() == null ? "" : pago.getMetodoPago().getDescripcion()), "-fx-font-size: 11px;");
+            agregarTexto(ticket, "Importe de este pago: " + moneda(pago.getMonto()), "-fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 8px 0 0 0;");
+            agregarTexto(ticket, "Acumulado pagado: " + moneda(totalPagado), "-fx-font-size: 11px;");
+            agregarTexto(ticket, "Pendiente: " + moneda(pendiente), "-fx-font-size: 11px;");
+        }
         agregarTexto(ticket, "Gracias por su visita.", "-fx-font-size: 11px; -fx-alignment: center; -fx-padding: 12px 0 0 0;");
         return ticket;
     }
@@ -303,7 +354,7 @@ public class FinanzasController {
     }
 
     private void agregarTexto(VBox contenedor, String texto, String estilo) {
-        Label label = new Label(texto); label.setWrapText(true); label.setMaxWidth(Double.MAX_VALUE); label.setStyle(estilo); contenedor.getChildren().add(label);
+        Label label = new Label(texto); label.setWrapText(true); label.setMaxWidth(Double.MAX_VALUE); contenedor.getChildren().add(label); label.setStyle(estilo);
     }
 
     @FXML
@@ -362,6 +413,10 @@ public class FinanzasController {
 
     private String valor(Object valor) { return valor == null ? "" : String.valueOf(valor); }
     private boolean vacio(String valor) { return valor == null || valor.isBlank(); }
+
+    private BigDecimal dinero(BigDecimal valor) {
+        return (valor == null ? BigDecimal.ZERO : valor).setScale(2, RoundingMode.HALF_UP);
+    }
 
     private void mostrarError(String titulo, String mensaje) {
         Alert alert = new Alert(Alert.AlertType.ERROR);

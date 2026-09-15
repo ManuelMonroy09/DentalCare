@@ -39,6 +39,7 @@ public class TratamientoDialogController {
         configurarDuracion();
         guardarButton.setOnAction(event -> guardar());
         cancelarButton.setOnAction(event -> cerrar());
+        ocultarError();
     }
 
     private void configurarDuracion() {
@@ -54,9 +55,11 @@ public class TratamientoDialogController {
         descripcionArea.setText(tratamiento.getDescripcion() != null ? tratamiento.getDescripcion() : "");
         precioField.setText(tratamiento.getPrecio() != null ? tratamiento.getPrecio().toPlainString() : "");
         duracionSpinner.getValueFactory().setValue(tratamiento.getDuracionMinutos());
+        ocultarError();
     }
 
     private void guardar() {
+        ocultarError();
         try {
             String nombre = nombreField.getText();
             String descripcion = descripcionArea.getText();
@@ -113,6 +116,14 @@ public class TratamientoDialogController {
 
     private void mostrarError(String mensaje) {
         lblError.setText(mensaje);
+        lblError.setVisible(true);
+        lblError.setManaged(true);
+    }
+
+    private void ocultarError() {
+        lblError.setText("");
+        lblError.setVisible(false);
+        lblError.setManaged(false);
     }
 
     private void cerrar() {

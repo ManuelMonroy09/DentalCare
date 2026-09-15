@@ -192,10 +192,30 @@ public class FinanzasController {
 
     private void configurarDialogo(Dialog<?> dialogo, double ancho, double alto) {
         DialogPane pane = dialogo.getDialogPane();
+        pane.getStyleClass().add("standard-dialog");
+        String dentalcareCss = getClass().getResource("/ui/css/dentalcare.css").toExternalForm();
+        String dialogCss = getClass().getResource("/ui/css/dialog.css").toExternalForm();
+        if (!pane.getStylesheets().contains(dentalcareCss)) pane.getStylesheets().add(dentalcareCss);
+        if (!pane.getStylesheets().contains(dialogCss)) pane.getStylesheets().add(dialogCss);
         pane.setMinWidth(ancho);
         pane.setPrefWidth(ancho);
         pane.setMinHeight(alto);
         pane.setPrefHeight(alto);
+        pane.applyCss();
+        for (ButtonType tipo : pane.getButtonTypes()) {
+            if (!(pane.lookupButton(tipo) instanceof Button button)) continue;
+            button.getStyleClass().removeAll("dialog-primary-button", "dialog-secondary-button");
+            if (tipo.getButtonData() == ButtonBar.ButtonData.CANCEL_CLOSE || tipo == ButtonType.CANCEL || tipo == ButtonType.CLOSE) {
+                button.getStyleClass().add("dialog-secondary-button");
+            } else {
+                button.getStyleClass().add("dialog-primary-button");
+            }
+            button.setMinHeight(40);
+            button.setPrefHeight(40);
+            button.setMaxHeight(44);
+            button.setWrapText(false);
+            button.setMnemonicParsing(false);
+        }
         dialogo.setResizable(false);
     }
 
@@ -240,6 +260,7 @@ public class FinanzasController {
         ButtonType imprimir = new ButtonType("Imprimir", ButtonBar.ButtonData.OK_DONE);
         ButtonType cancelar = new ButtonType("Cerrar", ButtonBar.ButtonData.CANCEL_CLOSE);
         dialogo.getDialogPane().getButtonTypes().setAll(imprimir, cancelar);
+        configurarDialogo(dialogo, 380, 620);
         dialogo.showAndWait().ifPresent(resultado -> { if (resultado == imprimir) imprimirTicket(ticket); });
     }
 
@@ -300,7 +321,7 @@ public class FinanzasController {
                 "Pagado: " + moneda(pagado) + "\n" +
                 "Pendiente: " + moneda(pendiente) + "\n" +
                 "Estado: " + finanzasService.obtenerEstadoCargo(cargo.getId()).getDescripcion());
-        configurarDialogo(alert, 480, 300);
+        configurarDialogo(alert, 520, 320);
         alert.showAndWait();
     }
 
@@ -312,44 +333,38 @@ public class FinanzasController {
     }
 
     private void cargarDatos() {
-        List<Cargo> cargos = finanzasService.obtenerCargos();
+        var cargos = finanzasService.obtenerCargos();
         cargosTable.setItems(FXCollections.observableArrayList(cargos));
-        BigDecimal ingresosHoy = cargos.stream()
-                .filter(c -> LocalDate.now().equals(c.getFecha()))
-                .map(c -> finanzasService.obtenerTotalPagado(c.getId()))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal ingresos = finanzasService.obtenerIngresosDelDia();
         BigDecimal pendiente = cargos.stream()
-                .map(c -> finanzasService.obtenerSaldoPendiente(c.getId()))
+                .map(cargo -> finanzasService.obtenerSaldoPendiente(cargo.getId()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        long cobrosHoy = cargos.stream()
-                .filter(c -> LocalDate.now().equals(c.getFecha()))
-                .mapToLong(c -> finanzasService.obtenerPagosPorCargo(c.getId()).size())
-                .sum();
-        ingresosLabel.setText(moneda(ingresosHoy));
+        long cobrosHoy = finanzasService.obtenerPagosDelDia().size();
+        ingresosLabel.setText(moneda(ingresos));
         pendienteLabel.setText(moneda(pendiente));
         cobrosHoyLabel.setText(String.valueOf(cobrosHoy));
     }
 
     private String nombrePaciente(Long id) {
-        Paciente p = pacientes.get(id);
-        if (p == null) return "Paciente #" + id;
-        return (p.getNombre() + " " + p.getApellidoPaterno() + " " + p.getApellidoMaterno()).trim().replaceAll("\\s+", " ");
+        Paciente paciente = pacientes.get(id);
+        if (paciente == null) return "Paciente #" + id;
+        return (paciente.getNombre() + " " + paciente.getApellidoPaterno() + " " + paciente.getApellidoMaterno())
+                .trim().replaceAll("\\s+", " ");
     }
 
     private String moneda(BigDecimal valor) {
-        if (valor == null) valor = BigDecimal.ZERO;
+        if (valor == null) return "$0.00";
         return "$" + valor.setScale(2, RoundingMode.HALF_UP).toPlainString();
     }
 
-    private String valor(Object valor) { return valor == null ? "" : valor.toString(); }
+    private String valor(Object valor) { return valor == null ? "" : String.valueOf(valor); }
     private boolean vacio(String valor) { return valor == null || valor.isBlank(); }
 
     private void mostrarError(String titulo, String mensaje) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(titulo);
-        alert.setHeaderText(null);
-        alert.setContentText(mensaje);
-        configurarDialogo(alert, 420, 190);
+        alert.setHeaderText(mensaje);
+        configurarDialogo(alert, 460, 210);
         alert.showAndWait();
     }
 }

@@ -24,41 +24,18 @@ import java.util.Optional;
 @Component
 public class TratamientosController {
 
-    @FXML
-    private TableView<Tratamiento> tratamientosTable;
-
-    @FXML
-    private TableColumn<Tratamiento, Long> idColumn;
-
-    @FXML
-    private TableColumn<Tratamiento, String> nombreColumn;
-
-    @FXML
-    private TableColumn<Tratamiento, String> descripcionColumn;
-
-    @FXML
-    private TableColumn<Tratamiento, Integer> duracionColumn;
-
-    @FXML
-    private TableColumn<Tratamiento, String> precioColumn;
-
-    @FXML
-    private TableColumn<Tratamiento, String> estadoColumn;
-
-    @FXML
-    private Button nuevoButton;
-
-    @FXML
-    private Button editarButton;
-
-    @FXML
-    private Button estadoButton;
-
-    @FXML
-    private TextField buscarField;
-
-    @FXML
-    private Label contadorTratamientosLabel;
+    @FXML private TableView<Tratamiento> tratamientosTable;
+    @FXML private TableColumn<Tratamiento, Long> idColumn;
+    @FXML private TableColumn<Tratamiento, String> nombreColumn;
+    @FXML private TableColumn<Tratamiento, String> descripcionColumn;
+    @FXML private TableColumn<Tratamiento, Integer> duracionColumn;
+    @FXML private TableColumn<Tratamiento, String> precioColumn;
+    @FXML private TableColumn<Tratamiento, String> estadoColumn;
+    @FXML private Button nuevoButton;
+    @FXML private Button editarButton;
+    @FXML private Button estadoButton;
+    @FXML private TextField buscarField;
+    @FXML private Label contadorTratamientosLabel;
 
     private final TratamientoService tratamientoService;
     private final ApplicationContext applicationContext;
@@ -89,8 +66,10 @@ public class TratamientosController {
         nombreColumn.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         descripcionColumn.setCellValueFactory(new PropertyValueFactory<>("descripcion"));
         duracionColumn.setCellValueFactory(new PropertyValueFactory<>("duracionMinutos"));
-        precioColumn.setCellValueFactory(celda -> new javafx.beans.property.SimpleStringProperty(celda.getValue().getPrecio() != null ? FORMATO_MONEDA.format(celda.getValue().getPrecio()) : "$0.00"));
-        estadoColumn.setCellValueFactory(celda -> new javafx.beans.property.SimpleStringProperty(celda.getValue().isActivo() ? "Activo" : "Inactivo"));
+        precioColumn.setCellValueFactory(celda -> new javafx.beans.property.SimpleStringProperty(
+                celda.getValue().getPrecio() != null ? FORMATO_MONEDA.format(celda.getValue().getPrecio()) : "$0.00"));
+        estadoColumn.setCellValueFactory(celda -> new javafx.beans.property.SimpleStringProperty(
+                celda.getValue().isActivo() ? "Activo" : "Inactivo"));
         tratamientosTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         centrarColumna(idColumn);
         centrarColumna(duracionColumn);
@@ -122,26 +101,20 @@ public class TratamientosController {
     }
 
     private void aplicarFiltro() {
-        if (tratamientosFiltrados == null) {
-            return;
-        }
+        if (tratamientosFiltrados == null) return;
         String textoBusqueda = buscarField.getText();
         if (textoBusqueda == null || textoBusqueda.isBlank()) {
             tratamientosFiltrados.setPredicate(tratamiento -> true);
-            actualizarPlaceholder();
-            actualizarContadorTratamientos();
-            return;
-        }
-        String[] palabras = textoBusqueda.trim().toLowerCase(LOCALE_MEXICO).split("\\s+");
-        tratamientosFiltrados.setPredicate(tratamiento -> {
-            String datosTratamiento = construirTextoBusqueda(tratamiento);
-            for (String palabra : palabras) {
-                if (!datosTratamiento.contains(palabra)) {
-                    return false;
+        } else {
+            String[] palabras = textoBusqueda.trim().toLowerCase(LOCALE_MEXICO).split("\\s+");
+            tratamientosFiltrados.setPredicate(tratamiento -> {
+                String datosTratamiento = construirTextoBusqueda(tratamiento);
+                for (String palabra : palabras) {
+                    if (!datosTratamiento.contains(palabra)) return false;
                 }
-            }
-            return true;
-        });
+                return true;
+            });
+        }
         actualizarPlaceholder();
         actualizarContadorTratamientos();
     }
@@ -157,12 +130,10 @@ public class TratamientosController {
 
     private void actualizarPlaceholder() {
         if (tratamientosFiltrados.isEmpty()) {
-            if (buscarField.getText() == null || buscarField.getText().isBlank()) {
-                tratamientosTable.setPlaceholder(new Label("No hay tratamientos registrados."));
-            } else {
-                tratamientosTable.setPlaceholder(new Label("No se encontraron tratamientos."));
-            }
-
+            tratamientosTable.setPlaceholder(new Label(
+                    buscarField.getText() == null || buscarField.getText().isBlank()
+                            ? "No hay tratamientos registrados."
+                            : "No se encontraron tratamientos."));
         } else {
             tratamientosTable.setPlaceholder(new Label("No hay tratamientos registrados."));
         }
@@ -170,16 +141,14 @@ public class TratamientosController {
 
     private void configurarSeleccion() {
         tratamientosTable.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, nuevoValor) -> {
-                    boolean seleccionado = nuevoValor != null;
-                    editarButton.setDisable(!seleccionado);
-                    estadoButton.setDisable(!seleccionado);
-                    actualizarTextoBotonEstado(nuevoValor);
-                });
+            boolean seleccionado = nuevoValor != null;
+            editarButton.setDisable(!seleccionado);
+            estadoButton.setDisable(!seleccionado);
+            actualizarTextoBotonEstado(nuevoValor);
+        });
     }
 
-    private void actualizarTextoBotonEstado(
-            Tratamiento tratamiento
-    ) {
+    private void actualizarTextoBotonEstado(Tratamiento tratamiento) {
         if (tratamiento == null) {
             estadoButton.setText("Desactivar");
             return;
@@ -201,24 +170,22 @@ public class TratamientosController {
             loader.setControllerFactory(applicationContext::getBean);
             Parent root = loader.load();
             Stage stage = new Stage();
-            stage.setTitle("Nuevo Tratamiento");
+            stage.setTitle("Nuevo tratamiento");
             stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setScene(new Scene(root, 650, 500));
-            stage.setMinWidth(550);
-            stage.setMinHeight(450);
+            stage.setScene(new Scene(root, 720, 520));
+            stage.setMinWidth(720);
+            stage.setMinHeight(520);
+            stage.setResizable(false);
             stage.showAndWait();
             cargarTratamientos();
-
         } catch (Exception e) {
-            e.printStackTrace();
+            mostrarError("No fue posible abrir el formulario de tratamiento.", e);
         }
     }
 
     private void editarTratamiento() {
         Tratamiento tratamientoSeleccionado = tratamientosTable.getSelectionModel().getSelectedItem();
-        if (tratamientoSeleccionado == null) {
-            return;
-        }
+        if (tratamientoSeleccionado == null) return;
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/ui/fxml/TratamientoDialog.fxml"));
             loader.setControllerFactory(applicationContext::getBean);
@@ -226,34 +193,35 @@ public class TratamientosController {
             TratamientoDialogController controller = loader.getController();
             controller.setTratamiento(tratamientoSeleccionado);
             Stage stage = new Stage();
-            stage.setTitle("Editar Tratamiento");
+            stage.setTitle("Editar tratamiento");
             stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setScene(new Scene(root, 650, 500));
-            stage.setMinWidth(550);
-            stage.setMinHeight(450);
+            stage.setScene(new Scene(root, 720, 520));
+            stage.setMinWidth(720);
+            stage.setMinHeight(520);
+            stage.setResizable(false);
             stage.showAndWait();
             cargarTratamientos();
-
         } catch (Exception e) {
-            e.printStackTrace();
+            mostrarError("No fue posible abrir el formulario de edición.", e);
         }
     }
 
     private void cambiarEstado() {
         Tratamiento tratamientoSeleccionado = tratamientosTable.getSelectionModel().getSelectedItem();
-        if (tratamientoSeleccionado == null) {
-            return;
-        }
+        if (tratamientoSeleccionado == null) return;
+
         boolean actualmenteActivo = tratamientoSeleccionado.isActivo();
         String accion = actualmenteActivo ? "desactivar" : "activar";
         Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
         confirmacion.setTitle(actualmenteActivo ? "Desactivar tratamiento" : "Activar tratamiento");
-        confirmacion.setHeaderText(actualmenteActivo ? "¿Deseas desactivar este tratamiento?" : "¿Deseas activar este tratamiento?");
+        confirmacion.setHeaderText(actualmenteActivo
+                ? "¿Deseas desactivar este tratamiento?"
+                : "¿Deseas activar este tratamiento?");
         confirmacion.setContentText("Tratamiento: " + tratamientoSeleccionado.getNombre());
+        estilizarAlerta(confirmacion);
+
         Optional<ButtonType> resultado = confirmacion.showAndWait();
-        if (resultado.isEmpty() || resultado.get() != ButtonType.OK) {
-            return;
-        }
+        if (resultado.isEmpty() || resultado.get() != ButtonType.OK) return;
 
         try {
             if (actualmenteActivo) {
@@ -272,6 +240,31 @@ public class TratamientosController {
         alerta.setTitle("Error");
         alerta.setHeaderText(mensaje);
         alerta.setContentText(e.getMessage() != null ? e.getMessage() : "Ocurrió un error inesperado.");
+        estilizarAlerta(alerta);
         alerta.showAndWait();
+    }
+
+    private void estilizarAlerta(Alert alerta) {
+        DialogPane pane = alerta.getDialogPane();
+        pane.getStyleClass().add("standard-dialog");
+        String dentalcareCss = getClass().getResource("/ui/css/dentalcare.css").toExternalForm();
+        String dialogCss = getClass().getResource("/ui/css/dialog.css").toExternalForm();
+        if (!pane.getStylesheets().contains(dentalcareCss)) pane.getStylesheets().add(dentalcareCss);
+        if (!pane.getStylesheets().contains(dialogCss)) pane.getStylesheets().add(dialogCss);
+        pane.applyCss();
+        for (ButtonType tipo : pane.getButtonTypes()) {
+            if (!(pane.lookupButton(tipo) instanceof Button button)) continue;
+            button.getStyleClass().removeAll("dialog-primary-button", "dialog-secondary-button");
+            if (tipo == ButtonType.CANCEL || tipo == ButtonType.CLOSE) {
+                button.getStyleClass().add("dialog-secondary-button");
+            } else {
+                button.getStyleClass().add("dialog-primary-button");
+            }
+            button.setMinHeight(40);
+            button.setPrefHeight(40);
+            button.setMaxHeight(44);
+            button.setWrapText(false);
+            button.setMnemonicParsing(false);
+        }
     }
 }

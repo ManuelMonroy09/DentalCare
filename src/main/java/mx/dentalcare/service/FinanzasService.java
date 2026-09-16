@@ -29,11 +29,13 @@ public class FinanzasService {
     private final CargoRepository cargoRepository;
     private final PagoRepository pagoRepository;
     private final CitaService citaService;
+    private final AuditService auditService;
 
-    public FinanzasService(CargoRepository cargoRepository, PagoRepository pagoRepository, CitaService citaService) {
+    public FinanzasService(CargoRepository cargoRepository, PagoRepository pagoRepository, CitaService citaService, AuditService auditService) {
         this.cargoRepository = cargoRepository;
         this.pagoRepository = pagoRepository;
         this.citaService = citaService;
+        this.auditService = auditService;
     }
 
     public List<Cargo> obtenerCargos() {
@@ -73,7 +75,6 @@ public class FinanzasService {
         return pagoRepository.findById(pagoId).orElseThrow(() -> new IllegalArgumentException("No existe el pago seleccionado."));
     }
 
-    /** Genera cargos únicamente cuando la atención ya ocurrió. */
     public int generarCargosPendientes() {
         int creados = 0;
         for (Cita cita : citaService.obtenerTodas()) {
@@ -93,6 +94,7 @@ public class FinanzasService {
         if (cita.getPaciente() == null || cita.getPaciente().getId() == null) throw new IllegalArgumentException("La cita debe tener un paciente válido.");
         if (cita.getEstado() != EstadoCita.ATENDIDA) throw new IllegalStateException("Solo una cita atendida puede generar un cargo por servicios realizados.");
 
+        boolean nuevoCargo = cargoRepository.findByCitaId(cita.getId()).isEmpty();
         Cargo cargo = cargoRepository.findByCitaId(cita.getId()).orElseGet(() -> {
             BigDecimal total = dinero(cita.obtenerTotalTratamientos());
             if (total.compareTo(BigDecimal.ZERO) <= 0) throw new IllegalStateException("La cita no tiene tratamientos con importe para generar un cargo.");
@@ -103,6 +105,10 @@ public class FinanzasService {
         });
 
         vincularAnticiposAlCargo(cita.getId(), cargo.getId());
+        if (nuevoCargo) {
+            auditService.registrar("FINANZAS", "GENERAR_CARGO", "CARGO", cargo.getId(),
+                    "Cargo generado por servicios realizados", null, "Cargo #" + cargo.getId(), "EXITOSO");
+        }
         return cargo;
     }
 
@@ -137,7 +143,10 @@ public class FinanzasService {
         if (importe.compareTo(pendiente) > 0) throw new IllegalArgumentException("El pago no puede superar el saldo pendiente de $" + pendiente.toPlainString());
         Pago pago = new Pago(cargo.getPacienteId(), cargoId, LocalDateTime.now(), importe, metodoPago, notas == null ? null : notas.trim());
         pago.validar();
-        return pagoRepository.save(pago);
+        Pago guardado = pagoRepository.save(pago);
+        auditService.registrar("FINANZAS", "REGISTRAR_PAGO", "PAGO", guardado.getId(),
+                "Pago registrado", null, "$" + importe.toPlainString() + " | " + metodoPago.name(), "EXITOSO");
+        return guardado;
     }
 
     public Pago registrarAnticipo(Long citaId, BigDecimal monto, MetodoPago metodoPago, String notas) {
@@ -159,7 +168,10 @@ public class FinanzasService {
 
         Pago pago = Pago.anticipo(cita.getPaciente().getId(), citaId, LocalDateTime.now(), importe, metodoPago, notas == null ? null : notas.trim());
         pago.validar();
-        return pagoRepository.save(pago);
+        Pago guardado = pagoRepository.save(pago);
+        auditService.registrar("FINANZAS", "REGISTRAR_ANTICIPO", "PAGO", guardado.getId(),
+                "Anticipo registrado", null, "$" + importe.toPlainString() + " | " + metodoPago.name(), "EXITOSO");
+        return guardado;
     }
 
     public void cancelarPago(Long pagoId) {
@@ -167,6 +179,8 @@ public class FinanzasService {
         if (pago.getEstado() == EstadoPago.CANCELADO) throw new IllegalStateException("El pago seleccionado ya está cancelado.");
         pago.setEstado(EstadoPago.CANCELADO);
         pagoRepository.save(pago);
+        auditService.registrar("FINANZAS", "CANCELAR_PAGO", "PAGO", pagoId,
+                "Pago cancelado", "ACTIVO", "CANCELADO", "EXITOSO");
     }
 
     public BigDecimal obtenerTotalPagado(Long cargoId) {

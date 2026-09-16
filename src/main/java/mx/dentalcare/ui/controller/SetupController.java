@@ -10,6 +10,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.DataFormat;
@@ -104,16 +105,21 @@ public class SetupController {
         Node okNode = dialog.getDialogPane().lookupButton(ButtonType.OK);
         okNode.getStyleClass().add("dialog-primary-button");
 
-        Label message = new Label(
+        TextArea message = new TextArea(
                 "Esta es la clave de recuperación del administrador. Permite recuperar el acceso si se olvida la contraseña. "
                         + "Guárdala fuera de DentalCare, por ejemplo en un lugar físico seguro o en un gestor de contraseñas. "
                         + "No la guardes dentro de DentalCare ni la compartas con otras personas. "
                         + "Si pierdes esta clave y también la contraseña, este mecanismo no podrá recuperar el acceso."
         );
         message.setWrapText(true);
-        message.setMaxWidth(450);
-        message.setMinHeight(110);
-        message.setPrefHeight(110);
+        message.setEditable(false);
+        message.setFocusTraversable(false);
+        message.setPrefRowCount(5);
+        message.setMinHeight(120);
+        message.setPrefHeight(120);
+        message.setMaxHeight(120);
+        message.setMaxWidth(Double.MAX_VALUE);
+        message.getStyleClass().add("recovery-info-text");
 
         TextField keyField = new TextField(recoveryKey);
         keyField.setEditable(false);
@@ -127,12 +133,16 @@ public class SetupController {
             keyField.selectAll();
         });
 
-        VBox content = new VBox(14, message, keyField, copyButton);
+        VBox infoPanel = new VBox(message);
+        infoPanel.getStyleClass().add("recovery-info-panel");
+        infoPanel.setFillWidth(true);
+
+        VBox content = new VBox(14, infoPanel, keyField, copyButton);
         content.setPrefWidth(450);
-        content.setMinHeight(290);
+        content.setMinHeight(275);
         dialog.getDialogPane().setContent(content);
-        dialog.getDialogPane().setPrefHeight(430);
-        dialog.getDialogPane().setMinHeight(430);
+        dialog.getDialogPane().setPrefHeight(410);
+        dialog.getDialogPane().setMinHeight(410);
         dialog.showAndWait();
     }
 

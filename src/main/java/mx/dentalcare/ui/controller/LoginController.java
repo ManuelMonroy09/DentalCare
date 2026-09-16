@@ -68,8 +68,9 @@ public class LoginController {
         String password = txtPassword.getText();
         try {
             AuthenticatedUser user = authenticationService.login(username, password);
-            if (user.isAdmin() && !authenticationService.hasRecoveryKey()) {
-                mostrarClaveRecuperacion(authenticationService.generateRecoveryKey(), true);
+            if (!authenticationService.hasRecoveryKey(user.getUsername())) {
+                String recoveryKey = authenticationService.generateRecoveryKey(user.getUsername());
+                mostrarClaveRecuperacion(recoveryKey, true);
             }
             mostrarTransicion();
         } catch (SecurityException e) {
@@ -95,7 +96,7 @@ public class LoginController {
     private void mostrarDialogoRecuperacion() {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Recuperar acceso");
-        dialog.setHeaderText("Restablecer contraseña del administrador");
+        dialog.setHeaderText("Restablecer contraseña");
         dialog.getDialogPane().getStyleClass().add("standard-dialog");
         String dialogCss = getClass().getResource("/ui/css/dialog.css").toExternalForm();
         dialog.getDialogPane().getStylesheets().add(dialogCss);
@@ -107,8 +108,11 @@ public class LoginController {
         resetNode.getStyleClass().add("dialog-primary-button");
         cancelNode.getStyleClass().add("dialog-secondary-button");
 
-        Label ayuda = new Label("Introduce la clave de recuperación que se generó al configurar DentalCare.");
+        Label ayuda = new Label("Introduce el usuario y la clave de recuperación asociada a la cuenta.");
         ayuda.setWrapText(true);
+        TextField usernameField = new TextField(txtUsername.getText());
+        usernameField.setPromptText("Usuario");
+        usernameField.setMaxWidth(Double.MAX_VALUE);
         TextField recoveryField = new TextField();
         recoveryField.setPromptText("Clave de recuperación");
         recoveryField.setMaxWidth(Double.MAX_VALUE);
@@ -127,21 +131,28 @@ public class LoginController {
 
         VBox content = new VBox(10,
                 ayuda,
+                new Label("Usuario"), usernameField,
                 new Label("Clave de recuperación"), recoveryField,
                 new Label("Nueva contraseña"), newPassword,
                 new Label("Confirmar contraseña"), confirmPassword,
                 error);
         content.setPrefWidth(440);
-        content.setMinHeight(300);
+        content.setMinHeight(340);
         dialog.getDialogPane().setContent(content);
-        dialog.getDialogPane().setPrefHeight(500);
-        dialog.getDialogPane().setMinHeight(500);
+        dialog.getDialogPane().setPrefHeight(540);
+        dialog.getDialogPane().setMinHeight(540);
 
         resetNode.addEventFilter(ActionEvent.ACTION, event -> {
+            String username = usernameField.getText();
             String recoveryKey = recoveryField.getText();
             String password = newPassword.getText();
             String confirmation = confirmPassword.getText();
 
+            if (username == null || username.isBlank()) {
+                mostrarErrorDialog(error, "El usuario es obligatorio.");
+                event.consume();
+                return;
+            }
             if (recoveryKey == null || recoveryKey.isBlank()) {
                 mostrarErrorDialog(error, "La clave de recuperación es obligatoria.");
                 event.consume();
@@ -159,10 +170,13 @@ public class LoginController {
             }
 
             try {
-                String newRecoveryKey = authenticationService.recoverAdminPassword(recoveryKey, password);
+                String newRecoveryKey = authenticationService.recoverPassword(username, recoveryKey, password);
                 event.consume();
                 dialog.close();
-                Platform.runLater(() -> mostrarClaveRecuperacion(newRecoveryKey, false));
+                Platform.runLater(() -> {
+                    mostrarClaveRecuperacion(newRecoveryKey, false);
+                    mostrarTransicion();
+                });
             } catch (SecurityException e) {
                 mostrarErrorDialog(error, "La clave de recuperación es incorrecta o no es válida.");
                 event.consume();
@@ -175,7 +189,7 @@ public class LoginController {
             }
         });
 
-        dialog.setOnShown(event -> recoveryField.requestFocus());
+        dialog.setOnShown(event -> usernameField.requestFocus());
         dialog.showAndWait();
     }
 

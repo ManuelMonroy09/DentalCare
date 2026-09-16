@@ -4,7 +4,6 @@ import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
 import mx.dentalcare.domain.auditoria.AuditEntry;
 import mx.dentalcare.service.AuditService;
 import org.springframework.stereotype.Component;
@@ -12,9 +11,8 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.List;
 
 @Component
 public class AuditoriaController {
@@ -84,12 +82,36 @@ public class AuditoriaController {
         String moduloActual = moduloFiltro.getValue();
         String accionActual = accionFiltro.getValue();
 
-        usuarioFiltro.setItems(FXCollections.observableArrayList(
-                "Todos", entradas.stream().map(AuditEntry::getDisplayName).filter(Objects::nonNull).distinct().sorted().toList()));
-        moduloFiltro.setItems(FXCollections.observableArrayList(
-                "Todos", entradas.stream().map(AuditEntry::getModulo).filter(Objects::nonNull).distinct().sorted().toList()));
-        accionFiltro.setItems(FXCollections.observableArrayList(
-                "Todas", entradas.stream().map(AuditEntry::getAccion).filter(Objects::nonNull).distinct().sorted().toList()));
+        List<String> usuarios = entradas.stream()
+                .map(AuditEntry::getDisplayName)
+                .filter(Objects::nonNull)
+                .distinct()
+                .sorted()
+                .toList();
+        List<String> modulos = entradas.stream()
+                .map(AuditEntry::getModulo)
+                .filter(Objects::nonNull)
+                .distinct()
+                .sorted()
+                .toList();
+        List<String> acciones = entradas.stream()
+                .map(AuditEntry::getAccion)
+                .filter(Objects::nonNull)
+                .distinct()
+                .sorted()
+                .toList();
+
+        usuarioFiltro.setItems(FXCollections.observableArrayList());
+        usuarioFiltro.getItems().add("Todos");
+        usuarioFiltro.getItems().addAll(usuarios);
+
+        moduloFiltro.setItems(FXCollections.observableArrayList());
+        moduloFiltro.getItems().add("Todos");
+        moduloFiltro.getItems().addAll(modulos);
+
+        accionFiltro.setItems(FXCollections.observableArrayList());
+        accionFiltro.getItems().add("Todas");
+        accionFiltro.getItems().addAll(acciones);
 
         usuarioFiltro.setValue(usuarioActual == null ? "Todos" : usuarioActual);
         moduloFiltro.setValue(moduloActual == null ? "Todos" : moduloActual);

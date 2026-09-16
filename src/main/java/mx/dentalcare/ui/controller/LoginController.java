@@ -12,6 +12,7 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import mx.dentalcare.security.AuthenticationService;
@@ -35,6 +36,12 @@ public class LoginController {
     @FXML private void initialize() {
         String overrides = getClass().getResource("/ui/css/dentalcare-overrides.css").toExternalForm();
         if (!authRoot.getStylesheets().contains(overrides)) authRoot.getStylesheets().add(overrides);
+        Rectangle clip = new Rectangle();
+        clip.setArcWidth(36);
+        clip.setArcHeight(36);
+        clip.widthProperty().bind(authShell.widthProperty());
+        clip.heightProperty().bind(authShell.heightProperty());
+        authShell.setClip(clip);
     }
     @FXML private void iniciarMovimientoVentana(javafx.scene.input.MouseEvent event) { Stage stage = (Stage) authRoot.getScene().getWindow(); mouseOffsetX = event.getScreenX() - stage.getX(); mouseOffsetY = event.getScreenY() - stage.getY(); }
     @FXML private void moverVentana(javafx.scene.input.MouseEvent event) { Stage stage = (Stage) authRoot.getScene().getWindow(); stage.setX(event.getScreenX() - mouseOffsetX); stage.setY(event.getScreenY() - mouseOffsetY); }

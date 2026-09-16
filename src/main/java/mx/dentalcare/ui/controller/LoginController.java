@@ -117,9 +117,9 @@ public class LoginController {
         Label error = new Label();
         error.getStyleClass().add("standard-error");
         error.setWrapText(true);
-        error.setMinHeight(34);
-        error.setPrefHeight(34);
-        error.setMaxHeight(50);
+        error.setMinHeight(48);
+        error.setPrefHeight(48);
+        error.setMaxHeight(60);
         error.setManaged(true);
         error.setVisible(false);
 
@@ -130,9 +130,10 @@ public class LoginController {
                 new Label("Confirmar contraseña"), confirmPassword,
                 error);
         content.setPrefWidth(440);
+        content.setMinHeight(300);
         dialog.getDialogPane().setContent(content);
-        dialog.getDialogPane().setPrefHeight(440);
-        dialog.getDialogPane().setMinHeight(440);
+        dialog.getDialogPane().setPrefHeight(500);
+        dialog.getDialogPane().setMinHeight(500);
 
         resetNode.addEventFilter(ActionEvent.ACTION, event -> {
             String recoveryKey = recoveryField.getText();
@@ -157,6 +158,7 @@ public class LoginController {
 
             try {
                 String newRecoveryKey = authenticationService.recoverAdminPassword(recoveryKey, password);
+                event.consume();
                 dialog.close();
                 mostrarClaveRecuperacion(newRecoveryKey, false);
                 mostrarTransicion();
@@ -185,7 +187,9 @@ public class LoginController {
     private void mostrarClaveRecuperacion(String recoveryKey, boolean initialSetup) {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Clave de recuperación");
-        dialog.setHeaderText("Guarda esta clave en un lugar seguro");
+        dialog.setHeaderText(initialSetup
+                ? "Guarda esta clave antes de continuar"
+                : "Nueva clave de recuperación");
         dialog.getDialogPane().getStyleClass().add("standard-dialog");
         String dialogCss = getClass().getResource("/ui/css/dialog.css").toExternalForm();
         dialog.getDialogPane().getStylesheets().add(dialogCss);
@@ -193,11 +197,15 @@ public class LoginController {
         Node okNode = dialog.getDialogPane().lookupButton(ButtonType.OK);
         okNode.getStyleClass().add("dialog-primary-button");
 
-        Label message = new Label(initialSetup
-                ? "Esta clave permite recuperar el acceso del administrador si se olvida la contraseña. No la guardes dentro de DentalCare ni la compartas."
-                : "La contraseña fue restablecida. Por seguridad se generó una nueva clave de recuperación. Guarda la nueva clave y sustituye la anterior.");
+        String texto = initialSetup
+                ? "Esta clave permite recuperar el acceso del administrador si se olvida la contraseña. Guárdala fuera de DentalCare, por ejemplo en un lugar seguro o gestor de contraseñas. No la guardes dentro de DentalCare ni la compartas. Si pierdes esta clave y la contraseña, este mecanismo no podrá recuperar el acceso."
+                : "La contraseña fue restablecida correctamente. Por seguridad se generó una nueva clave de recuperación. Guarda esta nueva clave fuera de DentalCare y sustituye la anterior. La clave anterior ya no debe utilizarse para futuras recuperaciones.";
+
+        Label message = new Label(texto);
         message.setWrapText(true);
-        message.setMaxWidth(430);
+        message.setMinHeight(initialSetup ? 92 : 76);
+        message.setPrefHeight(initialSetup ? 92 : 76);
+        message.setMaxWidth(450);
 
         TextField keyField = new TextField(recoveryKey);
         keyField.setEditable(false);
@@ -211,11 +219,12 @@ public class LoginController {
             keyField.selectAll();
         });
 
-        VBox content = new VBox(12, message, keyField, copyButton);
-        content.setPrefWidth(430);
+        VBox content = new VBox(14, message, keyField, copyButton);
+        content.setPrefWidth(450);
+        content.setMinHeight(initialSetup ? 260 : 230);
         dialog.getDialogPane().setContent(content);
-        dialog.getDialogPane().setPrefHeight(330);
-        dialog.getDialogPane().setMinHeight(330);
+        dialog.getDialogPane().setPrefHeight(initialSetup ? 400 : 370);
+        dialog.getDialogPane().setMinHeight(initialSetup ? 400 : 370);
         dialog.showAndWait();
     }
 

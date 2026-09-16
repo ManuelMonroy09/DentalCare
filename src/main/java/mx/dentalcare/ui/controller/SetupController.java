@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import mx.dentalcare.security.AuthenticationService;
 import org.springframework.context.ApplicationContext;
@@ -22,7 +23,15 @@ public class SetupController {
     private final ApplicationContext context;
 
     public SetupController(AuthenticationService authenticationService, ApplicationContext context) { this.authenticationService = authenticationService; this.context = context; }
-    @FXML public void initialize() { boolean migrationRequired = authenticationService.requiresLegacyMigration(); legacySection.setManaged(migrationRequired); legacySection.setVisible(migrationRequired); }
+    @FXML public void initialize() {
+        boolean migrationRequired = authenticationService.requiresLegacyMigration();
+        legacySection.setManaged(migrationRequired);
+        legacySection.setVisible(migrationRequired);
+        Rectangle clip = new Rectangle();
+        clip.setArcWidth(36);
+        clip.setArcHeight(36);
+        clip.widthProperty().bind(((javafx.scene.Node) legacySection).getParent().getParent().getParent().layoutBoundsProperty().map(b -> b.getWidth()).get());
+    }
     @FXML private void iniciarMovimientoVentana(javafx.scene.input.MouseEvent event) { Stage stage = (Stage) txtPassword.getScene().getWindow(); mouseOffsetX = event.getScreenX() - stage.getX(); mouseOffsetY = event.getScreenY() - stage.getY(); }
     @FXML private void moverVentana(javafx.scene.input.MouseEvent event) { Stage stage = (Stage) txtPassword.getScene().getWindow(); stage.setX(event.getScreenX() - mouseOffsetX); stage.setY(event.getScreenY() - mouseOffsetY); }
     @FXML private void crearAdministrador() {

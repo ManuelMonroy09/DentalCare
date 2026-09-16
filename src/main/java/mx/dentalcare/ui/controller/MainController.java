@@ -108,7 +108,7 @@ public class MainController {
     }
 
     private void mostrarRolesPermisos() { StringBuilder texto = new StringBuilder(); for (UserRole role : UserRole.values()) { texto.append(role.getDisplayName()).append("\n"); for (UserPermission permission : AuthenticatedUser.permissionsFor(role)) texto.append("  • ").append(nombrePermiso(permission)).append("\n"); texto.append("\n"); } mostrarDialogoTexto("Roles y permisos", "Permisos actuales de DentalCare", texto.toString()); }
-    private void mostrarAuditoria() { mostrarDialogoTexto("Auditoría", "Auditoría de seguridad", "La auditoría detallada se habilitará como siguiente capa del sistema.\n\nLos roles y privilegios ya están activos."); }
+    private void mostrarAuditoria() { cargarVista("/ui/fxml/AuditoriaView.fxml"); }
 
     private void mostrarDialogoTexto(String titulo, String encabezado, String texto) { Dialog<ButtonType> dialog = crearDialogoEstandar(titulo, encabezado); Label label = crearTexto(texto); VBox content = crearPanel(8); content.getChildren().add(label); mostrarContenidoDialogo(dialog, content, ButtonType.OK); Button cerrar = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK); if (cerrar != null) cerrar.setText("Cerrar"); dialog.showAndWait(); }
 

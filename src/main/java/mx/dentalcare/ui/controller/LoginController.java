@@ -8,6 +8,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
@@ -16,6 +17,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.scene.input.Clipboard;
+import javafx.scene.input.DataFormat;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -98,6 +100,10 @@ public class LoginController {
 
         ButtonType resetButton = new ButtonType("Restablecer contraseña", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(resetButton, ButtonType.CANCEL);
+        Node resetNode = dialog.getDialogPane().lookupButton(resetButton);
+        Node cancelNode = dialog.getDialogPane().lookupButton(ButtonType.CANCEL);
+        resetNode.getStyleClass().add("dialog-primary-button");
+        cancelNode.getStyleClass().add("dialog-secondary-button");
 
         Label ayuda = new Label("Introduce la clave de recuperación que se generó al configurar DentalCare.");
         ayuda.setWrapText(true);
@@ -111,7 +117,10 @@ public class LoginController {
         Label error = new Label();
         error.getStyleClass().add("standard-error");
         error.setWrapText(true);
-        error.setManaged(false);
+        error.setMinHeight(34);
+        error.setPrefHeight(34);
+        error.setMaxHeight(50);
+        error.setManaged(true);
         error.setVisible(false);
 
         VBox content = new VBox(10,
@@ -120,10 +129,11 @@ public class LoginController {
                 new Label("Nueva contraseña"), newPassword,
                 new Label("Confirmar contraseña"), confirmPassword,
                 error);
-        content.setPrefWidth(460);
+        content.setPrefWidth(440);
         dialog.getDialogPane().setContent(content);
+        dialog.getDialogPane().setPrefHeight(440);
+        dialog.getDialogPane().setMinHeight(440);
 
-        Node resetNode = dialog.getDialogPane().lookupButton(resetButton);
         resetNode.addEventFilter(ActionEvent.ACTION, event -> {
             String recoveryKey = recoveryField.getText();
             String password = newPassword.getText();
@@ -180,26 +190,32 @@ public class LoginController {
         String dialogCss = getClass().getResource("/ui/css/dialog.css").toExternalForm();
         dialog.getDialogPane().getStylesheets().add(dialogCss);
         dialog.getDialogPane().getButtonTypes().add(ButtonType.OK);
+        Node okNode = dialog.getDialogPane().lookupButton(ButtonType.OK);
+        okNode.getStyleClass().add("dialog-primary-button");
 
         Label message = new Label(initialSetup
                 ? "Esta clave permite recuperar el acceso del administrador si se olvida la contraseña. No la guardes dentro de DentalCare ni la compartas."
                 : "La contraseña fue restablecida. Por seguridad se generó una nueva clave de recuperación. Guarda la nueva clave y sustituye la anterior.");
         message.setWrapText(true);
+        message.setMaxWidth(430);
 
         TextField keyField = new TextField(recoveryKey);
         keyField.setEditable(false);
         keyField.setMaxWidth(Double.MAX_VALUE);
         keyField.setOnMouseClicked(event -> keyField.selectAll());
 
-        javafx.scene.control.Button copyButton = new javafx.scene.control.Button("Copiar clave");
+        Button copyButton = new Button("Copiar clave");
+        copyButton.getStyleClass().add("dialog-secondary-button");
         copyButton.setOnAction(event -> {
-            Clipboard.getSystemClipboard().setContent(java.util.Map.of(javafx.scene.input.DataFormat.PLAIN_TEXT, recoveryKey));
+            Clipboard.getSystemClipboard().setContent(java.util.Map.of(DataFormat.PLAIN_TEXT, recoveryKey));
             keyField.selectAll();
         });
 
         VBox content = new VBox(12, message, keyField, copyButton);
-        content.setPrefWidth(520);
+        content.setPrefWidth(430);
         dialog.getDialogPane().setContent(content);
+        dialog.getDialogPane().setPrefHeight(330);
+        dialog.getDialogPane().setMinHeight(330);
         dialog.showAndWait();
     }
 

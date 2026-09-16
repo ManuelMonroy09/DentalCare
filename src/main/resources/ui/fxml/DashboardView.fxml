@@ -9,43 +9,53 @@
         fx:controller="mx.dentalcare.ui.controller.DashboardController"
         spacing="20"
         styleClass="content standard-page">
-    <Label text="Bienvenido a DentalCare" styleClass="page-title"/>
-    <Label text="Gestiona tu consultorio desde un solo lugar." styleClass="page-subtitle"/>
-    <HBox spacing="15">
-        <VBox spacing="8" styleClass="card" HBox.hgrow="ALWAYS">
-            <Label text="Pacientes" styleClass="card-title"/>
-            <Label fx:id="lblTotalPacientes" text="0" styleClass="card-value"/>
+
+    <VBox spacing="18" styleClass="standard-page-card">
+
+        <VBox spacing="4">
+            <Label text="Inicio" styleClass="page-title"/>
+            <Label text="Resumen general del consultorio" styleClass="page-subtitle"/>
         </VBox>
-        <VBox spacing="8" styleClass="card" HBox.hgrow="ALWAYS">
-            <Label text="Citas de hoy" styleClass="card-title"/>
-            <Label fx:id="lblCitasHoy" text="0" styleClass="card-value"/>
-        </VBox>
-        <VBox spacing="8" styleClass="card" HBox.hgrow="ALWAYS">
-            <Label text="Próxima cita" styleClass="card-title"/>
-            <Label fx:id="lblProximaHora" text="--:--" styleClass="card-value"/>
-        </VBox>
-    </HBox>
-    <VBox spacing="10" styleClass="card">
-        <Label text="Próxima cita" styleClass="card-title"/>
-        <Label fx:id="lblProximoPaciente" text="No hay próximas citas" styleClass="page-title"/>
-        <Label fx:id="lblProximoTratamiento" text="Agenda libre" styleClass="dashboard-next-treatment"/>
-        <Label fx:id="lblProximoEstado" text="" styleClass="page-subtitle"/>
-    </VBox>
-    <VBox spacing="12" styleClass="card">
-        <Label text="Resumen de hoy" styleClass="card-title"/>
+
         <HBox spacing="15">
-            <VBox spacing="4" styleClass="dashboard-summary-item" HBox.hgrow="ALWAYS">
-                <Label text="Ingresos" styleClass="dashboard-summary-label"/>
-                <Label fx:id="lblIngresosHoy" text="0.00" styleClass="dashboard-summary-value"/>
+            <VBox spacing="8" styleClass="card" HBox.hgrow="ALWAYS">
+                <Label text="Pacientes" styleClass="card-title"/>
+                <Label fx:id="lblTotalPacientes" text="0" styleClass="card-value"/>
             </VBox>
-            <VBox spacing="4" styleClass="dashboard-summary-item" HBox.hgrow="ALWAYS">
-                <Label text="Por cobrar" styleClass="dashboard-summary-label"/>
-                <Label fx:id="lblPorCobrar" text="0.00" styleClass="dashboard-summary-value"/>
+            <VBox spacing="8" styleClass="card" HBox.hgrow="ALWAYS">
+                <Label text="Citas de hoy" styleClass="card-title"/>
+                <Label fx:id="lblCitasHoy" text="0" styleClass="card-value"/>
             </VBox>
-            <VBox spacing="4" styleClass="dashboard-summary-item" HBox.hgrow="ALWAYS">
-                <Label text="Cobros realizados" styleClass="dashboard-summary-label"/>
-                <Label fx:id="lblCobrosHoy" text="0" styleClass="dashboard-summary-value"/>
+            <VBox spacing="8" styleClass="card" HBox.hgrow="ALWAYS">
+                <Label text="Próxima cita" styleClass="card-title"/>
+                <Label fx:id="lblProximaHora" text="--:--" styleClass="card-value"/>
             </VBox>
         </HBox>
+
+        <VBox spacing="10" styleClass="card">
+            <Label text="Próxima cita" styleClass="card-title"/>
+            <Label fx:id="lblProximoPaciente" text="No hay próximas citas" styleClass="page-title"/>
+            <Label fx:id="lblProximoTratamiento" text="Agenda libre" styleClass="dashboard-next-treatment"/>
+            <Label fx:id="lblProximoEstado" text="" styleClass="page-subtitle"/>
+        </VBox>
+
+        <VBox spacing="12" styleClass="card">
+            <Label text="Resumen de hoy" styleClass="card-title"/>
+            <HBox spacing="15">
+                <VBox spacing="4" styleClass="dashboard-summary-item" HBox.hgrow="ALWAYS">
+                    <Label text="Ingresos" styleClass="dashboard-summary-label"/>
+                    <Label fx:id="lblIngresosHoy" text="0.00" styleClass="dashboard-summary-value"/>
+                </VBox>
+                <VBox spacing="4" styleClass="dashboard-summary-item" HBox.hgrow="ALWAYS">
+                    <Label text="Por cobrar" styleClass="dashboard-summary-label"/>
+                    <Label fx:id="lblPorCobrar" text="0.00" styleClass="dashboard-summary-value"/>
+                </VBox>
+                <VBox spacing="4" styleClass="dashboard-summary-item" HBox.hgrow="ALWAYS">
+                    <Label text="Cobros realizados" styleClass="dashboard-summary-label"/>
+                    <Label fx:id="lblCobrosHoy" text="0" styleClass="dashboard-summary-value"/>
+                </VBox>
+            </HBox>
+        </VBox>
+
     </VBox>
 </VBox>

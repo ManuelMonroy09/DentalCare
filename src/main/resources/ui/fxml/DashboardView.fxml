@@ -59,59 +59,5 @@
             </HBox>
         </VBox>
 
-        <HBox spacing="16" VBox.vgrow="ALWAYS">
-            <VBox spacing="12" styleClass="card" HBox.hgrow="ALWAYS">
-                <Label text="Agenda de la semana" styleClass="card-title"/>
-                <HBox spacing="10" HBox.hgrow="ALWAYS">
-                    <VBox spacing="6" HBox.hgrow="ALWAYS">
-                        <Label text="Lun" styleClass="dashboard-summary-label"/>
-                        <Label text="—" styleClass="dashboard-summary-value"/>
-                    </VBox>
-                    <VBox spacing="6" HBox.hgrow="ALWAYS">
-                        <Label text="Mar" styleClass="dashboard-summary-label"/>
-                        <Label text="—" styleClass="dashboard-summary-value"/>
-                    </VBox>
-                    <VBox spacing="6" HBox.hgrow="ALWAYS">
-                        <Label text="Mié" styleClass="dashboard-summary-label"/>
-                        <Label text="—" styleClass="dashboard-summary-value"/>
-                    </VBox>
-                    <VBox spacing="6" HBox.hgrow="ALWAYS">
-                        <Label text="Jue" styleClass="dashboard-summary-label"/>
-                        <Label text="—" styleClass="dashboard-summary-value"/>
-                    </VBox>
-                    <VBox spacing="6" HBox.hgrow="ALWAYS">
-                        <Label text="Vie" styleClass="dashboard-summary-label"/>
-                        <Label text="—" styleClass="dashboard-summary-value"/>
-                    </VBox>
-                    <VBox spacing="6" HBox.hgrow="ALWAYS">
-                        <Label text="Sáb" styleClass="dashboard-summary-label"/>
-                        <Label text="—" styleClass="dashboard-summary-value"/>
-                    </VBox>
-                    <VBox spacing="6" HBox.hgrow="ALWAYS">
-                        <Label text="Dom" styleClass="dashboard-summary-label"/>
-                        <Label text="—" styleClass="dashboard-summary-value"/>
-                    </VBox>
-                </HBox>
-            </VBox>
-
-            <VBox spacing="12" styleClass="card" HBox.hgrow="ALWAYS">
-                <Label text="Estado de cuentas" styleClass="card-title"/>
-                <VBox spacing="10">
-                    <VBox spacing="3">
-                        <Label text="Por cobrar" styleClass="dashboard-summary-label"/>
-                        <Label text="$0.00" styleClass="dashboard-summary-value"/>
-                    </VBox>
-                    <VBox spacing="3">
-                        <Label text="Cargos pendientes" styleClass="dashboard-summary-label"/>
-                        <Label text="0" styleClass="dashboard-summary-value"/>
-                    </VBox>
-                    <VBox spacing="3">
-                        <Label text="Cargos registrados" styleClass="dashboard-summary-label"/>
-                        <Label text="0" styleClass="dashboard-summary-value"/>
-                    </VBox>
-                </VBox>
-            </VBox>
-        </HBox>
-
     </VBox>
 </VBox>

@@ -6,6 +6,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SetupController {
+    @FXML private HBox authShell;
     @FXML private VBox legacySection;
     @FXML private PasswordField txtLegacyPassword, txtPassword, txtConfirmPassword;
     @FXML private Label lblError;
@@ -30,7 +32,9 @@ public class SetupController {
         Rectangle clip = new Rectangle();
         clip.setArcWidth(36);
         clip.setArcHeight(36);
-        clip.widthProperty().bind(((javafx.scene.Node) legacySection).getParent().getParent().getParent().layoutBoundsProperty().map(b -> b.getWidth()).get());
+        clip.widthProperty().bind(authShell.widthProperty());
+        clip.heightProperty().bind(authShell.heightProperty());
+        authShell.setClip(clip);
     }
     @FXML private void iniciarMovimientoVentana(javafx.scene.input.MouseEvent event) { Stage stage = (Stage) txtPassword.getScene().getWindow(); mouseOffsetX = event.getScreenX() - stage.getX(); mouseOffsetY = event.getScreenY() - stage.getY(); }
     @FXML private void moverVentana(javafx.scene.input.MouseEvent event) { Stage stage = (Stage) txtPassword.getScene().getWindow(); stage.setX(event.getScreenX() - mouseOffsetX); stage.setY(event.getScreenY() - mouseOffsetY); }

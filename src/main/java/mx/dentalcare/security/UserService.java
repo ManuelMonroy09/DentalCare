@@ -2,6 +2,7 @@ package mx.dentalcare.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import mx.dentalcare.config.DataDirectoryService;
+import mx.dentalcare.service.AuditService;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -25,19 +26,22 @@ public class UserService {
     private final AesEncryptionService aesEncryptionService;
     private final MasterKeyService masterKeyService;
     private final SecuritySession securitySession;
+    private final AuditService auditService;
 
     public UserService(
             ObjectMapper objectMapper,
             KeyDerivationService keyDerivationService,
             AesEncryptionService aesEncryptionService,
             MasterKeyService masterKeyService,
-            SecuritySession securitySession
+            SecuritySession securitySession,
+            AuditService auditService
     ) {
         this.objectMapper = objectMapper;
         this.keyDerivationService = keyDerivationService;
         this.aesEncryptionService = aesEncryptionService;
         this.masterKeyService = masterKeyService;
         this.securitySession = securitySession;
+        this.auditService = auditService;
     }
 
     public synchronized void initializeAdmin(String password) {
@@ -50,6 +54,8 @@ public class UserService {
         }
 
         securitySession.setCurrentUser(new AuthenticatedUser("admin", "Administrador", UserRole.ADMINISTRADOR));
+        auditService.registrar("SEGURIDAD", "INICIALIZAR_ADMIN", "USUARIO", null,
+                "Cuenta administrativa inicializada", null, "admin", "EXITOSO");
     }
 
     public synchronized AuthenticatedUser authenticate(String username, String password) {
@@ -85,6 +91,8 @@ public class UserService {
             securitySession.authenticate(masterKey);
             AuthenticatedUser user = new AuthenticatedUser(record.username, record.displayName, record.role);
             securitySession.setCurrentUser(user);
+            auditService.registrar("SEGURIDAD", "INICIO_SESION", "USUARIO", null,
+                    "Inicio de sesión correcto", null, record.username, "EXITOSO");
             return user;
         } catch (SecurityException e) {
             securitySession.clear();
@@ -118,6 +126,8 @@ public class UserService {
         SecretKey masterKey = securitySession.requireMasterKey();
         store.users.add(createRecord(username.trim(), displayName.trim(), role, password, masterKey));
         saveStore(store);
+        auditService.registrar("SEGURIDAD", "CREAR_USUARIO", "USUARIO", null,
+                "Usuario creado", null, username.trim() + " | " + role.name(), "EXITOSO");
     }
 
     public synchronized void updateDisplayName(String username, String displayName) {
@@ -132,6 +142,7 @@ public class UserService {
             throw new IllegalArgumentException("No se encontró el usuario.");
         }
 
+        String anterior = record.displayName;
         record.displayName = displayName.trim();
         saveStore(store);
 
@@ -139,6 +150,8 @@ public class UserService {
         if (current.getUsername().equalsIgnoreCase(record.username)) {
             securitySession.setCurrentUser(new AuthenticatedUser(record.username, record.displayName, record.role));
         }
+        auditService.registrar("SEGURIDAD", "ACTUALIZAR_USUARIO", "USUARIO", null,
+                "Nombre visible actualizado", anterior, record.displayName, "EXITOSO");
     }
 
     public synchronized void setUserActive(String username, boolean active) {
@@ -151,8 +164,11 @@ public class UserService {
         if (record.username.equalsIgnoreCase(securitySession.requireCurrentUser().getUsername()) && !active) {
             throw new IllegalArgumentException("No puedes desactivar el usuario con el que has iniciado sesión.");
         }
+        boolean anterior = record.active;
         record.active = active;
         saveStore(store);
+        auditService.registrar("SEGURIDAD", active ? "ACTIVAR_USUARIO" : "DESACTIVAR_USUARIO", "USUARIO", null,
+                active ? "Usuario activado" : "Usuario desactivado", String.valueOf(anterior), String.valueOf(active), "EXITOSO");
     }
 
     public synchronized void changeCurrentUserPassword(String currentPassword, String newPassword) {
@@ -170,6 +186,8 @@ public class UserService {
         updateCredentials(record, newPassword, masterKey);
         saveStore(store);
         securitySession.setCurrentUser(new AuthenticatedUser(record.username, record.displayName, record.role));
+        auditService.registrar("SEGURIDAD", "CAMBIAR_CONTRASENA", "USUARIO", null,
+                "Contraseña actualizada", null, record.username, "EXITOSO");
     }
 
     public AuthenticatedUser currentUser() {

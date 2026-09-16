@@ -127,16 +127,25 @@ public class DashboardController {
             if (resumenGeneral == null || resumenGeneral.getParent() == null) return;
 
             VBox pagina = (VBox) resumenGeneral.getParent();
-            VBox.setVgrow(resumenGeneral, Priority.NEVER);
 
-            VBox nuevaSeccion = new VBox(12);
+            // El contenido existente conserva su diseño, pero deja de intentar
+            // ocupar todo el alto disponible para permitir que la nueva sección
+            // se acomode dentro de la misma pantalla.
+            VBox.setVgrow(resumenGeneral, Priority.NEVER);
+            resumenGeneral.setSpacing(12);
+
+            VBox nuevaSeccion = new VBox(8);
             nuevaSeccion.getStyleClass().add("standard-section");
+            nuevaSeccion.setPrefHeight(128);
+            nuevaSeccion.setMinHeight(128);
+            nuevaSeccion.setMaxHeight(128);
 
             Label titulo = new Label("Información adicional");
             titulo.getStyleClass().add("standard-section-title");
 
-            HBox contenedor = new HBox(16);
+            HBox contenedor = new HBox(12);
             contenedor.setFillHeight(true);
+            VBox.setVgrow(contenedor, Priority.ALWAYS);
 
             VBox agenda = crearTarjetaAgenda();
             VBox cuentas = crearTarjetaCuentas();
@@ -147,7 +156,7 @@ public class DashboardController {
             contenedor.getChildren().addAll(agenda, cuentas);
             nuevaSeccion.getChildren().addAll(titulo, contenedor);
 
-            VBox.setVgrow(nuevaSeccion, Priority.ALWAYS);
+            VBox.setVgrow(nuevaSeccion, Priority.NEVER);
             pagina.getChildren().add(nuevaSeccion);
         } catch (Exception e) {
             System.err.println("No fue posible cargar las tarjetas complementarias de Inicio: " + e.getMessage());
@@ -169,17 +178,22 @@ public class DashboardController {
     }
 
     private VBox crearTarjetaAgenda() {
-        VBox tarjeta = new VBox(12);
+        VBox tarjeta = new VBox(8);
         tarjeta.getStyleClass().add("card");
+        tarjeta.setPrefHeight(84);
+        tarjeta.setMinHeight(84);
+        tarjeta.setMaxHeight(84);
+        tarjeta.setStyle("-fx-padding: 12px;");
 
         Label titulo = new Label("Agenda de la semana");
         titulo.getStyleClass().add("card-title");
 
-        HBox dias = new HBox(10);
+        HBox dias = new HBox(8);
         dias.setFillHeight(true);
         for (String dia : new String[]{"Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"}) {
-            VBox columna = new VBox(6);
+            VBox columna = new VBox(3);
             columna.setFillWidth(true);
+            columna.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
             HBox.setHgrow(columna, Priority.ALWAYS);
 
             Label nombre = new Label(dia);
@@ -196,25 +210,35 @@ public class DashboardController {
     }
 
     private VBox crearTarjetaCuentas() {
-        VBox tarjeta = new VBox(12);
+        VBox tarjeta = new VBox(6);
         tarjeta.getStyleClass().add("card");
+        tarjeta.setPrefHeight(84);
+        tarjeta.setMinHeight(84);
+        tarjeta.setMaxHeight(84);
+        tarjeta.setStyle("-fx-padding: 12px;");
 
         Label titulo = new Label("Estado de cuentas");
         titulo.getStyleClass().add("card-title");
 
-        VBox datos = new VBox(10);
+        HBox datos = new HBox(18);
+        datos.setFillHeight(true);
+
         datos.getChildren().addAll(
                 crearDatoCuenta("Por cobrar", "$0.00"),
                 crearDatoCuenta("Cargos pendientes", "0"),
                 crearDatoCuenta("Cargos registrados", "0")
         );
 
+        for (var dato : datos.getChildren()) {
+            HBox.setHgrow(dato, Priority.ALWAYS);
+        }
+
         tarjeta.getChildren().addAll(titulo, datos);
         return tarjeta;
     }
 
     private VBox crearDatoCuenta(String nombre, String valor) {
-        VBox dato = new VBox(3);
+        VBox dato = new VBox(2);
         Label etiqueta = new Label(nombre);
         etiqueta.getStyleClass().add("dashboard-summary-label");
         Label cantidad = new Label(valor);

@@ -22,10 +22,12 @@ public class PacientesService {
 
     private final PacienteRepository pacienteRepository;
     private final CitaRepository citaRepository;
+    private final AuditService auditService;
 
-    public PacientesService(PacienteRepository pacienteRepository, CitaRepository citaRepository){
+    public PacientesService(PacienteRepository pacienteRepository, CitaRepository citaRepository, AuditService auditService){
         this.pacienteRepository = pacienteRepository;
         this.citaRepository = citaRepository;
+        this.auditService = auditService;
     }
 
     public List<Paciente> obtenerTodos(){
@@ -39,7 +41,12 @@ public class PacientesService {
     public Paciente guardar(Paciente paciente){
         validar(paciente);
         validarDuplicado(paciente);
-        return pacienteRepository.save(paciente);
+        boolean nuevo = paciente.getId() == null;
+        Paciente guardado = pacienteRepository.save(paciente);
+        auditService.registrar("PACIENTES", nuevo ? "CREAR" : "ACTUALIZAR", "PACIENTE", guardado.getId(),
+                nuevo ? "Paciente registrado" : "Paciente actualizado", null,
+                "Paciente #" + guardado.getId(), "EXITOSO");
+        return guardado;
     }
 
     public void eliminar(Long id){
@@ -58,6 +65,8 @@ public class PacientesService {
         }
 
         pacienteRepository.deleteById(id);
+        auditService.registrar("PACIENTES", "ELIMINAR", "PACIENTE", id,
+                "Paciente eliminado", "Paciente #" + id, null, "EXITOSO");
     }
 
     private void validar(Paciente paciente){

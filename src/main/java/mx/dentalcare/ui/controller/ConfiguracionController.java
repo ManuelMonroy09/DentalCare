@@ -135,7 +135,7 @@ public class ConfiguracionController {
 
     @FXML
     private void mostrarInformacionSistema() {
-        String version = "0.0.1-SNAPSHOT";
+        String version = "1.0.0";
         String java = System.getProperty("java.version", "desconocida");
         String sistema = System.getProperty("os.name", "desconocido") + " " + System.getProperty("os.version", "");
         Path datos = Path.of("data").toAbsolutePath().normalize();

@@ -190,6 +190,25 @@ public class UserService {
                 "Contraseña actualizada", null, record.username, "EXITOSO");
     }
 
+    public synchronized AuthenticatedUser resetAdminPassword(String newPassword) {
+        validatePassword(newPassword);
+        UserStore store = loadStore();
+        StoredUser admin = store.users.stream()
+                .filter(user -> user.active && user.role == UserRole.ADMINISTRADOR)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No se encontró una cuenta de administrador activa."));
+
+        SecretKey masterKey = securitySession.requireMasterKey();
+        updateCredentials(admin, newPassword, masterKey);
+        saveStore(store);
+
+        AuthenticatedUser user = new AuthenticatedUser(admin.username, admin.displayName, admin.role);
+        securitySession.setCurrentUser(user);
+        auditService.registrar("SEGURIDAD", "RECUPERAR_CONTRASENA", "USUARIO", null,
+                "Contraseña del administrador restablecida mediante recuperación", null, admin.username, "EXITOSO");
+        return user;
+    }
+
     public AuthenticatedUser currentUser() {
         return securitySession.requireCurrentUser();
     }

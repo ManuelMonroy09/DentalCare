@@ -55,6 +55,8 @@
 .button.auth-login-button:pressed { -fx-background-color: #1e40af; }
 .button.auth-login-button:focused { -fx-background-color: #2563eb; -fx-border-color: #93c5fd; -fx-border-width: 2px; }
 .button.auth-login-button:disabled { -fx-background-color: #2563eb; -fx-opacity: 0.65; }
+.button.auth-forgot-button { -fx-background-color: transparent; -fx-background-insets: 0; -fx-border-color: transparent; -fx-border-width: 0; -fx-text-fill: #2563eb; -fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 4px 8px; -fx-cursor: hand; }
+.button.auth-forgot-button:hover { -fx-text-fill: #1d4ed8; -fx-underline: true; }
 .auth-footer { -fx-font-size: 11px; -fx-text-fill: #9ca3af; -fx-alignment: CENTER; }
 .auth-transition-overlay { -fx-background-color: #f8fafc; }
 .auth-transition-content { -fx-background-color: #f8fafc; }

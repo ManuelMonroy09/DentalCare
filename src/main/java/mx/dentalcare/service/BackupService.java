@@ -20,6 +20,11 @@ import java.util.zip.ZipOutputStream;
 public class BackupService {
     private static final Path DATA_DIRECTORY = DataDirectoryService.directory();
     private static final DateTimeFormatter TIMESTAMP = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
+    private final AuditService auditService;
+
+    public BackupService(AuditService auditService) {
+        this.auditService = auditService;
+    }
 
     public Path crearRespaldo(Path destino) {
         if (destino == null) throw new IllegalArgumentException("Debes seleccionar un archivo de respaldo.");
@@ -33,6 +38,8 @@ public class BackupService {
                  var stream = Files.walk(DATA_DIRECTORY)) {
                 stream.filter(Files::isRegularFile).forEach(path -> agregarArchivo(zip, path));
             }
+            auditService.registrar("CONFIGURACION", "CREAR_RESPALDO", "RESPALDO", null,
+                    "Respaldo creado", null, archivo.getFileName().toString(), "EXITOSO");
             return archivo;
         } catch (IOException ex) { throw new IllegalStateException("No fue posible crear el respaldo: " + ex.getMessage(), ex); }
     }
@@ -72,6 +79,8 @@ public class BackupService {
                     } catch (IOException ex) { throw new IllegalStateException("No fue posible restaurar " + relativa + ".", ex); }
                 });
             }
+            auditService.registrar("CONFIGURACION", "RESTAURAR_RESPALDO", "RESPALDO", null,
+                    "Respaldo restaurado", null, respaldo.getFileName().toString(), "EXITOSO");
         } catch (IOException ex) { throw new IllegalStateException("No fue posible restaurar el respaldo: " + ex.getMessage(), ex); }
         finally { if (temporal != null) eliminarDirectorioTemporal(temporal); }
     }

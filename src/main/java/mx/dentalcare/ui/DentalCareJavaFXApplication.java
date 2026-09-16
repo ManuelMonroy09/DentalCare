@@ -7,7 +7,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
 import javafx.scene.paint.Color;
@@ -97,6 +96,9 @@ public class DentalCareJavaFXApplication extends Application {
                 pane.getStyleClass().add("standard-dialog");
             }
 
+            pane.setPrefWidth(520);
+            pane.setMinWidth(520);
+
             Button ok = (Button) pane.lookupButton(ButtonType.OK);
             if (ok != null) {
                 ok.getStyleClass().add("dialog-primary-button");
@@ -118,6 +120,20 @@ public class DentalCareJavaFXApplication extends Application {
                 no.setText("No");
                 no.getStyleClass().add("dialog-secondary-button");
             }
+
+            pane.applyCss();
+            pane.layout();
+            window.sizeToScene();
+
+            // El segundo ajuste permite que el alto calculado incluya
+            // contenido envuelto y botones después de aplicar el ancho.
+            Platform.runLater(() -> {
+                if (window.getScene() != null) {
+                    pane.applyCss();
+                    pane.layout();
+                    window.sizeToScene();
+                }
+            });
         }
     }
 

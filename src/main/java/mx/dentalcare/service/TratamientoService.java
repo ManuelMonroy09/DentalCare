@@ -10,9 +10,11 @@ import java.util.List;
 public class TratamientoService {
 
     private final TratamientoRepository tratamientoRepository;
+    private final AuditService auditService;
 
-    public TratamientoService(TratamientoRepository tratamientoRepository) {
+    public TratamientoService(TratamientoRepository tratamientoRepository, AuditService auditService) {
         this.tratamientoRepository = tratamientoRepository;
+        this.auditService = auditService;
     }
 
     public List<Tratamiento> obtenerTodos() {
@@ -37,7 +39,10 @@ public class TratamientoService {
         tratamiento.setId(null);
         tratamiento.setActivo(true);
         tratamiento.validar();
-        return tratamientoRepository.save(tratamiento);
+        Tratamiento guardado = tratamientoRepository.save(tratamiento);
+        auditService.registrar("TRATAMIENTOS", "CREAR", "TRATAMIENTO", guardado.getId(),
+                "Tratamiento creado", null, "Tratamiento #" + guardado.getId(), "EXITOSO");
+        return guardado;
     }
 
     public Tratamiento actualizar(Tratamiento tratamiento) {
@@ -49,18 +54,25 @@ public class TratamientoService {
         }
         obtenerPorId(tratamiento.getId());
         tratamiento.validar();
-        return tratamientoRepository.save(tratamiento);
+        Tratamiento actualizado = tratamientoRepository.save(tratamiento);
+        auditService.registrar("TRATAMIENTOS", "ACTUALIZAR", "TRATAMIENTO", actualizado.getId(),
+                "Tratamiento actualizado", null, "Tratamiento #" + actualizado.getId(), "EXITOSO");
+        return actualizado;
     }
 
     public void activar(Long id) {
         Tratamiento tratamiento = obtenerPorId(id);
         tratamiento.activar();
         tratamientoRepository.save(tratamiento);
+        auditService.registrar("TRATAMIENTOS", "ACTIVAR", "TRATAMIENTO", id,
+                "Tratamiento activado", "INACTIVO", "ACTIVO", "EXITOSO");
     }
 
     public void desactivar(Long id) {
         Tratamiento tratamiento = obtenerPorId(id);
         tratamiento.desactivar();
         tratamientoRepository.save(tratamiento);
+        auditService.registrar("TRATAMIENTOS", "DESACTIVAR", "TRATAMIENTO", id,
+                "Tratamiento desactivado", "ACTIVO", "INACTIVO", "EXITOSO");
     }
 }

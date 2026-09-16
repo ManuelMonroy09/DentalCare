@@ -40,289 +40,86 @@ public class LoginController {
     private final AuthenticationService authenticationService;
     private final ApplicationContext context;
 
-    public LoginController(AuthenticationService authenticationService, ApplicationContext context) {
-        this.authenticationService = authenticationService;
-        this.context = context;
-    }
+    public LoginController(AuthenticationService authenticationService, ApplicationContext context) { this.authenticationService = authenticationService; this.context = context; }
 
-    @FXML private void initialize() {
-        String overrides = getClass().getResource("/ui/css/dentalcare-overrides.css").toExternalForm();
-        if (!authRoot.getStylesheets().contains(overrides)) authRoot.getStylesheets().add(overrides);
-    }
+    @FXML private void initialize() { String overrides = getClass().getResource("/ui/css/dentalcare-overrides.css").toExternalForm(); if (!authRoot.getStylesheets().contains(overrides)) authRoot.getStylesheets().add(overrides); }
 
-    @FXML private void iniciarMovimientoVentana(javafx.scene.input.MouseEvent event) {
-        Stage stage = (Stage) authRoot.getScene().getWindow();
-        mouseOffsetX = event.getScreenX() - stage.getX();
-        mouseOffsetY = event.getScreenY() - stage.getY();
-    }
-
-    @FXML private void moverVentana(javafx.scene.input.MouseEvent event) {
-        Stage stage = (Stage) authRoot.getScene().getWindow();
-        stage.setX(event.getScreenX() - mouseOffsetX);
-        stage.setY(event.getScreenY() - mouseOffsetY);
-    }
+    @FXML private void iniciarMovimientoVentana(javafx.scene.input.MouseEvent event) { Stage stage = (Stage) authRoot.getScene().getWindow(); mouseOffsetX = event.getScreenX() - stage.getX(); mouseOffsetY = event.getScreenY() - stage.getY(); }
+    @FXML private void moverVentana(javafx.scene.input.MouseEvent event) { Stage stage = (Stage) authRoot.getScene().getWindow(); stage.setX(event.getScreenX() - mouseOffsetX); stage.setY(event.getScreenY() - mouseOffsetY); }
 
     @FXML private void iniciarSesion() {
-        ocultarError();
-        String username = txtUsername.getText();
-        String password = txtPassword.getText();
+        ocultarError(); String username = txtUsername.getText(); String password = txtPassword.getText();
         try {
             AuthenticatedUser user = authenticationService.login(username, password);
-            if (!authenticationService.hasRecoveryKey(user.getUsername())) {
-                String recoveryKey = authenticationService.generateRecoveryKey(user.getUsername());
-                mostrarClaveRecuperacion(recoveryKey, true);
-            }
+            if (!authenticationService.hasRecoveryKey(user.getUsername())) mostrarClaveRecuperacion(authenticationService.generateRecoveryKey(user.getUsername()), true);
             mostrarTransicion();
-        } catch (SecurityException e) {
-            mostrarError("El usuario o la contraseña son incorrectos.");
-            txtPassword.clear();
-            txtPassword.requestFocus();
-        } catch (IllegalArgumentException e) {
-            mostrarError(e.getMessage());
-        } catch (Exception e) {
-            mostrarError("No fue posible iniciar DentalCare. Verifica la configuración de seguridad.");
-        }
+        } catch (SecurityException e) { mostrarError("El usuario o la contraseña son incorrectos."); txtPassword.clear(); txtPassword.requestFocus();
+        } catch (IllegalArgumentException e) { mostrarError(e.getMessage());
+        } catch (Exception e) { mostrarError("No fue posible iniciar DentalCare. Verifica la configuración de seguridad."); }
     }
 
-    @FXML private void olvidoContrasena() {
-        mostrarDialogoRecuperacion();
-    }
-
-    @FXML private void cerrarVentana() {
-        Stage stage = (Stage) authRoot.getScene().getWindow();
-        stage.close();
-    }
+    @FXML private void olvidoContrasena() { mostrarDialogoRecuperacion(); }
+    @FXML private void cerrarVentana() { ((Stage) authRoot.getScene().getWindow()).close(); }
 
     private void mostrarDialogoRecuperacion() {
-        Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Recuperar acceso");
-        dialog.setHeaderText("Restablecer contraseña");
-        dialog.getDialogPane().getStyleClass().add("standard-dialog");
-        String dialogCss = getClass().getResource("/ui/css/dialog.css").toExternalForm();
-        dialog.getDialogPane().getStylesheets().add(dialogCss);
+        Dialog<ButtonType> dialog = new Dialog<>(); dialog.setTitle("Recuperar acceso"); dialog.setHeaderText("Restablecer contraseña");
+        dialog.getDialogPane().getStyleClass().add("standard-dialog"); String dialogCss = getClass().getResource("/ui/css/dialog.css").toExternalForm(); dialog.getDialogPane().getStylesheets().add(dialogCss);
+        ButtonType resetButton = new ButtonType("Restablecer", ButtonBar.ButtonData.OK_DONE); dialog.getDialogPane().getButtonTypes().addAll(resetButton, ButtonType.CANCEL);
+        Node resetNode = dialog.getDialogPane().lookupButton(resetButton); Node cancelNode = dialog.getDialogPane().lookupButton(ButtonType.CANCEL); resetNode.getStyleClass().add("dialog-primary-button"); cancelNode.getStyleClass().add("dialog-secondary-button");
 
-        ButtonType resetButton = new ButtonType("Restablecer", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(resetButton, ButtonType.CANCEL);
-        Node resetNode = dialog.getDialogPane().lookupButton(resetButton);
-        Node cancelNode = dialog.getDialogPane().lookupButton(ButtonType.CANCEL);
-        resetNode.getStyleClass().add("dialog-primary-button");
-        cancelNode.getStyleClass().add("dialog-secondary-button");
+        Label ayuda = new Label("Introduce el usuario y la clave de recuperación asociada a la cuenta."); ayuda.setWrapText(true);
+        TextField usernameField = new TextField(txtUsername.getText()); usernameField.setPromptText("Usuario"); usernameField.setMaxWidth(Double.MAX_VALUE);
+        TextField recoveryField = new TextField(); recoveryField.setPromptText("Clave de recuperación"); recoveryField.setMaxWidth(Double.MAX_VALUE);
+        PasswordField newPassword = new PasswordField(); newPassword.setPromptText("Mínimo 8 caracteres");
+        PasswordField confirmPassword = new PasswordField(); confirmPassword.setPromptText("Repite la nueva contraseña");
+        Label error = new Label(); error.getStyleClass().add("standard-error"); error.setWrapText(true); error.setMinHeight(48); error.setPrefHeight(48); error.setMaxHeight(60); error.setManaged(true); error.setVisible(false);
 
-        Label ayuda = new Label("Introduce el usuario y la clave de recuperación asociada a la cuenta.");
-        ayuda.setWrapText(true);
-        TextField usernameField = new TextField(txtUsername.getText());
-        usernameField.setPromptText("Usuario");
-        usernameField.setMaxWidth(Double.MAX_VALUE);
-        TextField recoveryField = new TextField();
-        recoveryField.setPromptText("Clave de recuperación");
-        recoveryField.setMaxWidth(Double.MAX_VALUE);
-        PasswordField newPassword = new PasswordField();
-        newPassword.setPromptText("Mínimo 8 caracteres");
-        PasswordField confirmPassword = new PasswordField();
-        confirmPassword.setPromptText("Repite la nueva contraseña");
-        Label error = new Label();
-        error.getStyleClass().add("standard-error");
-        error.setWrapText(true);
-        error.setMinHeight(48);
-        error.setPrefHeight(48);
-        error.setMaxHeight(60);
-        error.setManaged(true);
-        error.setVisible(false);
-
-        VBox content = new VBox(10,
-                ayuda,
-                new Label("Usuario"), usernameField,
-                new Label("Clave de recuperación"), recoveryField,
-                new Label("Nueva contraseña"), newPassword,
-                new Label("Confirmar contraseña"), confirmPassword,
-                error);
-        content.setPrefWidth(440);
-        content.setMinHeight(340);
-        dialog.getDialogPane().setContent(content);
-        dialog.getDialogPane().setPrefHeight(540);
-        dialog.getDialogPane().setMinHeight(540);
+        VBox content = new VBox(10, ayuda, new Label("Usuario"), usernameField, new Label("Clave de recuperación"), recoveryField, new Label("Nueva contraseña"), newPassword, new Label("Confirmar contraseña"), confirmPassword, error);
+        content.setPrefWidth(440); content.setMinHeight(340); dialog.getDialogPane().setContent(content); dialog.getDialogPane().setPrefHeight(540); dialog.getDialogPane().setMinHeight(540);
 
         resetNode.addEventFilter(ActionEvent.ACTION, event -> {
-            String username = usernameField.getText();
-            String recoveryKey = recoveryField.getText();
-            String password = newPassword.getText();
-            String confirmation = confirmPassword.getText();
-
-            if (username == null || username.isBlank()) {
-                mostrarErrorDialog(error, "El usuario es obligatorio.");
-                event.consume();
-                return;
-            }
-            if (recoveryKey == null || recoveryKey.isBlank()) {
-                mostrarErrorDialog(error, "La clave de recuperación es obligatoria.");
-                event.consume();
-                return;
-            }
-            if (password == null || password.length() < 8) {
-                mostrarErrorDialog(error, "La nueva contraseña debe tener al menos 8 caracteres.");
-                event.consume();
-                return;
-            }
-            if (!password.equals(confirmation)) {
-                mostrarErrorDialog(error, "Las contraseñas no coinciden.");
-                event.consume();
-                return;
-            }
-
+            String username = usernameField.getText(); String recoveryKey = recoveryField.getText(); String password = newPassword.getText(); String confirmation = confirmPassword.getText();
+            if (username == null || username.isBlank()) { mostrarErrorDialog(error, "El usuario es obligatorio."); event.consume(); return; }
+            if (recoveryKey == null || recoveryKey.isBlank()) { mostrarErrorDialog(error, "La clave de recuperación es obligatoria."); event.consume(); return; }
+            if (password == null || password.length() < 8) { mostrarErrorDialog(error, "La nueva contraseña debe tener al menos 8 caracteres."); event.consume(); return; }
+            if (!password.equals(confirmation)) { mostrarErrorDialog(error, "Las contraseñas no coinciden."); event.consume(); return; }
             try {
-                String newRecoveryKey = authenticationService.recoverPassword(username, recoveryKey, password);
-                event.consume();
-                dialog.close();
-                Platform.runLater(() -> {
-                    mostrarClaveRecuperacion(newRecoveryKey, false);
-                    mostrarTransicion();
-                });
-            } catch (SecurityException e) {
-                mostrarErrorDialog(error, "La clave de recuperación es incorrecta o no es válida.");
-                event.consume();
-            } catch (IllegalArgumentException e) {
-                mostrarErrorDialog(error, e.getMessage());
-                event.consume();
-            } catch (Exception e) {
-                mostrarErrorDialog(error, "No fue posible restablecer la contraseña. Los datos no fueron modificados.");
-                event.consume();
-            }
+                String newRecoveryKey = authenticationService.recoverPassword(username, recoveryKey, password); event.consume(); dialog.close();
+                Platform.runLater(() -> { mostrarClaveRecuperacion(newRecoveryKey, false); mostrarTransicion(); });
+            } catch (SecurityException e) { mostrarErrorDialog(error, "La clave de recuperación es incorrecta o no es válida."); event.consume();
+            } catch (IllegalArgumentException e) { mostrarErrorDialog(error, e.getMessage()); event.consume();
+            } catch (Exception e) { mostrarErrorDialog(error, "No fue posible restablecer la contraseña. Los datos no fueron modificados."); event.consume(); }
         });
-
-        dialog.setOnShown(event -> usernameField.requestFocus());
-        dialog.showAndWait();
+        dialog.setOnShown(event -> usernameField.requestFocus()); dialog.showAndWait();
     }
 
-    private void mostrarErrorDialog(Label error, String message) {
-        error.setText(message == null || message.isBlank() ? "No fue posible completar la operación." : message);
-        error.setManaged(true);
-        error.setVisible(true);
-    }
+    private void mostrarErrorDialog(Label error, String message) { error.setText(message == null || message.isBlank() ? "No fue posible completar la operación." : message); error.setManaged(true); error.setVisible(true); }
 
     private void mostrarClaveRecuperacion(String recoveryKey, boolean initialSetup) {
-        Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Clave de recuperación");
-        dialog.setHeaderText(initialSetup
-                ? "Guarda esta clave antes de continuar"
-                : "Nueva clave de recuperación");
-        dialog.getDialogPane().getStyleClass().add("standard-dialog");
-        String dialogCss = getClass().getResource("/ui/css/dialog.css").toExternalForm();
-        dialog.getDialogPane().getStylesheets().add(dialogCss);
-        dialog.getDialogPane().getButtonTypes().add(ButtonType.OK);
-        Node okNode = dialog.getDialogPane().lookupButton(ButtonType.OK);
-        okNode.getStyleClass().add("dialog-primary-button");
-
+        Dialog<ButtonType> dialog = new Dialog<>(); dialog.setTitle("Clave de recuperación"); dialog.setHeaderText(initialSetup ? "Guarda esta clave antes de continuar" : "Nueva clave de recuperación");
+        dialog.getDialogPane().getStyleClass().add("standard-dialog"); String dialogCss = getClass().getResource("/ui/css/dialog.css").toExternalForm(); dialog.getDialogPane().getStylesheets().add(dialogCss); dialog.getDialogPane().getButtonTypes().add(ButtonType.OK);
+        Node okNode = dialog.getDialogPane().lookupButton(ButtonType.OK); okNode.getStyleClass().add("dialog-primary-button");
         String texto = initialSetup
-                ? "Esta clave permite recuperar el acceso del administrador si se olvida la contraseña. Guárdala fuera de DentalCare, por ejemplo en un lugar seguro o gestor de contraseñas. No la guardes dentro de DentalCare ni la compartas. Si pierdes esta clave y la contraseña, este mecanismo no podrá recuperar el acceso."
+                ? "Esta clave permite recuperar el acceso de esta cuenta si se olvida la contraseña. Guárdala fuera de DentalCare, por ejemplo en un lugar seguro o gestor de contraseñas. No la guardes dentro de DentalCare ni la compartas. Si pierdes esta clave y la contraseña, este mecanismo no podrá recuperar el acceso."
                 : "La contraseña fue restablecida correctamente. Por seguridad se generó una nueva clave de recuperación. Guarda esta nueva clave fuera de DentalCare y sustituye la anterior. La clave anterior ya no debe utilizarse para futuras recuperaciones.";
-
-        TextArea message = new TextArea(texto);
-        message.setWrapText(true);
-        message.setEditable(false);
-        message.setFocusTraversable(false);
-        message.setPrefRowCount(initialSetup ? 5 : 4);
-        message.setMinHeight(initialSetup ? 120 : 100);
-        message.setPrefHeight(initialSetup ? 120 : 100);
-        message.setMaxHeight(initialSetup ? 120 : 100);
-        message.setMaxWidth(Double.MAX_VALUE);
-        message.getStyleClass().add("recovery-info-text");
-
-        TextField keyField = new TextField(recoveryKey);
-        keyField.setEditable(false);
-        keyField.setMaxWidth(Double.MAX_VALUE);
-        keyField.setOnMouseClicked(event -> keyField.selectAll());
-
-        Button copyButton = new Button("Copiar clave");
-        copyButton.getStyleClass().add("dialog-secondary-button");
-        copyButton.setOnAction(event -> {
-            Clipboard.getSystemClipboard().setContent(java.util.Map.of(DataFormat.PLAIN_TEXT, recoveryKey));
-            keyField.selectAll();
-        });
-
-        VBox infoPanel = new VBox(message);
-        infoPanel.getStyleClass().add("recovery-info-panel");
-        infoPanel.setFillWidth(true);
-
-        VBox content = new VBox(14, infoPanel, keyField, copyButton);
-        content.setPrefWidth(450);
-        content.setMinHeight(initialSetup ? 285 : 250);
-        dialog.getDialogPane().setContent(content);
-        dialog.getDialogPane().setPrefHeight(initialSetup ? 425 : 390);
-        dialog.getDialogPane().setMinHeight(initialSetup ? 425 : 390);
-        dialog.showAndWait();
+        TextArea message = new TextArea(texto); message.setWrapText(true); message.setEditable(false); message.setFocusTraversable(false); message.setPrefRowCount(initialSetup ? 5 : 4); message.setMinHeight(initialSetup ? 120 : 100); message.setPrefHeight(initialSetup ? 120 : 100); message.setMaxHeight(initialSetup ? 120 : 100); message.setMaxWidth(Double.MAX_VALUE); message.getStyleClass().add("recovery-info-text");
+        TextField keyField = new TextField(recoveryKey); keyField.setEditable(false); keyField.setMaxWidth(Double.MAX_VALUE); keyField.setOnMouseClicked(event -> keyField.selectAll());
+        Button copyButton = new Button("Copiar clave"); copyButton.getStyleClass().add("dialog-secondary-button"); copyButton.setOnAction(event -> { Clipboard.getSystemClipboard().setContent(java.util.Map.of(DataFormat.PLAIN_TEXT, recoveryKey)); keyField.selectAll(); });
+        VBox infoPanel = new VBox(message); infoPanel.getStyleClass().add("recovery-info-panel"); infoPanel.setFillWidth(true);
+        VBox content = new VBox(14, infoPanel, keyField, copyButton); content.setPrefWidth(450); content.setMinHeight(initialSetup ? 285 : 250); dialog.getDialogPane().setContent(content); dialog.getDialogPane().setPrefHeight(initialSetup ? 425 : 390); dialog.getDialogPane().setMinHeight(initialSetup ? 425 : 390); dialog.showAndWait();
     }
 
     private void mostrarTransicion() {
-        txtUsername.setDisable(true);
-        txtPassword.setDisable(true);
-        StackPane overlay = new StackPane();
-        overlay.getStyleClass().add("auth-transition-overlay");
-        overlay.setOpacity(0);
-        StackPane contenido = new StackPane();
-        contenido.getStyleClass().add("auth-transition-content");
-        ProgressIndicator indicador = new ProgressIndicator();
-        indicador.setProgress(-1);
-        indicador.getStyleClass().add("auth-progress");
-        Label titulo = new Label("DentalCare");
-        titulo.getStyleClass().add("auth-transition-title");
-        Label mensaje = new Label("Preparando tu espacio de trabajo...");
-        mensaje.getStyleClass().add("auth-transition-message");
-        VBox textos = new VBox(6, titulo, mensaje);
-        textos.setAlignment(javafx.geometry.Pos.CENTER);
-        VBox grupo = new VBox(18, indicador, textos);
-        grupo.setAlignment(javafx.geometry.Pos.CENTER);
-        contenido.getChildren().add(grupo);
-        overlay.getChildren().add(contenido);
-        authRoot.getChildren().add(overlay);
-        FadeTransition entrada = new FadeTransition(Duration.millis(220), overlay);
-        entrada.setFromValue(0);
-        entrada.setToValue(1);
-        entrada.play();
-        PauseTransition pausa = new PauseTransition(Duration.millis(420));
-        pausa.setOnFinished(event -> {
-            try {
-                abrirAplicacion();
-            } catch (Exception e) {
-                authRoot.getChildren().remove(overlay);
-                txtUsername.setDisable(false);
-                txtPassword.setDisable(false);
-                mostrarError("No fue posible abrir DentalCare. Verifica la configuración de seguridad.");
-            }
-        });
-        pausa.play();
+        txtUsername.setDisable(true); txtPassword.setDisable(true); StackPane overlay = new StackPane(); overlay.getStyleClass().add("auth-transition-overlay"); overlay.setOpacity(0); StackPane contenido = new StackPane(); contenido.getStyleClass().add("auth-transition-content");
+        ProgressIndicator indicador = new ProgressIndicator(); indicador.setProgress(-1); indicador.getStyleClass().add("auth-progress"); Label titulo = new Label("DentalCare"); titulo.getStyleClass().add("auth-transition-title"); Label mensaje = new Label("Preparando tu espacio de trabajo..."); mensaje.getStyleClass().add("auth-transition-message");
+        VBox textos = new VBox(6, titulo, mensaje); textos.setAlignment(javafx.geometry.Pos.CENTER); VBox grupo = new VBox(18, indicador, textos); grupo.setAlignment(javafx.geometry.Pos.CENTER); contenido.getChildren().add(grupo); overlay.getChildren().add(contenido); authRoot.getChildren().add(overlay);
+        FadeTransition entrada = new FadeTransition(Duration.millis(220), overlay); entrada.setFromValue(0); entrada.setToValue(1); entrada.play(); PauseTransition pausa = new PauseTransition(Duration.millis(420)); pausa.setOnFinished(event -> { try { abrirAplicacion(); } catch (Exception e) { authRoot.getChildren().remove(overlay); txtUsername.setDisable(false); txtPassword.setDisable(false); mostrarError("No fue posible abrir DentalCare. Verifica la configuración de seguridad."); } }); pausa.play();
     }
 
     private void abrirAplicacion() throws Exception {
-        Stage loginStage = (Stage) txtPassword.getScene().getWindow();
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/ui/fxml/MainView.fxml"));
-        loader.setControllerFactory(context::getBean);
-        Parent root = loader.load();
-        Scene scene = new Scene(root, 1280, 800);
-        Stage applicationStage = new Stage();
-        applicationStage.setTitle("DentalCare");
-        applicationStage.setScene(scene);
-        applicationStage.setMinWidth(1100);
-        applicationStage.setMinHeight(700);
-        applicationStage.setResizable(true);
-        applicationStage.show();
-        applicationStage.centerOnScreen();
-        loginStage.close();
-        root.setOpacity(0);
-        FadeTransition salida = new FadeTransition(Duration.millis(260), root);
-        salida.setFromValue(0);
-        salida.setToValue(1);
-        salida.play();
+        Stage loginStage = (Stage) txtPassword.getScene().getWindow(); FXMLLoader loader = new FXMLLoader(getClass().getResource("/ui/fxml/MainView.fxml")); loader.setControllerFactory(context::getBean); Parent root = loader.load(); Scene scene = new Scene(root, 1280, 800); Stage applicationStage = new Stage(); applicationStage.setTitle("DentalCare"); applicationStage.setScene(scene); applicationStage.setMinWidth(1100); applicationStage.setMinHeight(700); applicationStage.setResizable(true); applicationStage.show(); applicationStage.centerOnScreen(); loginStage.close(); root.setOpacity(0); FadeTransition salida = new FadeTransition(Duration.millis(260), root); salida.setFromValue(0); salida.setToValue(1); salida.play();
     }
 
-    private void mostrarError(String mensaje) {
-        lblError.setText(mensaje);
-        lblError.setManaged(true);
-        lblError.setVisible(true);
-    }
-
-    private void ocultarError() {
-        lblError.setText("");
-        lblError.setManaged(false);
-        lblError.setVisible(false);
-    }
+    private void mostrarError(String mensaje) { lblError.setText(mensaje); lblError.setManaged(true); lblError.setVisible(true); }
+    private void ocultarError() { lblError.setText(""); lblError.setManaged(false); lblError.setVisible(false); }
 }

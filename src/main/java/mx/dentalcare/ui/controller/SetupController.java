@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
@@ -100,9 +101,19 @@ public class SetupController {
         String dialogCss = getClass().getResource("/ui/css/dialog.css").toExternalForm();
         dialog.getDialogPane().getStylesheets().add(dialogCss);
         dialog.getDialogPane().getButtonTypes().add(ButtonType.OK);
+        Node okNode = dialog.getDialogPane().lookupButton(ButtonType.OK);
+        okNode.getStyleClass().add("dialog-primary-button");
 
-        Label message = new Label("Esta es la única clave de recuperación generada para el administrador. Guárdala fuera de DentalCare. Si la pierdes junto con la contraseña, la recuperación no podrá hacerse mediante este mecanismo.");
+        Label message = new Label(
+                "Esta es la clave de recuperación del administrador. Permite recuperar el acceso si se olvida la contraseña. "
+                        + "Guárdala fuera de DentalCare, por ejemplo en un lugar físico seguro o en un gestor de contraseñas. "
+                        + "No la guardes dentro de DentalCare ni la compartas con otras personas. "
+                        + "Si pierdes esta clave y también la contraseña, este mecanismo no podrá recuperar el acceso."
+        );
         message.setWrapText(true);
+        message.setMaxWidth(450);
+        message.setMinHeight(110);
+        message.setPrefHeight(110);
 
         TextField keyField = new TextField(recoveryKey);
         keyField.setEditable(false);
@@ -110,14 +121,18 @@ public class SetupController {
         keyField.setOnMouseClicked(event -> keyField.selectAll());
 
         Button copyButton = new Button("Copiar clave");
+        copyButton.getStyleClass().add("dialog-secondary-button");
         copyButton.setOnAction(event -> {
             Clipboard.getSystemClipboard().setContent(java.util.Map.of(DataFormat.PLAIN_TEXT, recoveryKey));
             keyField.selectAll();
         });
 
-        VBox content = new VBox(12, message, keyField, copyButton);
-        content.setPrefWidth(520);
+        VBox content = new VBox(14, message, keyField, copyButton);
+        content.setPrefWidth(450);
+        content.setMinHeight(290);
         dialog.getDialogPane().setContent(content);
+        dialog.getDialogPane().setPrefHeight(430);
+        dialog.getDialogPane().setMinHeight(430);
         dialog.showAndWait();
     }
 

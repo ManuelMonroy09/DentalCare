@@ -8,7 +8,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import mx.dentalcare.security.AuthenticationService;
 import org.springframework.context.ApplicationContext;
@@ -29,12 +28,6 @@ public class SetupController {
         boolean migrationRequired = authenticationService.requiresLegacyMigration();
         legacySection.setManaged(migrationRequired);
         legacySection.setVisible(migrationRequired);
-        Rectangle clip = new Rectangle();
-        clip.setArcWidth(36);
-        clip.setArcHeight(36);
-        clip.widthProperty().bind(authShell.widthProperty());
-        clip.heightProperty().bind(authShell.heightProperty());
-        authShell.setClip(clip);
     }
     @FXML private void iniciarMovimientoVentana(javafx.scene.input.MouseEvent event) { Stage stage = (Stage) txtPassword.getScene().getWindow(); mouseOffsetX = event.getScreenX() - stage.getX(); mouseOffsetY = event.getScreenY() - stage.getY(); }
     @FXML private void moverVentana(javafx.scene.input.MouseEvent event) { Stage stage = (Stage) txtPassword.getScene().getWindow(); stage.setX(event.getScreenX() - mouseOffsetX); stage.setY(event.getScreenY() - mouseOffsetY); }

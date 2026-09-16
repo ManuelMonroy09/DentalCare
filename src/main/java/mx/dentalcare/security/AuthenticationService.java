@@ -27,14 +27,15 @@ public class AuthenticationService {
         return !isConfigured() && migrationService.hasLegacyData();
     }
 
-    public void setupAdmin(String password, String legacyPassword) {
+    public String setupAdmin(String password, String legacyPassword) {
         validatePassword(password);
 
-        masterKeyService.initialize(password);
+        String recoveryKey = masterKeyService.initialize(password);
 
         try {
             migrationService.migrateIfNecessary(legacyPassword);
             userService.initializeAdmin(password);
+            return recoveryKey;
         } catch (RuntimeException e) {
             masterKeyService.clearConfiguration();
             throw e;
@@ -44,6 +45,26 @@ public class AuthenticationService {
     public AuthenticatedUser login(String username, String password) {
         validatePassword(password);
         return userService.authenticate(username, password);
+    }
+
+    public boolean hasRecoveryKey() {
+        return masterKeyService.hasRecoveryKey();
+    }
+
+    public String generateRecoveryKey() {
+        return masterKeyService.generateRecoveryKey();
+    }
+
+    /**
+     * Restablece la contraseña del administrador usando exclusivamente
+     * la clave de recuperación. La clave maestra y los datos clínicos no cambian.
+     * Después del restablecimiento se genera una nueva clave de recuperación.
+     */
+    public String recoverAdminPassword(String recoveryKey, String newPassword) {
+        validatePassword(newPassword);
+        masterKeyService.unlockWithRecoveryKey(recoveryKey);
+        userService.resetAdminPassword(newPassword);
+        return masterKeyService.generateRecoveryKey();
     }
 
     public void logout() {

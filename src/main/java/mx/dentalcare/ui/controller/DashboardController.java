@@ -118,25 +118,37 @@ public class DashboardController {
 
     /**
      * Las tarjetas adicionales se construyen fuera del FXML estable de Inicio.
-     * Si esta parte visual falla, el Dashboard original sigue pudiendo abrirse.
-     * No realiza consultas nuevas ni cambia la lógica existente.
+     * Se agregan en una sección independiente debajo de "Resumen de hoy".
+     * No realizan consultas nuevas ni cambian la lógica existente.
      */
     private void cargarTarjetasComplementarias() {
         try {
-            VBox seccion = obtenerSeccionPrincipal();
-            if (seccion == null || seccion.getChildren().size() > 4) return;
+            VBox resumenGeneral = obtenerSeccionPrincipal();
+            if (resumenGeneral == null || resumenGeneral.getParent() == null) return;
+
+            VBox pagina = (VBox) resumenGeneral.getParent();
+            VBox.setVgrow(resumenGeneral, Priority.NEVER);
+
+            VBox nuevaSeccion = new VBox(12);
+            nuevaSeccion.getStyleClass().add("standard-section");
+
+            Label titulo = new Label("Información adicional");
+            titulo.getStyleClass().add("standard-section-title");
 
             HBox contenedor = new HBox(16);
             contenedor.setFillHeight(true);
-            VBox.setVgrow(contenedor, Priority.ALWAYS);
 
             VBox agenda = crearTarjetaAgenda();
             VBox cuentas = crearTarjetaCuentas();
 
             HBox.setHgrow(agenda, Priority.ALWAYS);
             HBox.setHgrow(cuentas, Priority.ALWAYS);
+
             contenedor.getChildren().addAll(agenda, cuentas);
-            seccion.getChildren().add(contenedor);
+            nuevaSeccion.getChildren().addAll(titulo, contenedor);
+
+            VBox.setVgrow(nuevaSeccion, Priority.ALWAYS);
+            pagina.getChildren().add(nuevaSeccion);
         } catch (Exception e) {
             System.err.println("No fue posible cargar las tarjetas complementarias de Inicio: " + e.getMessage());
         }
@@ -144,11 +156,14 @@ public class DashboardController {
 
     private VBox obtenerSeccionPrincipal() {
         if (lblIngresosHoy == null || lblIngresosHoy.getParent() == null
-                || lblIngresosHoy.getParent().getParent() == null) {
+                || lblIngresosHoy.getParent().getParent() == null
+                || lblIngresosHoy.getParent().getParent().getParent() == null
+                || lblIngresosHoy.getParent().getParent().getParent().getParent() == null) {
             return null;
         }
-        if (lblIngresosHoy.getParent().getParent().getParent() instanceof VBox seccion) {
-            return seccion;
+
+        if (lblIngresosHoy.getParent().getParent().getParent() instanceof VBox resumenGeneral) {
+            return resumenGeneral;
         }
         return null;
     }

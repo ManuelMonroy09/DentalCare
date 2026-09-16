@@ -20,15 +20,15 @@
                 <Label text="Registro histórico de actividad del sistema" styleClass="page-subtitle"/>
             </VBox>
 
-            <VBox spacing="14" styleClass="standard-section">
-                <Label text="Filtros" styleClass="standard-section-title"/>
-                <GridPane hgap="12" vgap="10">
+            <VBox spacing="16" styleClass="standard-section">
+                <Label text="Filtros de actividad" styleClass="standard-section-title"/>
+                <GridPane hgap="16" vgap="12">
                     <columnConstraints>
-                        <ColumnConstraints minWidth="100" prefWidth="115"/>
+                        <ColumnConstraints minWidth="95" prefWidth="105"/>
                         <ColumnConstraints hgrow="ALWAYS"/>
-                        <ColumnConstraints minWidth="90" prefWidth="105"/>
+                        <ColumnConstraints minWidth="80" prefWidth="90"/>
                         <ColumnConstraints hgrow="ALWAYS"/>
-                        <ColumnConstraints minWidth="90" prefWidth="105"/>
+                        <ColumnConstraints minWidth="75" prefWidth="85"/>
                         <ColumnConstraints hgrow="ALWAYS"/>
                     </columnConstraints>
                     <Label text="Usuario" styleClass="standard-form-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
@@ -49,18 +49,18 @@
                 </GridPane>
             </VBox>
 
-            <VBox spacing="10" styleClass="standard-section" VBox.vgrow="ALWAYS">
+            <VBox spacing="12" styleClass="standard-section" VBox.vgrow="ALWAYS">
                 <Label text="Actividad registrada" styleClass="standard-section-title"/>
                 <TableView fx:id="tabla" VBox.vgrow="ALWAYS" minHeight="260"/>
             </VBox>
 
             <VBox spacing="12" styleClass="standard-section">
                 <Label text="Detalle de la operación" styleClass="standard-section-title"/>
-                <GridPane hgap="18" vgap="9">
+                <GridPane hgap="16" vgap="12">
                     <columnConstraints>
-                        <ColumnConstraints minWidth="145" prefWidth="165"/>
+                        <ColumnConstraints minWidth="130" prefWidth="155"/>
                         <ColumnConstraints hgrow="ALWAYS"/>
-                        <ColumnConstraints minWidth="145" prefWidth="165"/>
+                        <ColumnConstraints minWidth="130" prefWidth="155"/>
                         <ColumnConstraints hgrow="ALWAYS"/>
                     </columnConstraints>
                     <Label text="Usuario" styleClass="standard-form-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
@@ -81,6 +81,7 @@
                     <Label fx:id="detalleDescripcion" text="-" styleClass="standard-value" wrapText="true" GridPane.rowIndex="3" GridPane.columnIndex="3"/>
                     <Label text="Valor anterior" styleClass="standard-form-label" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
                     <Label fx:id="detalleAnterior" text="-" styleClass="standard-value" wrapText="true" GridPane.rowIndex="4" GridPane.columnIndex="1" GridPane.columnSpan="3"/>
+                    <Label text="Valor nuevo" styleClass="standard-value" wrapText="true" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
                     <Label text="Valor nuevo" styleClass="standard-form-label" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
                     <Label fx:id="detalleNuevo" text="-" styleClass="standard-value" wrapText="true" GridPane.rowIndex="5" GridPane.columnIndex="1" GridPane.columnSpan="3"/>
                 </GridPane>

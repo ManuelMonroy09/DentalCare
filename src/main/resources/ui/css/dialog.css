@@ -11,6 +11,8 @@
     -fx-border-radius: 10px;
     -fx-background-radius: 10px;
     -fx-font-family: "Segoe UI";
+    -fx-pref-width: 520px;
+    -fx-min-width: 520px;
 }
 
 /* ---------------------------------------------------------
@@ -70,6 +72,7 @@
     -fx-font-size: 14px;
     -fx-text-fill: #374151;
     -fx-wrap-text: true;
+    -fx-min-height: 70px;
 }
 
 .dialog-pane.standard-dialog > .content {
@@ -195,8 +198,8 @@
 }
 
 .dialog-pane.standard-dialog .button-bar .button {
-    -fx-min-width: 160px;
-    -fx-pref-width: 160px;
+    -fx-min-width: 150px;
+    -fx-pref-width: 150px;
     -fx-min-height: 40px;
     -fx-pref-height: 40px;
     -fx-max-height: 44px;

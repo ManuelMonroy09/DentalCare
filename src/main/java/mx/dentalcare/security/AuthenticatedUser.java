@@ -43,7 +43,8 @@ public final class AuthenticatedUser {
         return EnumSet.of(
                 UserPermission.VER_INICIO,
                 UserPermission.VER_PACIENTES,
-                UserPermission.GESTIONAR_CITAS
+                UserPermission.GESTIONAR_CITAS,
+                UserPermission.VER_FINANZAS
         );
     }
 }

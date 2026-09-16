@@ -31,46 +31,107 @@ public class MasterKeyService {
         this.securitySession = securitySession;
     }
 
-    public boolean isConfigured() { return Files.exists(SECURITY_FILE); }
+    public boolean isConfigured() {
+        return Files.exists(SECURITY_FILE);
+    }
 
-    public synchronized void initialize(String password) {
-        if (isConfigured()) throw new IllegalStateException("La seguridad de DentalCare ya está configurada.");
+    public synchronized String initialize(String password) {
+        if (isConfigured()) {
+            throw new IllegalStateException("La seguridad de DentalCare ya está configurada.");
+        }
+
         SecretKey masterKey = generateMasterKey();
         AuthenticationData metadata = wrapMasterKey(masterKey, password);
+        String recoveryKey = configureRecoveryKey(metadata, masterKey);
         writeMetadata(metadata);
         securitySession.authenticate(masterKey);
+        return recoveryKey;
     }
 
     public synchronized void unlock(String password) {
-        if (!isConfigured()) throw new IllegalStateException("La seguridad de DentalCare no está configurada.");
+        if (!isConfigured()) {
+            throw new IllegalStateException("La seguridad de DentalCare no está configurada.");
+        }
+
         try {
-            AuthenticationData metadata = objectMapper.readValue(Files.readString(SECURITY_FILE), AuthenticationData.class);
+            AuthenticationData metadata = readMetadata();
             validateMetadata(metadata);
-            byte[] salt = Base64.getDecoder().decode(metadata.getSalt());
-            byte[] iv = Base64.getDecoder().decode(metadata.getIv());
-            byte[] wrappedMasterKey = Base64.getDecoder().decode(metadata.getWrappedMasterKey());
-            SecretKey protectionKey = keyDerivationService.deriveKey(password, salt);
-            byte[] masterKeyBytes = aesEncryptionService.decrypt(wrappedMasterKey, protectionKey, iv);
-            if (masterKeyBytes.length != EncryptionConstants.MASTER_KEY_LENGTH_BYTES) {
-                throw new SecurityException("La clave maestra tiene un tamaño inválido.");
-            }
-            securitySession.authenticate(new SecretKeySpec(masterKeyBytes, "AES"));
+            securitySession.authenticate(unwrapMasterKey(metadata, password));
         } catch (Exception e) {
             securitySession.clear();
             throw new SecurityException("Contraseña incorrecta o configuración de seguridad inválida.", e);
         }
     }
 
+    public synchronized boolean hasRecoveryKey() {
+        if (!isConfigured()) return false;
+        try {
+            AuthenticationData metadata = readMetadata();
+            return metadata.getRecoverySalt() != null
+                    && metadata.getRecoveryIv() != null
+                    && metadata.getRecoveryWrappedMasterKey() != null;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public synchronized String generateRecoveryKey() {
+        SecretKey masterKey = securitySession.requireMasterKey();
+        AuthenticationData metadata = readMetadata();
+        String recoveryKey = configureRecoveryKey(metadata, masterKey);
+        writeMetadata(metadata);
+        return recoveryKey;
+    }
+
+    public synchronized void unlockWithRecoveryKey(String recoveryKey) {
+        if (!isConfigured()) {
+            throw new IllegalStateException("La seguridad de DentalCare no está configurada.");
+        }
+        if (recoveryKey == null || recoveryKey.isBlank()) {
+            throw new SecurityException("La clave de recuperación es obligatoria.");
+        }
+
+        try {
+            AuthenticationData metadata = readMetadata();
+            validateMetadata(metadata);
+            if (metadata.getRecoverySalt() == null || metadata.getRecoveryIv() == null
+                    || metadata.getRecoveryWrappedMasterKey() == null) {
+                throw new SecurityException("La recuperación del administrador todavía no está configurada.");
+            }
+
+            byte[] salt = Base64.getDecoder().decode(metadata.getRecoverySalt());
+            byte[] iv = Base64.getDecoder().decode(metadata.getRecoveryIv());
+            byte[] wrappedMasterKey = Base64.getDecoder().decode(metadata.getRecoveryWrappedMasterKey());
+            SecretKey recoveryProtectionKey = keyDerivationService.deriveKey(normalizeRecoveryKey(recoveryKey), salt);
+            byte[] masterKeyBytes = aesEncryptionService.decrypt(wrappedMasterKey, recoveryProtectionKey, iv);
+
+            if (masterKeyBytes.length != EncryptionConstants.MASTER_KEY_LENGTH_BYTES) {
+                throw new SecurityException("La clave maestra tiene un tamaño inválido.");
+            }
+
+            securitySession.authenticate(new SecretKeySpec(masterKeyBytes, "AES"));
+        } catch (Exception e) {
+            securitySession.clear();
+            throw new SecurityException("La clave de recuperación es incorrecta o no es válida.", e);
+        }
+    }
+
     public synchronized void changePassword(String currentPassword, String newPassword) {
         unlock(currentPassword);
         SecretKey masterKey = securitySession.requireMasterKey();
-        writeMetadata(wrapMasterKey(masterKey, newPassword));
+        AuthenticationData current = readMetadata();
+        AuthenticationData passwordMetadata = wrapMasterKey(masterKey, newPassword);
+        copyRecoveryData(current, passwordMetadata);
+        writeMetadata(passwordMetadata);
     }
 
     public synchronized void clearConfiguration() {
         securitySession.clear();
-        try { Files.deleteIfExists(SECURITY_FILE); }
-        catch (Exception e) { throw new RuntimeException("No fue posible eliminar la configuración de seguridad.", e); }
+        try {
+            Files.deleteIfExists(SECURITY_FILE);
+        } catch (Exception e) {
+            throw new RuntimeException("No fue posible eliminar la configuración de seguridad.", e);
+        }
     }
 
     public synchronized void clearConfigurationSessionOnly() {
@@ -83,15 +144,75 @@ public class MasterKeyService {
         return new SecretKeySpec(bytes, "AES");
     }
 
+    private SecretKey unwrapMasterKey(AuthenticationData metadata, String password) {
+        byte[] salt = Base64.getDecoder().decode(metadata.getSalt());
+        byte[] iv = Base64.getDecoder().decode(metadata.getIv());
+        byte[] wrappedMasterKey = Base64.getDecoder().decode(metadata.getWrappedMasterKey());
+        SecretKey protectionKey = keyDerivationService.deriveKey(password, salt);
+        byte[] masterKeyBytes = aesEncryptionService.decrypt(wrappedMasterKey, protectionKey, iv);
+
+        if (masterKeyBytes.length != EncryptionConstants.MASTER_KEY_LENGTH_BYTES) {
+            throw new SecurityException("La clave maestra tiene un tamaño inválido.");
+        }
+        return new SecretKeySpec(masterKeyBytes, "AES");
+    }
+
     private AuthenticationData wrapMasterKey(SecretKey masterKey, String password) {
         validatePassword(password);
         byte[] salt = CryptoUtils.randomBytes(EncryptionConstants.SALT_LENGTH);
         byte[] iv = CryptoUtils.randomBytes(EncryptionConstants.IV_LENGTH);
         SecretKey protectionKey = keyDerivationService.deriveKey(password, salt);
         byte[] wrapped = aesEncryptionService.encrypt(masterKey.getEncoded(), protectionKey, iv);
-        return new AuthenticationData(EncryptionConstants.SECURITY_VERSION, EncryptionConstants.KDF_ITERATIONS,
-                Base64.getEncoder().encodeToString(salt), Base64.getEncoder().encodeToString(iv),
-                Base64.getEncoder().encodeToString(wrapped));
+        return new AuthenticationData(
+                EncryptionConstants.SECURITY_VERSION,
+                EncryptionConstants.KDF_ITERATIONS,
+                Base64.getEncoder().encodeToString(salt),
+                Base64.getEncoder().encodeToString(iv),
+                Base64.getEncoder().encodeToString(wrapped)
+        );
+    }
+
+    private String configureRecoveryKey(AuthenticationData metadata, SecretKey masterKey) {
+        byte[] recoveryBytes = new byte[EncryptionConstants.MASTER_KEY_LENGTH_BYTES];
+        secureRandom.nextBytes(recoveryBytes);
+        String recoveryKey = Base64.getUrlEncoder().withoutPadding().encodeToString(recoveryBytes);
+
+        byte[] salt = CryptoUtils.randomBytes(EncryptionConstants.SALT_LENGTH);
+        byte[] iv = CryptoUtils.randomBytes(EncryptionConstants.IV_LENGTH);
+        SecretKey recoveryProtectionKey = keyDerivationService.deriveKey(recoveryKey, salt);
+        byte[] wrappedMasterKey = aesEncryptionService.encrypt(masterKey.getEncoded(), recoveryProtectionKey, iv);
+
+        metadata.setRecoverySalt(Base64.getEncoder().encodeToString(salt));
+        metadata.setRecoveryIv(Base64.getEncoder().encodeToString(iv));
+        metadata.setRecoveryWrappedMasterKey(Base64.getEncoder().encodeToString(wrappedMasterKey));
+        return formatRecoveryKey(recoveryKey);
+    }
+
+    private String normalizeRecoveryKey(String recoveryKey) {
+        return recoveryKey.replace("-", "").trim();
+    }
+
+    private String formatRecoveryKey(String recoveryKey) {
+        StringBuilder formatted = new StringBuilder();
+        for (int i = 0; i < recoveryKey.length(); i++) {
+            if (i > 0 && i % 8 == 0) formatted.append('-');
+            formatted.append(recoveryKey.charAt(i));
+        }
+        return formatted.toString();
+    }
+
+    private AuthenticationData readMetadata() {
+        try {
+            return objectMapper.readValue(Files.readString(SECURITY_FILE), AuthenticationData.class);
+        } catch (Exception e) {
+            throw new SecurityException("No fue posible leer la configuración de seguridad.", e);
+        }
+    }
+
+    private void copyRecoveryData(AuthenticationData source, AuthenticationData target) {
+        target.setRecoverySalt(source.getRecoverySalt());
+        target.setRecoveryIv(source.getRecoveryIv());
+        target.setRecoveryWrappedMasterKey(source.getRecoveryWrappedMasterKey());
     }
 
     private void writeMetadata(AuthenticationData metadata) {
@@ -104,18 +225,23 @@ public class MasterKeyService {
             } catch (java.nio.file.AtomicMoveNotSupportedException e) {
                 Files.move(temporaryFile, SECURITY_FILE, StandardCopyOption.REPLACE_EXISTING);
             }
-        } catch (Exception e) { throw new RuntimeException("No fue posible guardar la configuración de seguridad.", e); }
+        } catch (Exception e) {
+            throw new RuntimeException("No fue posible guardar la configuración de seguridad.", e);
+        }
     }
 
     private void validateMetadata(AuthenticationData metadata) {
         if (metadata == null || metadata.getVersion() != EncryptionConstants.SECURITY_VERSION
                 || metadata.getKdfIterations() != EncryptionConstants.KDF_ITERATIONS
-                || metadata.getSalt() == null || metadata.getIv() == null || metadata.getWrappedMasterKey() == null) {
+                || metadata.getSalt() == null || metadata.getIv() == null
+                || metadata.getWrappedMasterKey() == null) {
             throw new SecurityException("La configuración de seguridad no es válida.");
         }
     }
 
     private void validatePassword(String password) {
-        if (password == null || password.length() < 8) throw new IllegalArgumentException("La contraseña debe tener al menos 8 caracteres.");
+        if (password == null || password.length() < 8) {
+            throw new IllegalArgumentException("La contraseña debe tener al menos 8 caracteres.");
+        }
     }
 }

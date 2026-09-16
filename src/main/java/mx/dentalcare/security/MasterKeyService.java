@@ -188,8 +188,30 @@ public class MasterKeyService {
         return formatRecoveryKey(recoveryKey);
     }
 
+    /**
+     * La clave mostrada se agrupa con guiones cada 8 caracteres. Los guiones
+     * también son válidos dentro de Base64 URL-safe, por lo que no se pueden
+     * eliminar globalmente. Aquí se quitan únicamente los separadores que
+     * insertamos en posiciones conocidas, conservando cualquier '-' original.
+     */
     private String normalizeRecoveryKey(String recoveryKey) {
-        return recoveryKey.replace("-", "").trim();
+        String value = recoveryKey.trim().replaceAll("\\s+", "");
+        int rawLength = 43;
+        int formattedLength = 48;
+        if (value.length() == formattedLength) {
+            StringBuilder raw = new StringBuilder(rawLength);
+            for (int i = 0; i < value.length(); i++) {
+                if (i == 8 || i == 17 || i == 26 || i == 35 || i == 44) {
+                    if (value.charAt(i) != '-') {
+                        return value;
+                    }
+                    continue;
+                }
+                raw.append(value.charAt(i));
+            }
+            if (raw.length() == rawLength) return raw.toString();
+        }
+        return value;
     }
 
     private String formatRecoveryKey(String recoveryKey) {

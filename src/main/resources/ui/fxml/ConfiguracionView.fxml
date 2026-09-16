@@ -13,60 +13,78 @@
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="mx.dentalcare.ui.controller.ConfiguracionController"
             fitToWidth="true"
-            fitToHeight="true"
             hbarPolicy="NEVER"
             vbarPolicy="AS_NEEDED"
-            styleClass="content standard-page"
-            stylesheets="@../css/dentalcare.css,@../css/ui-standard.css">
+            styleClass="standard-page">
     <content>
-        <VBox spacing="18">
-            <padding><Insets top="30" right="35" bottom="30" left="35"/></padding>
-            <Label text="Configuración" styleClass="page-title"/>
-            <Label text="Personaliza los datos del consultorio y las herramientas de mantenimiento de DentalCare." styleClass="page-subtitle" wrapText="true"/>
+        <VBox spacing="16">
+            <padding><Insets top="24" right="28" bottom="24" left="28"/></padding>
 
-            <VBox spacing="14" styleClass="standard-section">
-                <Label text="Datos del consultorio" styleClass="standard-section-title"/>
-                <Label text="Estos datos aparecerán en los recibos impresos para el paciente." styleClass="standard-section-subtitle" wrapText="true"/>
-                <GridPane hgap="12" vgap="12">
-                    <Label text="Nombre del consultorio" styleClass="standard-form-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                    <TextField fx:id="txtNombreConsultorio" promptText="Ej. Clínica Dental Sonrisa" styleClass="form-control" GridPane.rowIndex="0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS"/>
-                    <Label text="Odontólogo" styleClass="standard-form-label" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                    <TextField fx:id="txtOdontologo" promptText="Nombre del odontólogo" styleClass="form-control" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS"/>
-                    <Label text="Teléfono" styleClass="standard-form-label" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                    <TextField fx:id="txtTelefono" promptText="Teléfono del consultorio" styleClass="form-control" GridPane.rowIndex="2" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS"/>
-                    <Label text="Correo" styleClass="standard-form-label" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                    <TextField fx:id="txtEmail" promptText="correo@ejemplo.com" styleClass="form-control" GridPane.rowIndex="3" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS"/>
-                    <Label text="Dirección" styleClass="standard-form-label" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-                    <TextField fx:id="txtDireccion" promptText="Dirección del consultorio" styleClass="form-control" GridPane.rowIndex="4" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS"/>
-                    <Label text="Pie del recibo" styleClass="standard-form-label" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
-                    <TextField fx:id="txtPieRecibo" promptText="Mensaje que aparecerá al final del recibo" styleClass="form-control" GridPane.rowIndex="5" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS"/>
-                </GridPane>
-                <HBox><Button text="Guardar configuración" onAction="#guardarConfiguracion" styleClass="primary-button"/></HBox>
-            </VBox>
+            <VBox spacing="16" VBox.vgrow="NEVER" styleClass="standard-section">
+                <VBox spacing="5">
+                    <Label text="Configuración" styleClass="page-title"/>
+                    <Label text="Personaliza los datos del consultorio y las herramientas de mantenimiento de DentalCare."
+                           styleClass="page-subtitle" wrapText="true"/>
+                </VBox>
 
-            <VBox spacing="14" styleClass="standard-section">
-                <Label text="Respaldo y restauración" styleClass="standard-section-title"/>
-                <Label text="Los respaldos conservan los archivos de datos cifrados de DentalCare. Guarda una copia fuera de la carpeta de instalación." styleClass="standard-section-subtitle" wrapText="true"/>
-                <HBox spacing="10">
-                    <Button text="Crear respaldo" onAction="#crearRespaldo" styleClass="primary-button"/>
-                    <Button text="Respaldo automático" onAction="#crearRespaldoAutomatico" styleClass="primary-button"/>
-                    <Button text="Restaurar respaldo" onAction="#restaurarRespaldo" styleClass="secondary-button"/>
-                </HBox>
-                <HBox spacing="10">
-                    <Button text="Abrir carpeta de datos" onAction="#abrirCarpetaDatos" styleClass="secondary-button"/>
-                    <Button text="Abrir carpeta de respaldo" onAction="#abrirCarpetaRespaldo" styleClass="secondary-button"/>
-                </HBox>
-            </VBox>
+                <VBox spacing="14" styleClass="standard-section">
+                    <Label text="Datos del consultorio" styleClass="standard-section-title"/>
+                    <Label text="Estos datos aparecerán en los recibos impresos para el paciente."
+                           styleClass="standard-section-subtitle" wrapText="true"/>
 
-            <VBox spacing="14" styleClass="standard-section">
-                <Label text="Información del sistema" styleClass="standard-section-title"/>
-                <Label text="Consulta la versión de DentalCare, la versión de Java y la ubicación de los datos locales." styleClass="standard-section-subtitle" wrapText="true"/>
-                <HBox><Button text="Ver información" onAction="#mostrarInformacionSistema" styleClass="secondary-button"/></HBox>
-            </VBox>
+                    <GridPane hgap="16" vgap="12">
+                        <columnConstraints>
+                            <javafx.scene.layout.ColumnConstraints minWidth="170" prefWidth="190"/>
+                            <javafx.scene.layout.ColumnConstraints hgrow="ALWAYS"/>
+                        </columnConstraints>
+                        <Label text="Nombre del consultorio" styleClass="standard-form-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                        <TextField fx:id="txtNombreConsultorio" promptText="Ej. Clínica Dental Sonrisa" styleClass="form-control" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                        <Label text="Odontólogo" styleClass="standard-form-label" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                        <TextField fx:id="txtOdontologo" promptText="Nombre del odontólogo" styleClass="form-control" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                        <Label text="Teléfono" styleClass="standard-form-label" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                        <TextField fx:id="txtTelefono" promptText="Teléfono del consultorio" styleClass="form-control" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                        <Label text="Correo" styleClass="standard-form-label" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                        <TextField fx:id="txtEmail" promptText="correo@ejemplo.com" styleClass="form-control" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                        <Label text="Dirección" styleClass="standard-form-label" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                        <TextField fx:id="txtDireccion" promptText="Dirección del consultorio" styleClass="form-control" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                        <Label text="Pie del recibo" styleClass="standard-form-label" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                        <TextField fx:id="txtPieRecibo" promptText="Mensaje que aparecerá al final del recibo" styleClass="form-control" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+                    </GridPane>
 
-            <VBox spacing="8" styleClass="standard-section">
-                <Label text="Recomendación" styleClass="standard-section-title"/>
-                <Label text="Realiza respaldos periódicos y conserva al menos una copia en otra ubicación. La restauración reemplaza los datos actuales por los incluidos en el respaldo." styleClass="standard-section-subtitle" wrapText="true"/>
+                    <HBox styleClass="standard-actions">
+                        <Button text="Guardar configuración" onAction="#guardarConfiguracion" styleClass="primary-button"/>
+                    </HBox>
+                </VBox>
+
+                <VBox spacing="14" styleClass="standard-section">
+                    <Label text="Respaldo y restauración" styleClass="standard-section-title"/>
+                    <Label text="Los respaldos conservan los archivos de datos cifrados de DentalCare. Guarda una copia fuera de la carpeta de instalación."
+                           styleClass="standard-section-subtitle" wrapText="true"/>
+                    <HBox spacing="10" styleClass="standard-actions">
+                        <Button text="Crear respaldo" onAction="#crearRespaldo" styleClass="primary-button"/>
+                        <Button text="Respaldo automático" onAction="#crearRespaldoAutomatico" styleClass="primary-button"/>
+                        <Button text="Restaurar respaldo" onAction="#restaurarRespaldo" styleClass="secondary-button"/>
+                    </HBox>
+                    <HBox spacing="10">
+                        <Button text="Abrir carpeta de datos" onAction="#abrirCarpetaDatos" styleClass="secondary-button"/>
+                        <Button text="Abrir carpeta de respaldo" onAction="#abrirCarpetaRespaldo" styleClass="secondary-button"/>
+                    </HBox>
+                </VBox>
+
+                <VBox spacing="14" styleClass="standard-section">
+                    <Label text="Información del sistema" styleClass="standard-section-title"/>
+                    <Label text="Consulta la versión de DentalCare, la versión de Java y la ubicación de los datos locales."
+                           styleClass="standard-section-subtitle" wrapText="true"/>
+                    <HBox styleClass="standard-actions">
+                        <Button text="Ver información" onAction="#mostrarInformacionSistema" styleClass="secondary-button"/>
+                    </HBox>
+                </VBox>
+
+                <VBox spacing="8" styleClass="standard-section">
+                    <Label text="Recomendación" styleClass="standard-section-title"/>
+                    <Label text="Realiza respaldos periódicos y conserva al menos una copia en otra ubicación. La restauración reemplaza los datos actuales por los incluidos en el respaldo."
+                           styleClass="standard-section-subtitle" wrapText="true"/>
+                </VBox>
             </VBox>
         </VBox>
     </content>

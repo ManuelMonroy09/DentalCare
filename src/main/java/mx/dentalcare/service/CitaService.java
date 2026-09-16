@@ -33,15 +33,17 @@ public class CitaService {
     private final CargoRepository cargoRepository;
     private final PagoRepository pagoRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final AuditService auditService;
 
     public CitaService(CitaRepository citaRepository, TratamientoService tratamientoService,
                        CargoRepository cargoRepository, PagoRepository pagoRepository,
-                       ApplicationEventPublisher eventPublisher) {
+                       ApplicationEventPublisher eventPublisher, AuditService auditService) {
         this.citaRepository = citaRepository;
         this.tratamientoService = tratamientoService;
         this.cargoRepository = cargoRepository;
         this.pagoRepository = pagoRepository;
         this.eventPublisher = eventPublisher;
+        this.auditService = auditService;
     }
 
     public List<Cita> obtenerTodas() {
@@ -77,7 +79,12 @@ public class CitaService {
     public Cita guardar(Cita cita) {
         validarCita(cita);
         validarSolapamiento(cita);
-        return citaRepository.save(cita);
+        boolean nuevo = cita.getId() == null;
+        Cita guardada = citaRepository.save(cita);
+        auditService.registrar("CITAS", nuevo ? "CREAR" : "ACTUALIZAR", "CITA", guardada.getId(),
+                nuevo ? "Cita registrada" : "Cita actualizada", null,
+                "Cita #" + guardada.getId(), "EXITOSO");
+        return guardada;
     }
 
     public Cita guardarConTratamientos(Cita cita, List<Long> tratamientoIds) {
@@ -85,7 +92,12 @@ public class CitaService {
         validarTratamientosModificables(cita.getId());
         sincronizarTratamientos(cita, tratamientoIds);
         validarSolapamiento(cita);
-        return citaRepository.save(cita);
+        boolean nuevo = cita.getId() == null;
+        Cita guardada = citaRepository.save(cita);
+        auditService.registrar("CITAS", nuevo ? "CREAR" : "ACTUALIZAR", "CITA", guardada.getId(),
+                nuevo ? "Cita registrada con tratamientos" : "Cita actualizada con tratamientos", null,
+                "Cita #" + guardada.getId(), "EXITOSO");
+        return guardada;
     }
 
     private void sincronizarTratamientos(Cita cita, List<Long> tratamientoIds) {
@@ -114,14 +126,18 @@ public class CitaService {
         if (duracion <= 0) duracion = DURACION_POR_DEFECTO_MINUTOS;
         cita.setInicio(nuevoInicio);
         cita.setFin(nuevoInicio.plusMinutes(duracion));
-        return guardar(cita);
+        Cita guardada = guardar(cita);
+        auditService.registrar("CITAS", "CAMBIAR_HORARIO", "CITA", id, "Horario de cita actualizado", null, nuevoInicio.toString(), "EXITOSO");
+        return guardada;
     }
 
     public Cita cambiarDuracion(Long id, long duracionMinutos) {
         Cita cita = obtenerExistente(id);
         validarDuracion(duracionMinutos);
         cita.establecerDuracion(duracionMinutos);
-        return guardar(cita);
+        Cita guardada = guardar(cita);
+        auditService.registrar("CITAS", "CAMBIAR_DURACION", "CITA", id, "Duración de cita actualizada", null, duracionMinutos + " minutos", "EXITOSO");
+        return guardada;
     }
 
     public Cita agregarTratamiento(Long citaId, Long tratamientoId) {
@@ -131,7 +147,9 @@ public class CitaService {
         Tratamiento tratamiento = tratamientoService.obtenerPorId(tratamientoId);
         if (!tratamiento.isActivo()) throw new IllegalStateException("No se puede aplicar un tratamiento inactivo.");
         cita.agregarTratamiento(new TratamientoAplicado(tratamiento.getId(), tratamiento.getNombre(), tratamiento.getPrecio(), tratamiento.getDuracionMinutos()));
-        return citaRepository.save(cita);
+        Cita guardada = citaRepository.save(cita);
+        auditService.registrar("CITAS", "AGREGAR_TRATAMIENTO", "CITA", citaId, "Tratamiento agregado a la cita", null, "Tratamiento #" + tratamientoId, "EXITOSO");
+        return guardada;
     }
 
     public Cita quitarTratamiento(Long citaId, Long tratamientoId) {
@@ -140,7 +158,9 @@ public class CitaService {
         if (tratamientoId == null) throw new IllegalArgumentException("El identificador del tratamiento es obligatorio.");
         if (cita.getTratamientos() == null) return cita;
         cita.getTratamientos().removeIf(tratamiento -> tratamiento != null && tratamientoId.equals(tratamiento.getTratamientoId()));
-        return citaRepository.save(cita);
+        Cita guardada = citaRepository.save(cita);
+        auditService.registrar("CITAS", "QUITAR_TRATAMIENTO", "CITA", citaId, "Tratamiento retirado de la cita", "Tratamiento #" + tratamientoId, null, "EXITOSO");
+        return guardada;
     }
 
     public List<TratamientoAplicado> obtenerTratamientos(Long citaId) {
@@ -175,13 +195,20 @@ public class CitaService {
         return obtenerHistorial().stream().filter(cita -> cita.getPaciente() != null && cita.getPaciente().getId() != null && cita.getPaciente().getId().equals(pacienteId)).collect(Collectors.toList());
     }
 
-    public Cita cancelar(Long id) { Cita cita = obtenerExistente(id); cita.setEstado(EstadoCita.CANCELADA); return citaRepository.save(cita); }
+    public Cita cancelar(Long id) {
+        Cita cita = obtenerExistente(id);
+        cita.setEstado(EstadoCita.CANCELADA);
+        Cita guardada = citaRepository.save(cita);
+        auditService.registrar("CITAS", "CANCELAR", "CITA", id, "Cita cancelada", null, EstadoCita.CANCELADA.name(), "EXITOSO");
+        return guardada;
+    }
 
     public Cita confirmar(Long id) {
         Cita cita = obtenerExistente(id);
         cita.setEstado(EstadoCita.CONFIRMADA);
         Cita guardada = citaRepository.save(cita);
         publicarCambioEstado(guardada);
+        auditService.registrar("CITAS", "CONFIRMAR", "CITA", id, "Cita confirmada", null, EstadoCita.CONFIRMADA.name(), "EXITOSO");
         return guardada;
     }
 
@@ -190,10 +217,17 @@ public class CitaService {
         cita.setEstado(EstadoCita.ATENDIDA);
         Cita guardada = citaRepository.save(cita);
         publicarCambioEstado(guardada);
+        auditService.registrar("CITAS", "MARCAR_ATENDIDA", "CITA", id, "Cita marcada como atendida", null, EstadoCita.ATENDIDA.name(), "EXITOSO");
         return guardada;
     }
 
-    public Cita marcarNoAsistio(Long id) { Cita cita = obtenerExistente(id); cita.setEstado(EstadoCita.NO_ASISTIO); return citaRepository.save(cita); }
+    public Cita marcarNoAsistio(Long id) {
+        Cita cita = obtenerExistente(id);
+        cita.setEstado(EstadoCita.NO_ASISTIO);
+        Cita guardada = citaRepository.save(cita);
+        auditService.registrar("CITAS", "MARCAR_NO_ASISTIO", "CITA", id, "Cita marcada como no asistió", null, EstadoCita.NO_ASISTIO.name(), "EXITOSO");
+        return guardada;
+    }
 
     private void publicarCambioEstado(Cita cita) {
         if (cita != null && (cita.getEstado() == EstadoCita.CONFIRMADA || cita.getEstado() == EstadoCita.ATENDIDA)) eventPublisher.publishEvent(new CitaEstadoCambiadoEvent(cita));
@@ -215,6 +249,7 @@ public class CitaService {
         }
 
         citaRepository.deleteById(cita.getId());
+        auditService.registrar("CITAS", "ELIMINAR", "CITA", id, "Cita eliminada", "Cita #" + id, null, "EXITOSO");
     }
 
     private void mostrarAvisoEliminacion(String mensaje) {

@@ -1,6 +1,7 @@
 package mx.dentalcare.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import mx.dentalcare.config.DataDirectoryService;
 import mx.dentalcare.domain.configuracion.ConfiguracionConsultorio;
 import mx.dentalcare.security.AesEncryptionService;
 import mx.dentalcare.security.EncryptedFileStorage;
@@ -13,14 +14,16 @@ import java.nio.file.Path;
 
 @Service
 public class ConfiguracionService {
-    private static final Path FILE_PATH = Path.of("data", "configuracion.dat");
+    private static final Path FILE_PATH = DataDirectoryService.resolve("configuracion.dat");
 
     private final EncryptedFileStorage storage;
     private final SecuritySession securitySession;
+    private final AuditService auditService;
 
-    public ConfiguracionService(ObjectMapper objectMapper, SecuritySession securitySession) {
+    public ConfiguracionService(ObjectMapper objectMapper, SecuritySession securitySession, AuditService auditService) {
         this.securitySession = securitySession;
         this.storage = new EncryptedFileStorage(objectMapper, new KeyDerivationService(), new AesEncryptionService());
+        this.auditService = auditService;
     }
 
     public ConfiguracionConsultorio obtener() {
@@ -41,6 +44,8 @@ public class ConfiguracionService {
         configuracion.setDireccion(limpiar(configuracion.getDireccion()));
         configuracion.setPieRecibo(limpiar(configuracion.getPieRecibo()));
         storage.save(FILE_PATH, configuracion, securitySession.requireMasterKey());
+        auditService.registrar("CONFIGURACION", "ACTUALIZAR", "CONFIGURACION", null,
+                "Configuración del consultorio actualizada", null, "Configuración guardada", "EXITOSO");
     }
 
     private String limpiar(String valor) {

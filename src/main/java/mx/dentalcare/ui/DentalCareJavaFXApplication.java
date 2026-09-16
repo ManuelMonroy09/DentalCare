@@ -6,6 +6,10 @@ import javafx.collections.ListChangeListener;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -22,6 +26,7 @@ public class DentalCareJavaFXApplication extends Application {
     private ConfigurableApplicationContext context;
     private String hojaEstilosBase;
     private String hojaEstilosOverrides;
+    private String hojaEstilosDialogos;
 
     @Override
     public void init() {
@@ -53,6 +58,10 @@ public class DentalCareJavaFXApplication extends Application {
                 .getResource("/ui/css/dentalcare-overrides.css")
                 .toExternalForm();
 
+        hojaEstilosDialogos = getClass()
+                .getResource("/ui/css/dialog.css")
+                .toExternalForm();
+
         Window.getWindows().addListener((ListChangeListener<Window>) cambio -> {
             while (cambio.next()) {
                 if (!cambio.wasAdded()) {
@@ -78,6 +87,38 @@ public class DentalCareJavaFXApplication extends Application {
         if (!window.getScene().getStylesheets().contains(hojaEstilosOverrides)) {
             window.getScene().getStylesheets().add(hojaEstilosOverrides);
         }
+
+        if (!window.getScene().getStylesheets().contains(hojaEstilosDialogos)) {
+            window.getScene().getStylesheets().add(hojaEstilosDialogos);
+        }
+
+        if (window.getScene().getRoot() instanceof DialogPane pane) {
+            if (!pane.getStyleClass().contains("standard-dialog")) {
+                pane.getStyleClass().add("standard-dialog");
+            }
+
+            Button ok = (Button) pane.lookupButton(ButtonType.OK);
+            if (ok != null) {
+                ok.getStyleClass().add("dialog-primary-button");
+            }
+
+            Button cancel = (Button) pane.lookupButton(ButtonType.CANCEL);
+            if (cancel != null) {
+                cancel.getStyleClass().add("dialog-secondary-button");
+            }
+
+            Button yes = (Button) pane.lookupButton(ButtonType.YES);
+            if (yes != null) {
+                yes.setText("Sí");
+                yes.getStyleClass().add("dialog-primary-button");
+            }
+
+            Button no = (Button) pane.lookupButton(ButtonType.NO);
+            if (no != null) {
+                no.setText("No");
+                no.getStyleClass().add("dialog-secondary-button");
+            }
+        }
     }
 
     private void mostrarVista(Stage stage, String ruta, String titulo, double ancho, double alto) throws Exception {
@@ -90,6 +131,7 @@ public class DentalCareJavaFXApplication extends Application {
 
         if (!scene.getStylesheets().contains(hojaEstilosBase)) scene.getStylesheets().add(hojaEstilosBase);
         if (!scene.getStylesheets().contains(hojaEstilosOverrides)) scene.getStylesheets().add(hojaEstilosOverrides);
+        if (!scene.getStylesheets().contains(hojaEstilosDialogos)) scene.getStylesheets().add(hojaEstilosDialogos);
 
         stage.setTitle(titulo);
         stage.setScene(scene);

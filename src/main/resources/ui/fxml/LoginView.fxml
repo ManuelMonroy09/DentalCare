@@ -60,6 +60,10 @@
                 <Button text="Iniciar sesión" styleClass="auth-login-button" onAction="#iniciarSesion"/>
             </HBox>
 
+            <HBox alignment="CENTER">
+                <Button text="¿Olvidaste tu contraseña?" styleClass="auth-forgot-button" onAction="#olvidoContrasena"/>
+            </HBox>
+
             <Label text="DentalCare • Acceso seguro" styleClass="auth-footer"/>
         </VBox>
 

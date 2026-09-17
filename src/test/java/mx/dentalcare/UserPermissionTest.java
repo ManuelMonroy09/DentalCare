@@ -5,6 +5,7 @@ import mx.dentalcare.security.UserPermission;
 import mx.dentalcare.security.UserRole;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -16,7 +17,7 @@ class UserPermissionTest {
         AuthenticatedUser admin = new AuthenticatedUser("admin", "Administrador", UserRole.ADMINISTRADOR);
 
         assertTrue(admin.isAdmin());
-        assertEquals(Set.copyOf(UserPermission.values()), AuthenticatedUser.permissionsFor(UserRole.ADMINISTRADOR));
+        assertEquals(Set.copyOf(Arrays.asList(UserPermission.values())), AuthenticatedUser.permissionsFor(UserRole.ADMINISTRADOR));
         for (UserPermission permission : UserPermission.values()) {
             assertTrue(admin.hasPermission(permission));
         }

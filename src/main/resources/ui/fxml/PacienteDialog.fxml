@@ -31,11 +31,11 @@
                     <ColumnConstraints percentWidth="50" hgrow="ALWAYS"/>
                     <ColumnConstraints percentWidth="50" hgrow="ALWAYS"/>
                 </columnConstraints>
-                <VBox spacing="5" GridPane.columnIndex="0"><Label text="Nombre(s)" styleClass="standard-form-label"/><TextField fx:id="nombreField" promptText="Nombre" maxWidth="Infinity"/></VBox>
-                <VBox spacing="5" GridPane.columnIndex="1"><Label text="Apellido paterno" styleClass="standard-form-label"/><TextField fx:id="apellidoPaternoField" promptText="Apellido paterno" maxWidth="Infinity"/></VBox>
-                <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="1"><Label text="Apellido materno" styleClass="standard-form-label"/><TextField fx:id="apellidoMaternoField" promptText="Apellido materno" maxWidth="Infinity"/></VBox>
-                <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="1"><Label text="Teléfono" styleClass="standard-form-label"/><TextField fx:id="telefonoField" promptText="Teléfono" maxWidth="Infinity"/></VBox>
-                <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.columnSpan="2"><Label text="Correo electrónico" styleClass="standard-form-label"/><TextField fx:id="emailField" promptText="correo@ejemplo.com" maxWidth="Infinity"/></VBox>
+                <VBox spacing="5" GridPane.columnIndex="0"><Label text="Nombre(s)" styleClass="standard-form-label"/><TextField fx:id="nombreField" promptText="Nombre" styleClass="form-control" maxWidth="Infinity"/></VBox>
+                <VBox spacing="5" GridPane.columnIndex="1"><Label text="Apellido paterno" styleClass="standard-form-label"/><TextField fx:id="apellidoPaternoField" promptText="Apellido paterno" styleClass="form-control" maxWidth="Infinity"/></VBox>
+                <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="1"><Label text="Apellido materno" styleClass="standard-form-label"/><TextField fx:id="apellidoMaternoField" promptText="Apellido materno" styleClass="form-control" maxWidth="Infinity"/></VBox>
+                <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="1"><Label text="Teléfono" styleClass="standard-form-label"/><TextField fx:id="telefonoField" promptText="Teléfono" styleClass="form-control" maxWidth="Infinity"/></VBox>
+                <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.columnSpan="2"><Label text="Correo electrónico" styleClass="standard-form-label"/><TextField fx:id="emailField" promptText="correo@ejemplo.com" styleClass="form-control" maxWidth="Infinity"/></VBox>
             </GridPane>
         </VBox>
         <Label fx:id="errorLabel" wrapText="true" maxWidth="Infinity" styleClass="standard-error"/>

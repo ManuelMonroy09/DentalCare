@@ -27,9 +27,11 @@
                 <Label text="Gestión inteligente para tu consultorio dental." styleClass="auth-brand-subtitle" wrapText="true"/>
             </VBox>
             <VBox spacing="10" styleClass="auth-brand-info">
-                <Label text="Comienza con una gestión más clara y eficiente." styleClass="auth-brand-info-title" wrapText="true"/>
+                <Label text="Gestión clara, todo bajo control." styleClass="auth-brand-info-title" wrapText="true"/>
                 <Label text="Centraliza la información de tu práctica y administra pacientes, citas, tratamientos y finanzas desde una experiencia diseñada para mantener todo organizado, accesible y bajo control." styleClass="auth-brand-info-text" wrapText="true"/>
-                <Label text="© 2026 Manuel Monroy &amp; Scarleth · Todos los derechos reservados." styleClass="auth-brand-info-text" wrapText="true"/>
+                <Label text="Pacientes · Agenda · Tratamientos · Finanzas" styleClass="auth-brand-info-text" wrapText="true"/>
+                <Label text="Tecnología para una gestión más clara y eficiente." styleClass="auth-brand-info-text" wrapText="true"/>
+                <Label text="© 2026 Juan Manuel Mendoza Monroy &amp; Scarleth. Todos los derechos reservados." styleClass="auth-brand-info-text" wrapText="true"/>
             </VBox>
         </VBox>
 

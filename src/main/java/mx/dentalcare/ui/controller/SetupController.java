@@ -138,8 +138,9 @@ public class SetupController {
         rechazarNode.getStyleClass().add("dialog-secondary-button");
         aceptarNode.setDisable(true);
         if (aceptarNode instanceof Button aceptarButton) {
-            aceptarButton.setPrefWidth(155);
-            aceptarButton.setMinWidth(155);
+            aceptarButton.setPrefWidth(190);
+            aceptarButton.setMinWidth(190);
+            aceptarButton.setMaxWidth(190);
         }
         aceptacion.selectedProperty().addListener((obs, oldValue, selected) -> aceptarNode.setDisable(!selected));
 

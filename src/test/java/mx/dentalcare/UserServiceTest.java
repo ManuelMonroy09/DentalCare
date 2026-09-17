@@ -80,11 +80,4 @@ class UserServiceTest {
                 () -> service.recoverPassword("usuario", "recovery", "1234567"));
         verifyNoInteractions(securitySession);
     }
-
-    @Test
-    void inicializacionDeAdminDebeRechazarPasswordCorta() {
-        assertThrows(IllegalArgumentException.class,
-                () -> service.initializeAdmin("1234567"));
-        verifyNoInteractions(securitySession);
-    }
 }

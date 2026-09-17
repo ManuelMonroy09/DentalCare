@@ -4,6 +4,8 @@ import mx.dentalcare.domain.cita.Cita;
 import mx.dentalcare.domain.cita.EstadoCita;
 import mx.dentalcare.domain.paciente.Paciente;
 import mx.dentalcare.domain.tratamiento.Tratamiento;
+import mx.dentalcare.domain.tratamiento.TratamientoAplicado;
+import mx.dentalcare.event.CitaEstadoCambiadoEvent;
 import mx.dentalcare.repository.CargoRepository;
 import mx.dentalcare.repository.CitaRepository;
 import mx.dentalcare.repository.PagoRepository;
@@ -130,9 +132,8 @@ class CitaServiceUnitTest {
     @Test
     void debeSincronizarTratamientosAlGuardar() {
         Cita cita = cita(1L, EstadoCita.PROGRAMADA);
-        Tratamiento existente = tratamiento(8L, true);
         Tratamiento nuevo = tratamiento(9L, true);
-        cita.agregarTratamiento(new mx.dentalcare.domain.tratamiento.TratamientoAplicado(8L, "Limpieza", new BigDecimal("500"), 45));
+        cita.agregarTratamiento(new TratamientoAplicado(8L, "Limpieza", new BigDecimal("500"), 45));
         when(cargoRepository.findByCitaId(1L)).thenReturn(Optional.empty());
         when(pagoRepository.findAll()).thenReturn(List.of());
         when(tratamientoService.obtenerPorId(9L)).thenReturn(nuevo);
@@ -152,17 +153,19 @@ class CitaServiceUnitTest {
 
         service.confirmar(1L);
         assertEquals(EstadoCita.CONFIRMADA, cita.getEstado());
-        verify(eventPublisher).publishEvent(any());
+        verify(eventPublisher).publishEvent(any(CitaEstadoCambiadoEvent.class));
 
         service.marcarAtendida(1L);
         assertEquals(EstadoCita.ATENDIDA, cita.getEstado());
-        verify(eventPublisher, times(2)).publishEvent(any());
+        verify(eventPublisher, times(2)).publishEvent(any(CitaEstadoCambiadoEvent.class));
 
         service.marcarNoAsistio(1L);
         assertEquals(EstadoCita.NO_ASISTIO, cita.getEstado());
+        verify(eventPublisher, times(2)).publishEvent(any(CitaEstadoCambiadoEvent.class));
 
         service.cancelar(1L);
         assertEquals(EstadoCita.CANCELADA, cita.getEstado());
+        verify(eventPublisher, times(2)).publishEvent(any(CitaEstadoCambiadoEvent.class));
     }
 
     @Test

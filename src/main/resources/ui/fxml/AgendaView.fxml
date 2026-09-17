@@ -4,13 +4,12 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<?import javafx.scene.control.TextField?>
 <BorderPane
         xmlns="http://javafx.com/javafx/21"
         xmlns:fx="http://javafx.com/fxml/1"
@@ -62,6 +61,7 @@
                         promptText="Buscar paciente..."
                         prefWidth="260"
                         styleClass="agenda-search-field"/>
+
                 <ComboBox
                         fx:id="cmbVista"
                         promptText="Vista"

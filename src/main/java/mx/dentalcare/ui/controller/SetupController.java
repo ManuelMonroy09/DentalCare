@@ -107,7 +107,7 @@ public class SetupController {
         String dialogCss = getClass().getResource("/ui/css/dialog.css").toExternalForm();
         dialog.getDialogPane().getStylesheets().add(dialogCss);
 
-        ButtonType aceptar = new ButtonType("Acepto y continuar", ButtonBar.ButtonData.OK_DONE);
+        ButtonType aceptar = new ButtonType("Aceptar y continuar", ButtonBar.ButtonData.OK_DONE);
         ButtonType rechazar = new ButtonType("No aceptar", ButtonBar.ButtonData.CANCEL_CLOSE);
         dialog.getDialogPane().getButtonTypes().addAll(aceptar, rechazar);
 
@@ -137,6 +137,10 @@ public class SetupController {
         aceptarNode.getStyleClass().add("dialog-primary-button");
         rechazarNode.getStyleClass().add("dialog-secondary-button");
         aceptarNode.setDisable(true);
+        if (aceptarNode instanceof Button aceptarButton) {
+            aceptarButton.setPrefWidth(155);
+            aceptarButton.setMinWidth(155);
+        }
         aceptacion.selectedProperty().addListener((obs, oldValue, selected) -> aceptarNode.setDisable(!selected));
 
         final boolean[] resultado = {false};

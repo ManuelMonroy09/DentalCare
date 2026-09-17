@@ -10,7 +10,6 @@ import mx.dentalcare.domain.financiero.Pago;
 import mx.dentalcare.domain.financiero.TipoPago;
 import mx.dentalcare.domain.paciente.Paciente;
 import mx.dentalcare.domain.tratamiento.TratamientoAplicado;
-import mx.dentalcare.event.CitaEstadoCambiadoEvent;
 import mx.dentalcare.repository.CargoRepository;
 import mx.dentalcare.repository.PagoRepository;
 import mx.dentalcare.service.AuditService;
@@ -70,7 +69,7 @@ class FinanzasServiceTest {
     @Test
     void noDebePermitirPagoMayorAlSaldo() {
         Cargo cargo = cargo(10L, 7L, 1000);
-        Pago existente = pago(10L, 100L, 500L, TipoPago.PAGO, EstadoPago.REGISTRADO);
+        Pago existente = pago(10L, 100L, 500, TipoPago.PAGO, EstadoPago.REGISTRADO);
         when(cargoRepository.findById(10L)).thenReturn(Optional.of(cargo));
         when(pagoRepository.findAll()).thenReturn(List.of(existente));
 
@@ -92,7 +91,7 @@ class FinanzasServiceTest {
     @Test
     void debeCalcularSaldoYEstadoDelCargo() {
         Cargo cargo = cargo(10L, 7L, 1000);
-        Pago pago = pago(10L, 100L, 400L, TipoPago.PAGO, EstadoPago.REGISTRADO);
+        Pago pago = pago(10L, 100L, 400, TipoPago.PAGO, EstadoPago.REGISTRADO);
         when(cargoRepository.findById(10L)).thenReturn(Optional.of(cargo));
         when(pagoRepository.findAll()).thenReturn(List.of(pago));
 
@@ -104,7 +103,7 @@ class FinanzasServiceTest {
     @Test
     void pagoCanceladoNoDebeContarComoPagado() {
         Cargo cargo = cargo(10L, 7L, 1000);
-        Pago cancelado = pago(10L, 100L, 400L, TipoPago.PAGO, EstadoPago.CANCELADO);
+        Pago cancelado = pago(10L, 100L, 400, TipoPago.PAGO, EstadoPago.CANCELADO);
         when(cargoRepository.findById(10L)).thenReturn(Optional.of(cargo));
         when(pagoRepository.findAll()).thenReturn(List.of(cancelado));
 
@@ -183,7 +182,7 @@ class FinanzasServiceTest {
 
     @Test
     void debeCancelarPagoActivo() {
-        Pago pago = pago(10L, 100L, 250L, TipoPago.PAGO, EstadoPago.REGISTRADO);
+        Pago pago = pago(10L, 100L, 250, TipoPago.PAGO, EstadoPago.REGISTRADO);
         pago.setId(20L);
         when(pagoRepository.findById(20L)).thenReturn(Optional.of(pago));
 

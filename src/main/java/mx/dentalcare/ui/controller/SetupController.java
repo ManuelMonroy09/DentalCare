@@ -134,13 +134,13 @@ public class SetupController {
 
         Node aceptarNode = dialog.getDialogPane().lookupButton(aceptar);
         Node rechazarNode = dialog.getDialogPane().lookupButton(rechazar);
-        aceptarNode.getStyleClass().add("dialog-primary-button");
+        aceptarNode.getStyleClass().addAll("dialog-primary-button", "dialog-license-accept-button");
         rechazarNode.getStyleClass().add("dialog-secondary-button");
         aceptarNode.setDisable(true);
         if (aceptarNode instanceof Button aceptarButton) {
-            aceptarButton.setPrefWidth(190);
-            aceptarButton.setMinWidth(190);
-            aceptarButton.setMaxWidth(190);
+            aceptarButton.setPrefWidth(210);
+            aceptarButton.setMinWidth(210);
+            aceptarButton.setMaxWidth(210);
         }
         aceptacion.selectedProperty().addListener((obs, oldValue, selected) -> aceptarNode.setDisable(!selected));
 

@@ -147,10 +147,12 @@ class AuthenticationServiceTest {
         when(userService.hasRecoveryKey("admin")).thenReturn(false);
         doNothing().when(masterKeyService).unlockWithRecoveryKey("recovery");
         when(masterKeyService.generateRecoveryKey()).thenReturn("global-new-key");
+        when(userService.generateRecoveryKey("admin")).thenReturn("admin-new-key");
 
-        assertEquals("global-new-key", service.recoverPassword("admin", "recovery", "password2"));
+        assertEquals("admin-new-key", service.recoverPassword("admin", "recovery", "password2"));
         verify(masterKeyService).unlockWithRecoveryKey("recovery");
         verify(userService).resetAdminPassword("password2");
+        verify(masterKeyService).generateRecoveryKey();
         verify(userService).generateRecoveryKey("admin");
     }
 
